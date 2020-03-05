@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Home</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- <script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.26.1"></script> -->
+	<script src="http://localhost/libraryproject/ScarletsFrame/dist/scarletsframe.min.js?31"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+</head>
+<body>
+	<!-- Assets Loader (Optional) -->
+	<script type="text/javascript">
+		var cf_cdn = 'https://cdnjs.cloudflare.com/ajax/libs';
+
+		// Register sf.dom to global
+		$ = sf.dom;
+
+		// Load Blackprint module first
+		if(/localhost|127.0.0.1/.test(location.hostname)){ // Development environment
+			sf.loader.css(["/dist/blackprint.min.css?1583381604124"]);
+			sf.loader.js([
+				// Load Blackprint module first
+				"/dist/blackprint.html.js?1583383671138",
+				"/dist/blackprint.min.js?1583397676919",
+			]);
+		}
+
+		else{ // Production environment
+			sf.loader.css(["https://blackprint.github.io/Blackprint/dist/blackprint.min.css"]);
+			sf.loader.js([
+				"https://blackprint.github.io/Blackprint/dist/blackprint.html.js",
+				"https://blackprint.github.io/Blackprint/dist/blackprint.min.js",
+			]);
+		}
+
+		// === Example and other assets ===
+		// https://www.npmjs.com/package/scarletsframe#asset-loader
+		sf.loader.css([
+			cf_cdn+'/animate.css/3.7.0/animate.min.css',
+			"https://fonts.googleapis.com/css?family=Nunito",
+			"/assets/mycss.min.css?1583234500831",
+		]);
+
+		sf.loader.js([
+			"/assets/myhtml.html.js?1583283207609",
+			"/assets/myjs.min.js?1583397630251",
+		]);
+	</script>
+
+	<!-- Ground viewport -->
+	<vw-ground></vw-ground>
+</body>
+</html>
