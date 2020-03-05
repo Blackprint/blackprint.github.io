@@ -8,6 +8,14 @@
 	<script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.26.4"></script>
 	<!-- <script src="http://localhost/libraryproject/ScarletsFrame/dist/scarletsframe.min.js?31"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+	<style type="text/css">
+		#loading{
+			line-height: 100vh;
+			color: #ababab;
+			font-size: 20px;
+			text-align: center;
+		}
+	</style>
 </head>
 <body>
 	<!-- Assets Loader (Optional) -->
@@ -44,12 +52,23 @@
 		]);
 
 		sf.loader.js([
-			"/assets/myhtml.html.js?1583406443469",
+			"/assets/myhtml.html.js?1583409899601",
 			"/assets/myjs.min.js?1583406733576",
 		]);
+
+		sf.loader.onProgress(function(loaded, total){
+			loading.textContent = `Please wait ${loaded/total*100}%`;
+		});
+
+		$(function(){
+			$('vw-ground').css('display', '');
+			loading.remove();
+		});
 	</script>
 
+	<div id="loading"></div>
+
 	<!-- Ground viewport -->
-	<vw-ground></vw-ground>
+	<vw-ground style="display: none"></vw-ground>
 </body>
 </html>
