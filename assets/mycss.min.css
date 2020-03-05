@@ -21,7 +21,6 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  backface-visibility: hidden;
   margin: 0; }
 
 sf-m {
@@ -81,6 +80,7 @@ sf-page-view {
     font-size: 18px;
     text-align: center;
     padding: 10px;
-    cursor: pointer; }
+    cursor: pointer;
+    height: 24px; }
 
-/*# sourceMappingURL=mycss.min.1583234501055.css.map */
+/*# sourceMappingURL=mycss.min.1583406620690.css.map */
