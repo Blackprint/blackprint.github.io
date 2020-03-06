@@ -64,6 +64,13 @@ sf-page-view {
   transform-style: preserve-3d;
   transform: translate3d(0, 0, 0); }
 
+img {
+  opacity: 1;
+  transition: opacity 0.3s ease-in; }
+
+img.loading {
+  opacity: 0; }
+
 .header {
   position: relative;
   background: #00000085;
@@ -83,4 +90,4 @@ sf-page-view {
     cursor: pointer;
     height: 24px; }
 
-/*# sourceMappingURL=mycss.min.1583406620690.css.map */
+/*# sourceMappingURL=mycss.min.1583456192938.css.map */

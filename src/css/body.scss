@@ -61,3 +61,11 @@ sf-page-view{
 		transform: translate3d(0, 0, 0);
 	}
 }
+
+img{
+	opacity: 1;
+	transition: opacity 0.3s ease-in;
+}
+img.loading{
+	opacity: 0;
+}

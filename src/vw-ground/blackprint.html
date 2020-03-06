@@ -1,4 +1,4 @@
-<img class="background" src="/assets/img/background/blackprint.jpg?1" onload="this.style.display=''" style="display:none">
+<img class="background loading" src="/assets/img/background/blackprint.jpg?1" onload="$(this).removeClass('loading')">
 
 <!-- Model on ./blackprint/header.js -->
 <sf-m name="header" class="header">
@@ -10,5 +10,5 @@
 <!-- We will import Blackprint/page template here -->
 <vw-sketch>
 	<!-- Default page for eye candy XD -->
-	<img src="/assets/img/candy.png" onload="this.style.display=''" style="display:none;position:absolute;right:0;bottom:0">
+	<img src="/assets/img/candy.png" onload="$(this).removeClass('loading')" class="loading" style="position:absolute;right:0;bottom:0">
 </vw-sketch>
