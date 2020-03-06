@@ -5,30 +5,29 @@ sf.model.for('header', function(self, root){
 
 	var onHomepage;
 	self.init = function(){
-		setTimeout(function(){
-			sf.url.parse(); // Trigger to reparse current URL
+		sf.url.parse(); // Trigger to reparse current URL
 
-			if(!sf.url.hashes.ground || sf.url.hashes.ground === '/'){
+		if(!sf.url.hashes.ground || sf.url.hashes.ground === '/'){
+			setTimeout(function(){
 				textAnimation("Let's getting started!");
 
 				onHomepage = setInterval(function(){
 					self.$el('.right').animateKey('fadeOut');
 				}, 2000);
-			}
-			else{
-				self.description = '';
-				textAnimation("Welcome to the example!");
-			}
-		}, 2000);
+			}, 2000);
+		}
+		else textAnimation("Welcome to the example!");
 	}
 
 	self.toWorkspace = function(){
-		ground.goto('/page/1');
-
 		clearInterval(onHomepage);
 
-		self.description = '';
-		textAnimation("Welcome to the example!");
+		ground.goto('/page/1', function(){
+			self.description = 'Developers! ';
+			setTimeout(function(){
+				textAnimation("Welcome to the example!");
+			}, 1000);
+		});
 	}
 
 	function textAnimation(text){
