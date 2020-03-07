@@ -9,6 +9,13 @@ html, body {
 	margin: 0;
 }
 
+.disable-effect{
+	*{
+		filter: inherit !important;
+	    box-shadow: unset !important;
+	}
+}
+
 sf-m{
 	display: block;
 }

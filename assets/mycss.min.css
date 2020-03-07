@@ -23,6 +23,10 @@ html, body {
   overflow: hidden;
   margin: 0; }
 
+.disable-effect * {
+  filter: inherit !important;
+  box-shadow: unset !important; }
+
 sf-m {
   display: block; }
 
@@ -90,4 +94,4 @@ img.loading {
     cursor: pointer;
     height: 24px; }
 
-/*# sourceMappingURL=mycss.min.1583456192938.css.map */
+/*# sourceMappingURL=mycss.min.1583552961392.css.map */
