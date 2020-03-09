@@ -5,8 +5,8 @@
 	<title>Home</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.26.6"></script>
-	<!-- <script src="http://localhost/libraryproject/ScarletsFrame/dist/scarletsframe.min.js?33"></script> -->
+	<script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.26.10"></script>
+	<!-- <script src="http://localhost/libraryproject/ScarletsFrame/dist/scarletsframe.min.js?39"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 	<style type="text/css">
 		#loading{
@@ -29,19 +29,19 @@
 
 		// Load Blackprint module first
 		if(/localhost|127.0.0.1/.test(location.hostname)){ // Development environment
-			sf.loader.css(["/dist/blackprint.min.css?1583475170347"]);
+			sf.loader.css(["/dist/blackprint.min.css?1583636829228"]);
 			sf.loader.js([
 				// Load Blackprint module first
-				"/dist/blackprint.html.js?1583479117105",
-				"/dist/blackprint.min.js?1583500240983",
+				"/dist/blackprint.html.js?1583688544564",
+				"/dist/blackprint.min.js?1583752118990",
 			]);
 		}
 
 		else{ // Production environment
-			sf.loader.css(["https://blackprint.github.io/Blackprint/dist/blackprint.min.css?1583475170347"]);
+			sf.loader.css(["https://blackprint.github.io/Blackprint/dist/blackprint.min.css?1583636829228"]);
 			sf.loader.js([
-				"https://blackprint.github.io/Blackprint/dist/blackprint.html.js?1583479117105",
-				"https://blackprint.github.io/Blackprint/dist/blackprint.min.js?1583500240983",
+				"https://blackprint.github.io/Blackprint/dist/blackprint.html.js?1583688544564",
+				"https://blackprint.github.io/Blackprint/dist/blackprint.min.js?1583752118990",
 			]);
 		}
 
@@ -55,7 +55,7 @@
 
 		sf.loader.js([
 			"/assets/myhtml.html.js?1583456276338",
-			"/assets/myjs.min.js?1583553481267",
+			"/assets/myjs.min.js?1583749224841",
 		]);
 
 		sf.loader.onProgress(function(loaded, total){
