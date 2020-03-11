@@ -42,6 +42,8 @@ $(function(){
 
 	sketch.registerHandler('display/logger', function(handle, node){
 		node.title = "Logger";
+		node.type = 'logger';
+		node.description = 'Print anything into text';
 		handle.log = '';
 
 		var inputs = handle.inputs = {
@@ -50,7 +52,44 @@ $(function(){
 
 		// When node being executed
 		node.run = function(){
-			handle.log = inputs.Any;
+			var value = inputs.Any;
+
+			if(value === null)
+				handle.log = 'null';
+			else if(value === void 0)
+				handle.log = 'undefined';
+			else if(value.constructor === Function)
+				handle.log = value.toString();
+			else if(value.constructor === String || value.constructor === Number)
+				handle.log = value;
+			else 
+				handle.log = JSON.stringify(value);
+		}
+	});
+
+	sketch.registerHandler('button/test', function(handle, node){
+		node.title = "Button";
+		node.type = 'button';
+
+		var outputs = handle.outputs = {
+			Clicked:Object
+		};
+
+		self.run = function(){
+			console.log('hey', arguments);
+		}
+	});
+
+	sketch.registerHandler('input/test', function(handle, node){
+		node.title = "Input";
+		node.type = 'input';
+
+		var outputs = handle.outputs = {
+			Value:Object
+		};
+
+		self.run = function(){
+			console.log('hey', arguments);
 		}
 	});
 
@@ -106,7 +145,8 @@ $(function(){
 			// sketch.createNode('math/random', {x:298, y:73});
 			// sketch.createNode('math/random', {x:297, y:239});
 			// sketch.createNode('math/multiply', {x:525, y:155});
-			// sketch.createNode('display/logger', {x:754, y:163});
+			sketch.createNode('button/test', {x:580, y:36});
+			sketch.createNode('input/test', {x:846, y:43});
 		}, 500);
 	});
 });

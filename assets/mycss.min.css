@@ -75,6 +75,86 @@ img {
 img.loading {
   opacity: 0; }
 
+sf-space[blackprint] .nodes .node .header .title {
+  height: 16px;
+  display: flex; }
+
+sf-space[blackprint] .nodes .node.function .header .icon {
+  background: url("/assets/img/icon/function.png") no-repeat;
+  padding-left: 22px; }
+
+sf-space[blackprint] .nodes .node.trigger .header {
+  box-shadow: inset 0 0 3px #a05f5f;
+  background-image: -webkit-gradient(linear, left top, right bottom, from(rgba(226, 18, 18, 0.7)), to(rgba(229, 41, 41, 0.2)), color-stop(0.8, rgba(229, 32, 32, 0.1))); }
+  sf-space[blackprint] .nodes .node.trigger .header .icon {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    background: none;
+    height: 16px;
+    padding-right: 4px;
+    display: inline-block; }
+    sf-space[blackprint] .nodes .node.trigger .header .icon:before {
+      content: "\f542"; }
+
+sf-space[blackprint] .nodes .node.input .header {
+  box-shadow: inset 0 0 3px #75a05f;
+  background-image: -webkit-gradient(linear, left top, right bottom, from(rgba(108, 232, 93, 0.7)), to(rgba(103, 255, 108, 0.2)), color-stop(0.8, rgba(130, 226, 124, 0.1))); }
+  sf-space[blackprint] .nodes .node.input .header .icon {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    background: none;
+    height: 16px;
+    padding-right: 4px;
+    display: inline-block; }
+    sf-space[blackprint] .nodes .node.input .header .icon:before {
+      content: "\f1de"; }
+
+sf-space[blackprint] .node.trigger .button {
+  display: inline-flex;
+  background: #ffffff1c;
+  height: 30px;
+  box-shadow: 0 0 8px white;
+  width: 100px;
+  border: 2px solid #BFC0C0;
+  margin: 5px 5px 10px 10px;
+  color: #BFC0C0;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer; }
+  sf-space[blackprint] .node.trigger .button img {
+    width: 20px;
+    height: auto; }
+  sf-space[blackprint] .node.trigger .button a {
+    position: relative;
+    transform: translateX(0);
+    transition: transform .4s ease-out; }
+  sf-space[blackprint] .node.trigger .button:hover a {
+    transform: translateX(150px); }
+  sf-space[blackprint] .node.trigger .button .arrow {
+    width: 100%;
+    height: 100%;
+    background: #BFC0C0;
+    transform: translateX(-200px);
+    position: absolute;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .4s ease-out;
+    bottom: 0; }
+  sf-space[blackprint] .node.trigger .button:hover .arrow {
+    transform: translateX(0); }
+
+sf-space[blackprint] .node.input textarea {
+  margin-left: 5px;
+  margin-right: -10px; }
+
 .header {
   position: relative;
   background: #00000085;
@@ -94,4 +174,4 @@ img.loading {
     cursor: pointer;
     height: 24px; }
 
-/*# sourceMappingURL=mycss.min.1583552961392.css.map */
+/*# sourceMappingURL=mycss.min.1583848738125.css.map */
