@@ -8,6 +8,16 @@ ground.addRoute([
 	    'vw-sketch':[{
 	    	path:'/page/:pageIndex',
 	    	template:'Blackprint/page', // Import blackprint page
+	    	on:{
+	    		// Start importing blackprint sample here
+	    		showed: startImportSample,
+
+	    		/*
+	    		coming: The cable would have wrong position because the DOM still hidden,
+	    		leaving: Maybe we can uninitialize something,
+	    		hidden: Animate something maybe
+	    		*/
+	    	}
 	    }]
 	}, {
 	    path:'/getting-started',
