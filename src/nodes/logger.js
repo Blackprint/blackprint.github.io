@@ -11,5 +11,6 @@ sketch.registerElement('logger', {
 		properties: [],
 	} */
 
+	// Input binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
 	self.log = '...';
 });

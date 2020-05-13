@@ -10,4 +10,16 @@ sketch.registerElement('button', {
 		outputs: [],
 		properties: [],
 	} */
+
+	// To get the button element
+	// self.$el('.button')
+
+	// self.$el only available after component was initialized
+	// self.init = function(){ ... }
+
+	// Element event binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Element-Event
+	self.clicked = function(ev){
+		console.log("Element: 'Trigger' button clicked, going to run the handler");
+		self.handle.clicked && self.handle.clicked(ev);
+	}
 });
