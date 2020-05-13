@@ -1,4 +1,8 @@
 var ground = sf.views('vw-ground', 'ground');
+
+// Increase views limit from 3 into 100
+ground.maxCache = 100;
+
 ground.addRoute([
 	{
 	    path:'/',
@@ -23,15 +27,6 @@ ground.addRoute([
 	    path:'/getting-started',
 	    template:'vw-ground/getting-started'
 	},
-]);
-
-// Increase views limit from 3 into 100
-ground.maxCache = 100;
-
-ground.on('routeFinish routeCached', function(){
+]).on('finish', function(){
 	animatePageTransition(ground);
-});
-
-ground.on('routeError', function(e){
-	console.warn(e);
-});
+}).on('error', console.error);
