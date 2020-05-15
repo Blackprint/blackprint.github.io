@@ -14,7 +14,6 @@
     transform: scale(1.2); } }
 
 html, body {
-  background-color: #232323;
   color: #636b6f;
   font-family: 'Nunito', sans-serif;
   font-weight: 100;
@@ -48,6 +47,7 @@ sf-page-view {
   display: block;
   visibility: hidden;
   position: absolute;
+  top: 0;
   overflow: hidden;
   width: 100%;
   height: 100%; }
@@ -56,6 +56,14 @@ sf-page-view {
     position: relative; }
     sf-page-view.page-current.anim-pending .page-current {
       visibility: hidden; }
+
+vw-sketch {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 45px; }
+  vw-sketch.page-current {
+    top: 0; }
 
 .disable-anim {
   transition-delay: 0s;
@@ -155,6 +163,35 @@ sf-space[blackprint] .node.input textarea {
   margin-left: 5px;
   margin-right: -10px; }
 
+sf-space[blackprint] .node textarea {
+  height: 20px;
+  width: 60px;
+  margin: 0px 5px 0px 0px;
+  background: rgba(0, 0, 0, 0.63);
+  color: white;
+  border: none;
+  margin-left: -10px; }
+
+.welcome-text {
+  color: white;
+  text-align: center;
+  padding: 0 20px; }
+  .welcome-text .description {
+    white-space: pre-line; }
+
+a {
+  color: inherit;
+  text-decoration: none; }
+
+.welcome-featured {
+  display: grid;
+  position: absolute;
+  color: #a0a0a0;
+  bottom: 55px;
+  left: 10px; }
+  .welcome-featured i {
+    margin-right: 5px; }
+
 .header {
   position: relative;
   background: #00000085;
@@ -166,6 +203,7 @@ sf-space[blackprint] .node.input textarea {
     border-right: 2px solid;
     font-size: 26px;
     padding: 0 15px 0 15px;
+    cursor: pointer;
     text-align: center; }
   .header .right {
     font-size: 18px;
@@ -174,4 +212,4 @@ sf-space[blackprint] .node.input textarea {
     cursor: pointer;
     height: 24px; }
 
-/*# sourceMappingURL=mycss.min.1583848738125.css.map */
+/*# sourceMappingURL=mycss.min.1589504824304.css.map */
