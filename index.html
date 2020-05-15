@@ -11,7 +11,7 @@
 
 	<!-- Must be loaded before blackprint.js -->
 	<!-- <script src="/dist/interpreter.min.js?1589514574748"></script> -->
-	<script src="https://cdn.jsdelivr.net/npm/blackprint-interpreter/dist/interpreter.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blackprint-interpreter@latest/dist/interpreter.min.js"></script>
 
 	<style type="text/css">
 		#loading-page{
@@ -34,15 +34,15 @@
 
 		// Load Blackprint module first
 		;(function(){
-			var url = 'https://cdn.jsdelivr.net/gh/blackprint/blackprint/';
+			var url = 'https://blackprint.github.io/Blackprint/';
 			if(/localhost|127.0.0.1/.test(location.hostname)) // Development environment
 				url = '';
 
-			sf.loader.css([url+"/dist/blackprint.min.css?1589517387193"]);
+			sf.loader.css([url+"/dist/blackprint.min.css?1589518932805"]);
 			sf.loader.js([
 				// Load Blackprint module first
 				url+"/dist/blackprint.html.js?1589506091714",
-				url+"/dist/blackprint.min.js?1589514757344",
+				url+"/dist/blackprint.min.js?1589518737366",
 			]);
 		})();
 
@@ -54,7 +54,7 @@
 			cf_cdn+'/font-awesome/5.12.1/css/solid.min.css',
 			cf_cdn+'/font-awesome/5.12.1/css/brands.min.css',
 			"https://fonts.googleapis.com/css?family=Nunito",
-			"/assets/mycss.min.css?1589504824304",
+			"/assets/mycss.min.css?1589518697790",
 		]);
 
 		sf.loader.js([
