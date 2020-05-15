@@ -19,6 +19,10 @@ sf.model.for('header', function(self, root){
 		else textAnimation("Welcome to the example!");
 	}
 
+	self.toHome = function(){
+		ground.goto('/');
+	}
+
 	self.toWorkspace = function(){
 		clearInterval(onHomepage);
 

@@ -3,6 +3,7 @@ var ground = sf.views('vw-ground', 'ground');
 // Increase views limit from 3 into 100
 ground.maxCache = 100;
 
+// https://github.com/ScarletsFiction/ScarletsFrame/wiki/Router-or-Views
 ground.addRoute([
 	{
 	    path:'/',
@@ -30,3 +31,7 @@ ground.addRoute([
 ]).on('finish', function(){
 	animatePageTransition(ground);
 }).on('error', console.error);
+
+sf.views.onCrossing = function(url, target){
+	window.open(url, target).focus();
+}

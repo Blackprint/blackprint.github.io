@@ -1,14 +1,32 @@
-<img class="background loading" src="/assets/img/background/blackprint.jpg?1" onload="$(this).removeClass('loading')">
+<img class="background" src="/assets/img/background/blackprint.jpg?1">
 
 <!-- Model on ./blackprint/header.js -->
 <sf-m name="header" class="header">
-	<div class="left">{{ message }}</div>
+	<div class="left" @click="toHome">{{ message }}</div>
 	<div class="right" @click="toWorkspace">{{ description }}</div>
 </sf-m>
 
 <!-- Router handler on ./route.js -->
 <!-- We will import Blackprint/page template here -->
 <vw-sketch>
-	<!-- Default page for eye candy XD -->
-	<img src="/assets/img/candy.png" onload="$(this).removeClass('loading')" class="loading" style="position:absolute;right:0;bottom:0">
+	<!-- Filling the default page if haven't being routed -->
+	<div class="welcome-text">
+		<h1>Welcome to Blackprint!</h1>
+		<div class="description">This project haven't been finished yet.
+			To open the sketch page, please click that blinking text on the top left.
+		</div>
+	</div>
+
+	<!-- Featured link -->
+	<div class="welcome-featured">
+		<a target="_blank" href="https://www.patreon.com/stefansarya">
+			<i class="fab fa-patreon"></i> Patreon
+		</a>
+		<a target="_blank" href="https://github.com/Blackprint/Blackprint">
+			<i class="fab fa-github"></i> Github
+		</a>
+	</div>
+
+	<!-- Eye candy XD -->
+	<img src="/assets/img/candy.png" style="position:absolute;right:0;bottom:0">
 </vw-sketch>
