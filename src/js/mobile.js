@@ -2,7 +2,7 @@ var hasTouchScreen = false;
 if (navigator.maxTouchPoints !== void 0)
     hasTouchScreen = navigator.maxTouchPoints > 0;
 else if (navigator.msMaxTouchPoints !== void 0)
-    hasTouchScreen = navigator.msMaxTouchPoints > 0; 
+    hasTouchScreen = navigator.msMaxTouchPoints > 0;
 else {
     var mQ = window.matchMedia && matchMedia("(pointer:coarse)");
     if (mQ && mQ.media === "(pointer:coarse)")

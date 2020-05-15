@@ -1,7 +1,13 @@
 sketch.registerNode('math/multiply', function(handle, node){
-	window.handle = handle; // debug test
-
 	node.title = "Multiply";
+	// Let's use default node interface
+
+	// Handle all output port here
+	handle.outputs = {
+		Result:Number,
+	};
+
+	// Handle all input port here
 	var inputs = handle.inputs = {
 		Exec: function(){
 			handle.outputs.Result = multiply();
@@ -23,28 +29,33 @@ sketch.registerNode('math/multiply', function(handle, node){
 		return inputs.A * inputs.B;
 	}
 
-	handle.outputs = {
-		Result:Number,
-	};
+	// When any output value from other node are updated
+	// Let's immediately change current node result
+	handle.update = function(cable){
+		handle.outputs.Result = multiply();
+	}
 
-	// Event listener can only be registered after init
+	// Event listener can only be registered after handle init
 	handle.init = function(){
 		node.on('cable.connect', function(cable){
 			console.log(`Cable connected from ${cable.owner.node.title} (${cable.owner.name}) to ${cable.target.node.title} (${cable.target.name})`);
 		});
 	}
 
-	// When any output value from other node are updated
-	// Let's immediately change current node result
-	handle.update = function(cable){
-		handle.outputs.Result = multiply();
-	}
+	// If you want to test it or play around from the browser console
+	setTimeout(function(){
+		if(node.x === void 0)
+			console.log('Node from Interpreter:', node);
+		else
+			console.log('Node from Sketch:', node);
+	}, 10);
 });
 
 sketch.registerNode('math/random', function(handle, node){
 	node.title = "Random";
 	node.description = "Number (0-100)";
-	node.dynamic = true; // Reexecute when doing loop somewhere
+
+	// Let's use default node interface
 
 	handle.outputs = {
 		Out:Number
@@ -74,9 +85,10 @@ sketch.registerNode('math/random', function(handle, node){
 
 sketch.registerNode('display/logger', function(handle, node){
 	node.title = "Logger";
-	node.type = 'logger';
 	node.description = 'Print anything into text';
-	node.trigger = false;
+
+	// Let's use ../nodes/logger.js
+	node.type = 'logger';
 
 	handle.inputs = {
 		Any: Blackprint.PortListener(function(port, val){
@@ -113,6 +125,8 @@ sketch.registerNode('display/logger', function(handle, node){
 sketch.registerNode('button/simple', function(handle, node){
 	// node = under ScarletsFrame element control
 	node.title = "Button";
+
+	// Let's use ../nodes/button.js
 	node.type = 'button';
 
 	// handle = under Blackprint node flow control
@@ -130,6 +144,8 @@ sketch.registerNode('button/simple', function(handle, node){
 sketch.registerNode('input/simple', function(handle, node){
 	// node = under ScarletsFrame element control
 	node.title = "Input";
+
+	// Let's use ../nodes/input.js
 	node.type = 'input';
 
 	// handle = under Blackprint node flow control
@@ -142,11 +158,28 @@ sketch.registerNode('input/simple', function(handle, node){
 	// And also call outputs.Changed() if connected to other node
 	handle.changed = function(text, ev){
 		console.log('The input box have new value:', text);
-		handle.outputs.Value = text;
+
+		// node.options.value === text;
+		handle.outputs.Value = node.options.value;
 
 		// This will call every connected node
 		handle.outputs.Changed();
 	}
+});
+
+sketch.registerNode('sketch/export', function(handle, node){
+	// node = under ScarletsFrame element control
+	node.title = "Blackprint Export";
+
+	// Let's use ../nodes/logger.js
+	node.type = 'logger';
+
+	// handle = under Blackprint node flow control
+	handle.inputs = {
+		export:function(){
+			node.log = sketch.exportJSON();
+		}
+	};
 });
 
 // Does nothing :3

@@ -3,4 +3,7 @@
 $(function(){
 
 // Blackprint.space = Namespace (https://github.com/ScarletsFiction/ScarletsFrame/wiki/Namespace)
-var sketch = window.sketch = new Blackprint();
+// sketch.scope = shortcut to obtain your model scope/context
+
+var sketch = window.sketch = new Blackprint.Sketch();
+sketch.settings('visualizeFlow', true);
