@@ -154,9 +154,21 @@ sketch.registerNode('input/simple', function(handle, node){
 		Value:'', // Default to empty string
 	};
 
+	// Bring value from imported node to handle output
+	handle.imported = function(){
+		if(node.options.value)
+			console.warn("Saved options as outputs:", node.options.value);
+
+		handle.outputs.Value = node.options.value;
+	}
+
 	// Proxy string value from: node.changed -> handle.changed -> outputs.Value
 	// And also call outputs.Changed() if connected to other node
 	handle.changed = function(text, ev){
+		// This node still being imported
+		if(node.importing !== false)
+			return;
+
 		console.log('The input box have new value:', text);
 
 		// node.options.value === text;
@@ -177,7 +189,9 @@ sketch.registerNode('sketch/export', function(handle, node){
 	// handle = under Blackprint node flow control
 	handle.inputs = {
 		export:function(){
-			node.log = sketch.exportJSON();
+			node.log = sketch.exportJSON({
+				exclude:['sketch/export']
+			});
 		}
 	};
 });

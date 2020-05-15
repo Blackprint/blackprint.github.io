@@ -20,7 +20,7 @@ sketch.registerInterface('input', {
 
 		// Listener for two way binding when value from HTML input element is being received by the framework
 		// I'm using this for auto scale the width/height of the textarea
-		v2m$value:function(old, now){
+		on$value:function(old, now){
 			// Scale the input box depend on character length
 			var el = self.$el('textarea');
 
@@ -61,14 +61,13 @@ interTest.registerInterface('input', function(self, bind){
 		options:{
 			set value(val){
 				theValue = val;
+
+				if(self.handle.changed !== void 0)
+					self.handle.changed(val);
 			},
 			get value(){
 				return theValue;
 			}
 		}
 	});
-
-	self.textChanged = function(text){
-		self.handle.changed(text);
-	}
 });
