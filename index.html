@@ -13,6 +13,14 @@
 	<!-- <script src="/dist/interpreter.min.js?1589514574748"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/blackprint-interpreter@latest/dist/interpreter.min.js"></script>
 
+	<script type="text/javascript">
+	  // Polyfill for Safari and Firefox
+	  (function(){function z(a){document.write('<script src="'+a+'"><\/script>')}
+	    if(window.PointerEvent === void 0)
+	      z('https://code.jquery.com/pep/0.4.3/pep.js');
+	  })();
+	</script>
+
 	<style type="text/css">
 		#loading-page{
 			line-height: 100vh;
@@ -59,7 +67,7 @@
 
 		sf.loader.js([
 			"/assets/myhtml.html.js?1589504818773",
-			"/assets/myjs.min.js?1589515791261",
+			"/assets/myjs.min.js?1589679939724",
 		]);
 
 		;(function(){
