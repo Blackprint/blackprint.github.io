@@ -117,6 +117,17 @@ sf-space[blackprint] .nodes .node.input .header {
     sf-space[blackprint] .nodes .node.input .header .icon:before {
       content: "\f1de"; }
 
+sf-space[blackprint] sf-m.performance .cables > svg {
+  filter: none; }
+
+sf-space[blackprint] sf-m.performance .nodes .node {
+  box-shadow: none;
+  transition: none; }
+
+sf-space[blackprint] .description {
+  margin-top: 3px;
+  white-space: pre-line; }
+
 sf-space[blackprint] .node.trigger .button {
   display: inline-flex;
   background: #ffffff1c;
@@ -211,5 +222,25 @@ a {
     padding: 10px;
     cursor: pointer;
     height: 24px; }
+
+.header-menu .item-list {
+  display: flex;
+  position: absolute;
+  right: 0px;
+  top: 7px;
+  font-size: 24px; }
+  .header-menu .item-list .item {
+    padding: 0 10px;
+    cursor: pointer; }
+    .header-menu .item-list .item.active {
+      color: white; }
+
+.header-menu .header-zoom {
+  position: absolute;
+  right: 10px;
+  color: white;
+  opacity: 0.8;
+  top: 50px;
+  font-size: 22px; }
 
 /*# sourceMappingURL=mycss.min.css.map */

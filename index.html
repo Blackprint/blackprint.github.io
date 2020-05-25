@@ -10,7 +10,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
 
 	<!-- Must be loaded before blackprint.js -->
-	<!-- <script src="/dist/interpreter.min.js?1589514574748"></script> -->
+	<!-- <script src="/dist/interpreter.min.js?1590401976888"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/blackprint-interpreter@latest/dist/interpreter.min.js"></script>
 
 	<script type="text/javascript">
@@ -35,8 +35,6 @@
 
 	<!-- Assets Loader -->
 	<script type="text/javascript">
-		var cf_cdn = 'https://cdnjs.cloudflare.com/ajax/libs';
-
 		// Register sf.dom to global
 		$ = sf.dom;
 
@@ -46,28 +44,32 @@
 			if(/localhost|127.0.0.1/.test(location.hostname)) // Development environment
 				url = '';
 
-			sf.loader.css([url+"/dist/blackprint.min.css?1589518932805"]);
+			sf.loader.css([
+			    url+"/dist/blackprint.min.css?1590384721993",
+			]);
+
 			sf.loader.js([
 				// Load Blackprint module first
-				url+"/dist/blackprint.html.js?1589506091714",
-				url+"/dist/blackprint.min.js?1589518737366",
+				url+"/dist/blackprint.html.js?1590383005665",
+				url+"/dist/blackprint.min.js?1590401847902",
 			]);
 		})();
 
 		// === Example and other assets ===
 		// https://www.npmjs.com/package/scarletsframe#asset-loader
 		sf.loader.css([
-			cf_cdn+'/animate.css/3.7.0/animate.min.css',
-			cf_cdn+'/font-awesome/5.12.1/css/fontawesome.min.css',
-			cf_cdn+'/font-awesome/5.12.1/css/solid.min.css',
-			cf_cdn+'/font-awesome/5.12.1/css/brands.min.css',
+			'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/fontawesome.min.css',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/solid.min.css',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/brands.min.css',
 			"https://fonts.googleapis.com/css?family=Nunito",
-			"/assets/mycss.min.css?1589518697790",
+			"/assets/mycss.min.css?1590444098903",
 		]);
 
 		sf.loader.js([
-			"/assets/myhtml.html.js?1589504818773",
-			"/assets/myjs.min.js?1589679939724",
+		    "https://unpkg.com/sweetalert/dist/sweetalert.min.js",
+			"/assets/myhtml.html.js?1590444175636",
+			"/assets/myjs.min.js?1590448905840",
 		]);
 
 		;(function(){
