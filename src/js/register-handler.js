@@ -1,4 +1,6 @@
-sketch.registerNode('math/multiply', function(handle, node){
+// Nodes here registered as 'example' namespace
+
+Blackprint.registerNode('example/math/multiply', function(handle, node){
 	node.title = "Multiply";
 	// Let's use default node interface
 
@@ -51,7 +53,7 @@ sketch.registerNode('math/multiply', function(handle, node){
 	}, 10);
 });
 
-sketch.registerNode('math/random', function(handle, node){
+Blackprint.registerNode('example/math/random', function(handle, node){
 	node.title = "Random";
 	node.description = "Number (0-100)";
 
@@ -83,7 +85,7 @@ sketch.registerNode('math/random', function(handle, node){
 	}
 });
 
-sketch.registerNode('display/logger', function(handle, node){
+Blackprint.registerNode('example/display/logger', function(handle, node){
 	node.title = "Logger";
 	node.description = 'Print anything into text';
 
@@ -122,7 +124,7 @@ sketch.registerNode('display/logger', function(handle, node){
 	}
 });
 
-sketch.registerNode('button/simple', function(handle, node){
+Blackprint.registerNode('example/button/simple', function(handle, node){
 	// node = under ScarletsFrame element control
 	node.title = "Button";
 
@@ -141,7 +143,7 @@ sketch.registerNode('button/simple', function(handle, node){
 	}
 });
 
-sketch.registerNode('input/simple', function(handle, node){
+Blackprint.registerNode('example/input/simple', function(handle, node){
 	// node = under ScarletsFrame element control
 	node.title = "Input";
 
@@ -179,25 +181,8 @@ sketch.registerNode('input/simple', function(handle, node){
 	}
 });
 
-sketch.registerNode('sketch/export', function(handle, node){
-	// node = under ScarletsFrame element control
-	node.title = "Blackprint Export";
-
-	// Let's use ../nodes/logger.js
-	node.type = 'logger';
-
-	// handle = under Blackprint node flow control
-	handle.inputs = {
-		export:function(){
-			node.log = sketch.exportJSON({
-				exclude:['sketch/export']
-			});
-		}
-	};
-});
-
 // Does nothing :3
-sketch.registerNode('dummy/test', function(handle, node){
+Blackprint.registerNode('example/dummy/test', function(handle, node){
 	node.title = "Do nothing";
 
 	// PortName must different any port
