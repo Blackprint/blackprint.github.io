@@ -1,7 +1,7 @@
 // == Blackprint Visual Interpreter ==
 // You're allowed tp control related DOM element here
-sketch.registerInterface('button', {
-	extend: Blackprint.Trigger,
+Blackprint.registerInterface('button', {
+	extend: Blackprint.Node,
 	template: 'nodes/button.html'
 }, function(self){
 	// Property of this scope
@@ -31,7 +31,7 @@ sketch.registerInterface('button', {
 // == For Standalone Interpreter ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-interTest.registerInterface('button', function(self){
+Blackprint.Interpreter.registerInterface('button', function(self){
 	self.clicked = function(ev){
 		console.log("Interpreter: 'Trigger' button clicked, going to run the handler");
 		self.handle.clicked && self.handle.clicked(ev);

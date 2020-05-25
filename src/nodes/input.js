@@ -1,7 +1,7 @@
 // == Blackprint Visual Interpreter ==
 // You're allowed tp control related DOM element here
-sketch.registerInterface('input', {
-	extend: Blackprint.Input,
+Blackprint.registerInterface('input', {
+	extend: Blackprint.Node,
 	template: 'nodes/input.html'
 }, function(self){
 	// Property of this scope
@@ -55,7 +55,7 @@ sketch.registerInterface('input', {
 // == For Standalone Interpreter ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-interTest.registerInterface('input', function(self, bind){
+Blackprint.Interpreter.registerInterface('input', function(self, bind){
 	var theValue = '...';
 	bind({
 		options:{
