@@ -1,7 +1,10 @@
 // https://www.npmjs.com/package/scarletsframe#initializedefine-model
-sf.model.for('header', function(self, root){
+sf.model('header', function(self, root){
 	self.message = "Hello";
 	self.description = "Developers! ";
+	self.showOptions = false;
+
+	self.info = {scale:100};
 
 	var onHomepage;
 	self.init = function(){
@@ -16,7 +19,16 @@ sf.model.for('header', function(self, root){
 				}, 2000);
 			}, 2000);
 		}
-		else textAnimation("Welcome to the example!");
+		else{
+			self.description = "Developers! ";
+			textAnimation("Welcome to the example!");
+
+			self.showOptions = true;
+
+			sketch.scope('container').onScale = function(scale){
+				self.info.scale = Math.round(scale*100);
+			}
+		}
 	}
 
 	self.toHome = function(){
@@ -44,5 +56,90 @@ sf.model.for('header', function(self, root){
 			if(description.length === 0)
 				clearInterval(interval);
 		}, 50);
+	}
+
+	self.switchVFXActive = false;
+	self.switchVFX = function(){
+		self.switchVFXActive = !self.switchVFXActive;
+
+		if(self.switchVFXActive){
+			sketch.scope('container').$el.addClass('performance');
+			self.visualizeActive = false;
+			Blackprint.settings('visualizeFlow', false);
+		}
+		else sketch.scope('container').$el.removeClass('performance');
+	}
+
+	self.visualizeActive = true;
+	self.visualizeFlow = function(){
+		self.visualizeActive = !self.visualizeActive;
+		Blackprint.settings('visualizeFlow', self.visualizeActive);
+	}
+
+	self.saveSketch = function(ev){
+		sketch.scope('dropdown').show([{
+			title:'Copy JSON',
+			callback:function(){
+				var temp = sketch.exportJSON();
+				navigator.clipboard.writeText(temp);
+
+				swal({
+					title: "Copied to clipboard!",
+					text: temp
+				});
+			}
+		}, {
+			title:'To File',
+			callback:function(){
+				var btn = document.createElement("a");
+				var file = new Blob([sketch.exportJSON()], {type: 'application/json'});
+				btn.href = URL.createObjectURL(file);
+				btn.download = 'blackprint.json';
+				btn.click();
+
+				// Auto revoke after 10 sec
+				setTimeout(function(){
+					URL.revokeObjectURL(btn.href);
+				}, 10000);
+			}
+		}], ev.x, ev.y);
+	}
+
+	self.loadSketch = function(ev){
+		sketch.scope('dropdown').show([{
+			title:'Append from JSON',
+			callback:function(){
+				swal({
+					title:"Append from JSON",
+					content: "input",
+				}).then(function(val){
+					sketch.importJSON(val);
+				});
+			}
+		}, {
+			title:'Import JSON',
+			callback:function(){
+				swal({
+					title:"Import JSON",
+					content: "input",
+				}).then(function(val){
+					if(!val)
+						return;
+
+					sketch.clearNodes();
+					sketch.importJSON(val);
+				});
+			}
+		}, {
+			title:'From File',
+			callback:function(){
+				var el = document.createElement("input");
+				el.setAttribute('type', 'file');
+				el.onchange = function(){
+					console.log(345, this);
+				}
+				el.click();
+			}
+		}], ev.x, ev.y);
 	}
 });
