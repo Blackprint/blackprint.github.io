@@ -4,6 +4,20 @@
 <sf-m name="header" class="header">
 	<div class="left" @click="toHome">{{ message }}</div>
 	<div class="right" @click="toWorkspace">{{ description }}</div>
+	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
+		<div class="item-list">
+			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></i></div>
+			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
+			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
+			<div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
+			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div>
+		</div>
+		<div class="header-zoom">
+			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
+				<i class="fas fa-search"></i> {{ info.scale }}%
+			</div>
+		</div>
+	</div>
 </sf-m>
 
 <!-- Router handler on ./route.js -->
@@ -30,3 +44,5 @@
 	<!-- Eye candy XD -->
 	<img src="/assets/img/candy.png" style="position:absolute;right:0;bottom:0">
 </vw-sketch>
+
+<div class="mini-blackprint hidden"></div>

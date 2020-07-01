@@ -23,3 +23,24 @@ a{
 		margin-right: 5px;
 	}
 }
+
+.mini-blackprint{
+	width: 30vw;
+	height: calc(30vw - 45px);
+	position: absolute;
+	top: 50px;
+	right: 0;
+	overflow: hidden;
+	box-shadow: 0 0 6px #ffffff6b;
+	background: #ffffff40;
+	border-radius: 10px;
+	pointer-events: none;
+
+	&.hidden{
+		display: none;
+	}
+
+	sf-space{
+		transform: scale(0.3);
+	}
+}

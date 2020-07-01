@@ -58,6 +58,36 @@ sf.model('header', function(self, root){
 		}, 50);
 	}
 
+	self.cloneActive = false;
+	self.cloneContainer = function(){
+		self.cloneActive = !self.cloneActive;
+
+		if(self.cloneActive){
+			// We must clear nodes from the sketch to reset the container
+			// And initialize some node data and component from beginning
+			var backupJSON = sketch.exportJSON();
+			sketch.clearNodes();
+
+			// Reset current container view
+			var container = sketch.scope('container');
+			container.pos.x = 0;
+			container.pos.y = 0;
+			container.scale = 1; // 100% scale
+
+			var cloned = sketch.cloneContainer();
+
+			// Remove the dropdown from cloned container
+			$('sf-m[name="dropdown"]', cloned).remove()
+
+			// Put the cloned container into DOM
+			$('.mini-blackprint').removeClass('hidden').append(cloned);
+
+			// And reimport it again
+			sketch.importJSON(backupJSON);
+		}
+		else $('.mini-blackprint').addClass('hidden').text('');
+	}
+
 	self.switchVFXActive = false;
 	self.switchVFX = function(){
 		self.switchVFXActive = !self.switchVFXActive;

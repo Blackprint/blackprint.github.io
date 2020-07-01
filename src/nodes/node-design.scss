@@ -55,6 +55,21 @@ sf-space[blackprint]{
 		}
 	}
 
+	sf-m.performance{
+		.cables > svg{
+			filter: none;
+		}
+		.nodes .node{
+			box-shadow: none;
+			transition: none;
+		}
+	}
+
+	.description{
+		margin-top: 3px;
+		white-space: pre-line;
+	}
+
 	.node.trigger{
 		.button {
 			display: inline-flex;
