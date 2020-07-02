@@ -7,19 +7,16 @@ ground.maxCache = 100;
 ground.addRoute([
 	{
 	    path:'/',
-	    template:'vw-ground/blackprint',
+	    template:'vw-ground/ground',
 
-	    // Nested router for vw-sketch
-	    'vw-sketch':[{
+	    // Nested router for vw-page
+	    'vw-page':[{
 	    	path:'/page/:pageIndex',
-	    	template:'Blackprint/page', // Import blackprint page
+	    	template:'vw-ground/vw-page/sketch-page',
 	    	on:{
 	    		showed: function(){
 	    			// Show sketch options
 					sf.model('header').showOptions = true;
-
-		    		// Start importing blackprint sample here
-	    			startImportSample();
 	    		},
 	    		leaving: function(){
 					sf.model('header').showOptions = false;
@@ -32,11 +29,11 @@ ground.addRoute([
 	    		hidden: Animate something maybe
 	    		*/
 	    	}
-	    }]
-	}, {
-	    path:'/getting-started',
-	    template:'vw-ground/getting-started'
-	},
+	    }, {
+		    path:'/getting-started',
+		    template:'vw-ground/vw-page/getting-started'
+		}]
+	}
 ]).on('finish', function(){
 	animatePageTransition(ground);
 }).on('error', console.error);
