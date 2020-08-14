@@ -43,7 +43,7 @@ Blackprint.registerInterface('input', {
 	}
 
 	// Add event listener to textarea after element initialized
-	self.init = function(){
+	self.init = self.hotReloaded = function(){
 		// Only create if the Blackprint handler need this
 		if(self.handle.changed)
 			self.$el('textarea').on('input', self.textChanged);
