@@ -1,9 +1,6 @@
 // == Blackprint Visual Interpreter ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('logger', {
-	extend: Blackprint.Node,
-	template: 'nodes/logger.html'
-}, function(self){
+Blackprint.registerInterface('nodes/logger', function(self){
 	// Property of this scope
 	/* self == {
 		x: 0,
@@ -41,7 +38,7 @@ Blackprint.registerInterface('logger', {
 // == For Standalone Interpreter ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-Blackprint.Interpreter.registerInterface('logger', function(self, bind){
+Blackprint.Interpreter.registerInterface('nodes/logger', function(self, bind){
 	bind({
 		set log(val){
 			console.log("Logger:", val);

@@ -7,8 +7,8 @@ var interTest = window.interpreter = new Blackprint.Interpreter();
 
 // Wait after ./register-handler.js was executed
 setTimeout(function(){
-	// Uncomment if we don't need sample
-	return;
+	if(location.hostname === 'localhost')
+		return;
 
 	// These nodes are the handler that registered from ./register-handler.js
 	var registered = Blackprint.nodes;

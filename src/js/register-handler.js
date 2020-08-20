@@ -39,8 +39,8 @@ Blackprint.registerNode('example/math/multiply', function(handle, node){
 
 	// Event listener can only be registered after handle init
 	handle.init = function(){
-		node.on('cable.connect', function(cable){
-			console.log(`Cable connected from ${cable.owner.node.title} (${cable.owner.name}) to ${cable.target.node.title} (${cable.target.name})`);
+		node.on('cable.connect', function(port1, port2){
+			console.log(`Cable connected from ${port1.node.title} (${port1.name}) to ${port2.node.title} (${port2.name})`);
 		});
 	}
 
@@ -90,7 +90,7 @@ Blackprint.registerNode('example/display/logger', function(handle, node){
 	node.description = 'Print anything into text';
 
 	// Let's use ../nodes/logger.js
-	node.type = 'logger';
+	node.interface = 'nodes/logger';
 
 	handle.inputs = {
 		Any: Blackprint.PortListener(function(port, val){
@@ -129,7 +129,7 @@ Blackprint.registerNode('example/button/simple', function(handle, node){
 	node.title = "Button";
 
 	// Let's use ../nodes/button.js
-	node.type = 'button';
+	node.interface = 'nodes/button';
 
 	// handle = under Blackprint node flow control
 	handle.outputs = {
@@ -148,7 +148,7 @@ Blackprint.registerNode('example/input/simple', function(handle, node){
 	node.title = "Input";
 
 	// Let's use ../nodes/input.js
-	node.type = 'input';
+	node.interface = 'nodes/input';
 
 	// handle = under Blackprint node flow control
 	handle.outputs = {

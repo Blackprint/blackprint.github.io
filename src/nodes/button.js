@@ -1,9 +1,6 @@
 // == Blackprint Visual Interpreter ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('button', {
-	extend: Blackprint.Node,
-	template: 'nodes/button.html'
-}, function(self){
+Blackprint.registerInterface('nodes/button', function(self){
 	// Property of this scope
 	/* self == {
 		x: 0,
@@ -31,7 +28,7 @@ Blackprint.registerInterface('button', {
 // == For Standalone Interpreter ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-Blackprint.Interpreter.registerInterface('button', function(self){
+Blackprint.Interpreter.registerInterface('nodes/button', function(self){
 	self.clicked = function(ev){
 		console.log("Interpreter: 'Trigger' button clicked, going to run the handler");
 		self.handle.clicked && self.handle.clicked(ev);
