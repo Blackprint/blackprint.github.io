@@ -1,8 +1,8 @@
 // == Blackprint Visual Interpreter ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('nodes/logger', function(self){
+Blackprint.registerInterface('nodes/logger', function(iface){
 	// Property of this scope
-	/* self == {
+	/* iface == {
 		x: 0,
 		y: 0,
 		inputs: [],
@@ -11,13 +11,13 @@ Blackprint.registerInterface('nodes/logger', function(self){
 	} */
 
 	// One way binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
-	self.log = '...';
+	iface.log = '...';
 
 	// Listener when log value is being send to HTML input element by the framework
 	// I'm using this for auto scale the width/height of the textarea
-	self.m2v$log = function(old, now){
+	iface.m2v$log = function(now){
 		// Scale the input box depend on character length
-		var el = self.$el('textarea');
+		var el = iface.$el('textarea');
 
 		// Skip if textarea was larger than our auto control
 		// I mean, if user have change the size manually
@@ -38,7 +38,7 @@ Blackprint.registerInterface('nodes/logger', function(self){
 // == For Standalone Interpreter ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-Blackprint.Interpreter.registerInterface('nodes/logger', function(self, bind){
+Blackprint.Interpreter.registerInterface('nodes/logger', function(iface, bind){
 	bind({
 		set log(val){
 			console.log("Logger:", val);
