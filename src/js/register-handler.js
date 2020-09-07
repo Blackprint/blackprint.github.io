@@ -1,26 +1,26 @@
 // Nodes here registered as 'example' namespace
 
-Blackprint.registerNode('example/math/multiply', function(handle, node){
-	node.title = "Multiply";
+Blackprint.registerNode('example/math/multiply', function(node, iface){
+	iface.title = "Multiply";
 	// Let's use default node interface
 
 	// Handle all output port here
-	handle.outputs = {
+	node.outputs = {
 		Result:Number,
 	};
 
 	// Handle all input port here
-	var inputs = handle.inputs = {
-		Exec: function(){
-			handle.outputs.Result = multiply();
-			console.log("Result has been set:", handle.outputs.Result);
-		},
+	var inputs = node.inputs = {
+		Exec: Blackprint.PortTrigger(function(){
+			node.outputs.Result = multiply();
+			console.log("Result has been set:", node.outputs.Result);
+		}),
 		A: Number,
 		B: Blackprint.PortValidator(Number, function(val){
 			// Executed when inputs.B is being obtained
 			// And the output from other node is being assigned
 			// as current port value in this node
-			console.log(node.title, '- Port B got input:', val);
+			console.log(iface.title, '- Port B got input:', val);
 			return Number(val);
 		}),
 	};
@@ -33,170 +33,173 @@ Blackprint.registerNode('example/math/multiply', function(handle, node){
 
 	// When any output value from other node are updated
 	// Let's immediately change current node result
-	handle.update = function(cable){
-		handle.outputs.Result = multiply();
+	node.update = function(cable){
+		node.outputs.Result = multiply();
 	}
 
 	// Event listener can only be registered after handle init
-	handle.init = function(){
-		node.on('cable.connect', function(port1, port2){
-			console.log(`Cable connected from ${port1.node.title} (${port1.name}) to ${port2.node.title} (${port2.name})`);
+	node.init = function(){
+		iface.on('cable.connect', function(port1, port2){
+			console.log(`Cable connected from ${port1.iface.title} (${port1.name}) to ${port2.iface.title} (${port2.name})`);
 		});
 	}
 
 	// If you want to test it or play around from the browser console
 	setTimeout(function(){
-		if(node.x === void 0)
-			console.log('Node from Interpreter:', node);
+		if(iface.x === void 0)
+			console.log('Node from Interpreter:', iface);
 		else
-			console.log('Node from Sketch:', node);
+			console.log('Node from Sketch:', iface);
 	}, 10);
 });
 
-Blackprint.registerNode('example/math/random', function(handle, node){
-	node.title = "Random";
-	node.description = "Number (0-100)";
+Blackprint.registerNode('example/math/random', function(node, iface){
+	iface.title = "Random";
+	iface.description = "Number (0-100)";
 
 	// Let's use default node interface
 
-	handle.outputs = {
+	node.outputs = {
 		Out:Number
 	};
 
 	var executed = false;
-	handle.inputs = {
-		'Re-seed':function(){
+	node.inputs = {
+		'Re-seed':Blackprint.PortTrigger(function(){
 			executed = true;
-			handle.outputs.Out = Math.round(Math.random()*100);
-		}
+			node.outputs.Out = Math.round(Math.random()*100);
+		})
 	};
 
 	// When the connected node is requesting for the output value
-	handle.request = function(port, node){
+	node.request = function(port, iface2){
 		// Only run once this node never been executed
 		// Return false if no value was changed
 		if(executed === true)
 			return false;
 
-		console.warn('Value request for port:', port.name, "from node:", node.title);
+		console.warn('Value request for port:', port.name, "from node:", iface2.title);
 
 		// Let's create the value for him
-		handle.inputs['Re-seed']();
+		node.inputs['Re-seed']();
 	}
 });
 
-Blackprint.registerNode('example/display/logger', function(handle, node){
-	node.title = "Logger";
-	node.description = 'Print anything into text';
+Blackprint.registerNode('example/display/logger', function(node, iface){
+	iface.title = "Logger";
+	iface.description = 'Print anything into text';
 
 	// Let's use ../nodes/logger.js
-	node.interface = 'nodes/logger';
+	iface.interface = 'nodes/logger';
 
-	handle.inputs = {
-		Any: Blackprint.PortListener(function(port, val){
-			console.log("I connected to", port.name, "port from", port.node.title, "that have new value:", val);
-
-			// Let's take all data from all connected nodes
-			// Instead showing new single data-> val
-			refreshLogger(handle.inputs.Any);
-		})
+	node.inputs = {
+		Any: null
 	};
 
 	function refreshLogger(val){
 		if(val === null)
-			node.log = 'null';
+			iface.log = 'null';
 		else if(val === void 0)
-			node.log = 'undefined';
+			iface.log = 'undefined';
 		else if(val.constructor === Function)
-			node.log = val.toString();
+			iface.log = val.toString();
 		else if(val.constructor === String || val.constructor === Number)
-			node.log = val;
+			iface.log = val;
 		else
-			node.log = JSON.stringify(val);
+			iface.log = JSON.stringify(val);
 	}
 
-	handle.init = function(){
+	node.init = function(){
 		// Let's show data after new cable was connected or disconnected
-		node.on('cable.connect cable.disconnect', function(){
+		iface.on('cable.connect cable.disconnect', function(){
 			console.log("A cable was changed on Logger, now refresing the input element");
-			refreshLogger(handle.inputs.Any);
+			refreshLogger(node.inputs.Any);
+		});
+
+		console.log(iface);
+		iface.inputs.Any.on('value', function(port){
+			console.log("I connected to", port.name, "port from", port.iface.title, "that have new value:", port.value);
+
+			// Let's take all data from all connected nodes
+			// Instead showing new single data-> val
+			refreshLogger(node.inputs.Any);
 		});
 	}
 });
 
-Blackprint.registerNode('example/button/simple', function(handle, node){
+Blackprint.registerNode('example/button/simple', function(node, iface){
 	// node = under ScarletsFrame element control
-	node.title = "Button";
+	iface.title = "Button";
 
 	// Let's use ../nodes/button.js
-	node.interface = 'nodes/button';
+	iface.interface = 'nodes/button';
 
 	// handle = under Blackprint node flow control
-	handle.outputs = {
+	node.outputs = {
 		Clicked:Function
 	};
 
-	// Proxy event object from: node.clicked -> handle.clicked -> outputs.Clicked
-	handle.clicked = function(ev){
+	// Proxy event object from: node.clicked -> node.clicked -> outputs.Clicked
+	node.clicked = function(ev){
 		console.log('button/simple: got', ev, "time to trigger to the other node");
-		handle.outputs.Clicked(ev);
+		node.outputs.Clicked(ev);
 	}
 });
 
-Blackprint.registerNode('example/input/simple', function(handle, node){
-	// node = under ScarletsFrame element control
-	node.title = "Input";
+Blackprint.registerNode('example/input/simple', function(node, iface){
+	// iface = under ScarletsFrame element control
+	iface.title = "Input";
 
 	// Let's use ../nodes/input.js
-	node.interface = 'nodes/input';
+	iface.interface = 'nodes/input';
 
 	// handle = under Blackprint node flow control
-	handle.outputs = {
+	node.outputs = {
 		Changed:Function,
-		Value:'', // Default to empty string
+		Value:String, // Default to empty string
 	};
 
 	// Bring value from imported node to handle output
-	handle.imported = function(){
-		if(node.options.value)
-			console.warn("Saved options as outputs:", node.options.value);
+	node.imported = function(){
+		if(iface.options.value)
+			console.warn("Saved options as outputs:", iface.options.value);
 
-		handle.outputs.Value = node.options.value;
+		node.outputs.Value = iface.options.value;
 	}
 
-	// Proxy string value from: node.changed -> handle.changed -> outputs.Value
+	// Proxy string value from: node.changed -> node.changed -> outputs.Value
 	// And also call outputs.Changed() if connected to other node
-	handle.changed = function(text, ev){
+	node.changed = function(text, ev){
 		// This node still being imported
-		if(node.importing !== false)
+		if(iface.importing !== false)
 			return;
 
 		console.log('The input box have new value:', text);
 
 		// node.options.value === text;
-		handle.outputs.Value = node.options.value;
+		node.outputs.Value = iface.options.value;
 
 		// This will call every connected node
-		handle.outputs.Changed();
+		node.outputs.Changed();
 	}
 });
 
 // Does nothing :3
-Blackprint.registerNode('example/dummy/test', function(handle, node){
-	node.title = "Do nothing";
+Blackprint.registerNode('example/dummy/test', function(node, iface){
+	iface.title = "Do nothing";
 
 	// PortName must different any port
-	handle.inputs = {
+	node.inputs = {
 		"Input 1":Boolean,
 		"Input 2":String
 	};
 
-	handle.outputs = {
+	node.outputs = {
 		"Output 1":Object,
 		"Output 2":Number
 	};
 
-	handle.properties = {
+	node.properties = {
 		"Property 1":Boolean,
 		"Property 2":Number
 	};
