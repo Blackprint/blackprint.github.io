@@ -6,14 +6,17 @@ Blackprint.registerNode('example/math/multiply', function(node, iface){
 
 	// Handle all output port here
 	node.outputs = {
-		Result:Number,
+		Result: Number,
 	};
 
+	// Kind of shortcut
+	const Output = node.outputs;
+
 	// Handle all input port here
-	var inputs = node.inputs = {
+	const Input = node.inputs = {
 		Exec: Blackprint.PortTrigger(function(){
-			node.outputs.Result = multiply();
-			console.log("Result has been set:", node.outputs.Result);
+			Output.Result = multiply();
+			console.log("Result has been set:", Output.Result);
 		}),
 		A: Number,
 		B: Blackprint.PortValidator(Number, function(val){
@@ -27,14 +30,14 @@ Blackprint.registerNode('example/math/multiply', function(node, iface){
 
 	// Your own processing mechanism
 	function multiply(){
-		console.log('Multiplying', inputs.A, 'with', inputs.B);
-		return inputs.A * inputs.B;
+		console.log('Multiplying', Input.A, 'with', Input.B);
+		return Input.A * Input.B;
 	}
 
 	// When any output value from other node are updated
 	// Let's immediately change current node result
 	node.update = function(cable){
-		node.outputs.Result = multiply();
+		Output.Result = multiply();
 	}
 
 	// Event listener can only be registered after handle init
@@ -59,15 +62,15 @@ Blackprint.registerNode('example/math/random', function(node, iface){
 
 	// Let's use default node interface
 
-	node.outputs = {
-		Out:Number
+	const Output = node.outputs = {
+		Out: Number
 	};
 
 	var executed = false;
 	node.inputs = {
-		'Re-seed':Blackprint.PortTrigger(function(){
+		'Re-seed': Blackprint.PortTrigger(function(){
 			executed = true;
-			node.outputs.Out = Math.round(Math.random()*100);
+			Output.Out = Math.round(Math.random()*100);
 		})
 	};
 
@@ -92,7 +95,7 @@ Blackprint.registerNode('example/display/logger', function(node, iface){
 	// Let's use ../nodes/logger.js
 	iface.interface = 'nodes/logger';
 
-	node.inputs = {
+	const Input = node.inputs = {
 		Any: Blackprint.PortArrayOf(null) // Any data type, and can be used for many cable
 	};
 
@@ -113,16 +116,15 @@ Blackprint.registerNode('example/display/logger', function(node, iface){
 		// Let's show data after new cable was connected or disconnected
 		iface.on('cable.connect cable.disconnect', function(){
 			console.log("A cable was changed on Logger, now refresing the input element");
-			refreshLogger(node.inputs.Any);
+			refreshLogger(Input.Any);
 		});
 
-		console.log(iface);
 		iface.inputs.Any.on('value', function(port){
 			console.log("I connected to", port.name, "port from", port.iface.title, "that have new value:", port.value);
 
 			// Let's take all data from all connected nodes
 			// Instead showing new single data-> val
-			refreshLogger(node.inputs.Any);
+			refreshLogger(Input.Any);
 		});
 	}
 });
@@ -135,14 +137,14 @@ Blackprint.registerNode('example/button/simple', function(node, iface){
 	iface.interface = 'nodes/button';
 
 	// handle = under Blackprint node flow control
-	node.outputs = {
-		Clicked:Function
+	const Output = node.outputs = {
+		Clicked: Function
 	};
 
 	// Proxy event object from: node.clicked -> node.clicked -> outputs.Clicked
 	node.clicked = function(ev){
 		console.log('button/simple: got', ev, "time to trigger to the other node");
-		node.outputs.Clicked(ev);
+		Output.Clicked(ev);
 	}
 });
 
@@ -154,17 +156,22 @@ Blackprint.registerNode('example/input/simple', function(node, iface){
 	iface.interface = 'nodes/input';
 
 	// handle = under Blackprint node flow control
-	node.outputs = {
-		Changed:Function,
-		Value:String, // Default to empty string
+	const Output = node.outputs = {
+		Changed: Function,
+		Value: String, // Default to empty string
+	};
+
+	iface.options = {
+		value:'...'
 	};
 
 	// Bring value from imported node to handle output
-	node.imported = function(){
-		if(iface.options.value)
-			console.warn("Saved options as outputs:", iface.options.value);
+	node.imported = function(options){
+		console.warn("Old options:", JSON.stringify(iface.options));
+		console.warn("Imported options:", JSON.stringify(options));
 
-		node.outputs.Value = iface.options.value;
+		iface.options = options;
+		Output.Value = options.value;
 	}
 
 	// Proxy string value from: node.changed -> node.changed -> outputs.Value
@@ -177,10 +184,10 @@ Blackprint.registerNode('example/input/simple', function(node, iface){
 		console.log('The input box have new value:', text);
 
 		// node.options.value === text;
-		node.outputs.Value = iface.options.value;
+		Output.Value = iface.options.value;
 
 		// This will call every connected node
-		node.outputs.Changed();
+		Output.Changed();
 	}
 });
 
@@ -190,17 +197,17 @@ Blackprint.registerNode('example/dummy/test', function(node, iface){
 
 	// PortName must different any port
 	node.inputs = {
-		"Input 1":Boolean,
-		"Input 2":String
+		"Input 1": Boolean,
+		"Input 2": String
 	};
 
 	node.outputs = {
-		"Output 1":Object,
-		"Output 2":Number
+		"Output 1": Object,
+		"Output 2": Number
 	};
 
 	node.properties = {
-		"Property 1":Boolean,
-		"Property 2":Number
+		"Property 1": Boolean,
+		"Property 2": Number
 	};
 });
