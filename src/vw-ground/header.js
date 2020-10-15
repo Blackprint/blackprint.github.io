@@ -63,10 +63,8 @@ sf.model('header', function(self, root){
 		self.cloneActive = !self.cloneActive;
 
 		if(self.cloneActive){
-			// We must clear nodes from the sketch to reset the container
-			// And initialize some node data and component from beginning
-			var backupJSON = sketch.exportJSON();
-			sketch.clearNodes();
+			if(self.switchVFXActive === false)
+				self.switchVFX();
 
 			// Reset current container view
 			var container = sketch.scope('container');
@@ -74,18 +72,37 @@ sf.model('header', function(self, root){
 			container.pos.y = 0;
 			container.scale = 1; // 100% scale
 
-			var cloned = sketch.cloneContainer();
+			var mini = sketch.cloneContainer(); // Clone 1
 
-			// Remove the dropdown from cloned container
-			$('sf-m[name="dropdown"]', cloned).remove()
+			// Remove the dropdown and SVG animation
+			// from mini container
+			$('sf-m[name="dropdown"], animate', mini).remove();
 
-			// Put the cloned container into DOM
-			$('.mini-blackprint').removeClass('hidden').append(cloned);
+			// Clone into new window
+			sf.window.create({
+				title: "Cloned Sketch Container",
+				templateHTML: sketch.cloneContainer() // Clone 2
+			}, refreshViewport);
 
-			// And reimport it again
-			sketch.importJSON(backupJSON);
+			// Put the mini container into DOM
+			$('.mini-blackprint').removeClass('hidden').append(mini); // Clone 1
+
+			// Refresh mini viewport size
+			// I put it like this for a reason
+			refreshViewport();
+			function refreshViewport(){
+				setTimeout(function(){
+					container.pos.x = -0.1;
+					setTimeout(function(){
+						container.pos.x = 0;
+					}, 500);
+				}, 1000);
+			}
 		}
-		else $('.mini-blackprint').addClass('hidden').text('');
+		else{
+			$('.mini-blackprint').addClass('hidden').text('');
+			sf.window.destroy();
+		}
 	}
 
 	self.switchVFXActive = false;
