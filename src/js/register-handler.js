@@ -93,7 +93,7 @@ Blackprint.registerNode('example/display/logger', function(node, iface){
 	iface.interface = 'nodes/logger';
 
 	node.inputs = {
-		Any: null
+		Any: Blackprint.PortArrayOf(null) // Any data type, and can be used for many cable
 	};
 
 	function refreshLogger(val){
