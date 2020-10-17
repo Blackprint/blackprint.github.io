@@ -23,6 +23,10 @@
 	  (function(){function z(a){document.write('<script src="'+a+'"><\/script>')}
 	    if(window.PointerEvent === void 0)
 	      z('https://code.jquery.com/pep/0.4.3/pep.js');
+	  	if(KeyframeEffect.prototype.setKeyframes === void 0){
+	  	  KeyframeEffect.prototype.setKeyframes = function(){}
+	  	  KeyframeEffect.prototype.getKeyframes = function(){return []}
+	  	}
 	  })();
 
 	  // 1 = Will not replace model/component value (only replace function)
