@@ -8,9 +8,9 @@ sf.model('header', function(self, root){
 
 	var onHomepage;
 	self.init = function(){
-		sf.url.parse(); // Trigger to reparse current URL
+		sf.url.parse(true); // Trigger to reparse current URL
 
-		if(!sf.url.hashes.ground || sf.url.hashes.ground === '/'){
+		if(!sf.url.routes.ground || sf.url.routes.ground === '/'){
 			setTimeout(function(){
 				textAnimation("Let's getting started!");
 
