@@ -1,0 +1,23 @@
+## html
+<!-- /src/routes/+vw-ground/sketch.sf -->
+<vw-page></vw-page>
+
+## js-global.router
+={
+	on:{
+		showed(){
+			// Show sketch options
+			sf.model('header').showOptions = true;
+		},
+		leaving(){
+			sf.model('header').showOptions = false;
+		}
+
+		/*
+		showed: Sketch container have been loaded,
+		coming: The cable would have wrong position because the DOM still hidden,
+		leaving: Maybe we can uninitialize something,
+		hidden: Animate something maybe
+		*/
+	}
+}

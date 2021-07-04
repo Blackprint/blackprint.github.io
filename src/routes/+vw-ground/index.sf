@@ -1,0 +1,310 @@
+## html
+<!-- Model on ./blackprint/header.js -->
+<sf-m name="header" class="header">
+	<div class="left" @click="toHome">{{ message }}</div>
+	<div class="right" @click="toWorkspace">{{ description }}</div>
+	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
+		<div class="item-list">
+			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></i></div>
+			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
+			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
+			<div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
+			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div>
+		</div>
+		<div class="header-zoom">
+			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
+				<i class="fas fa-search"></i> {{ info.scale }}%
+			</div>
+		</div>
+	</div>
+</sf-m>
+
+<!-- Filling the default page if haven't being routed -->
+<div class="welcome-text">
+	<h1>Welcome to Blackprint!</h1>
+	<div class="description">This project haven't been finished yet.
+		To open the sketch page, please click that blinking text on the top left.
+	</div>
+</div>
+
+<!-- Featured link -->
+<div class="welcome-featured">
+	<a target="_blank" href="https://ko-fi.com/stefansarya">
+		<i class="fas fa-mug-hot"></i> Ko-fi
+	</a>
+	<a target="_blank" href="https://github.com/Blackprint/Blackprint">
+		<i class="fab fa-github"></i> Github
+	</a>
+</div>
+
+## scss-global
+.welcome-text{
+	color: white;
+	text-align: center;
+	padding: 0 20px;
+
+	.description{
+		white-space: pre-line;
+	}
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+
+.welcome-featured{
+	display: grid;
+	position: absolute;
+	color: #a0a0a0;
+	bottom: 55px;
+	left: 10px;
+	i{
+		margin-right: 5px;
+	}
+}
+
+.header{
+	position: relative;
+	background: #00000085;
+	align-items: center;
+	border-bottom: 1px solid black;
+	display: flex;
+	box-shadow: 0 0 8px 0 black;
+
+	.left {
+		border-right: 2px solid;
+		font-size: 26px;
+		padding: 0 15px 0 15px;
+		cursor: pointer;
+		text-align: center;
+	}
+
+	.right {
+		font-size: 18px;
+		text-align: center;
+		padding: 10px;
+		cursor: pointer;
+		height: 24px;
+	}
+}
+
+.header-menu{
+	.item-list{
+		display: flex;
+		position: absolute;
+		right: 0px;
+		top: 7px;
+		font-size: 24px;
+		.item{
+		    padding: 0 10px;
+		    cursor: pointer;
+
+		    &.active{
+		    	color: white;
+		    }
+		}
+	}
+	.header-zoom{
+		position: absolute;
+		right: 10px;
+		color: white;
+		opacity: 0.8;
+		top: 50px;
+		font-size: 22px;
+	}
+}
+
+## js-global
+// https://www.npmjs.com/package/scarletsframe#initializedefine-model
+sf.model('header', function(My, root){
+	My.message = "Hello";
+	My.description = "Developers! ";
+	My.showOptions = false;
+
+	My.info = {scale:100};
+
+	var onHomepage;
+	My.init = function(){
+		sf.URI.parse(); // Trigger to reparse current URL
+
+		if(!sf.URI.routes.ground || sf.URI.routes.ground === '/'){
+			setTimeout(function(){
+				textAnimation("Let's getting started!");
+
+				onHomepage = setInterval(function(){
+					My.$el('.right').animateKey('fadeOut');
+				}, 2000);
+			}, 2000);
+		}
+		else{
+			My.description = "Developers! ";
+			textAnimation("Welcome to the example!");
+
+			My.showOptions = true;
+
+			sketch.scope('container').onScale = function(scale){
+				My.info.scale = Math.round(scale*100);
+			}
+		}
+	}
+
+	My.toHome = function(){
+		views.goto('/');
+	}
+
+	My.toWorkspace = function(){
+		clearInterval(onHomepage);
+
+		views.goto('/sketch/1', function(){
+			My.description = 'Developers! ';
+			setTimeout(function(){
+				textAnimation("Welcome to the example!");
+			}, 1000);
+		});
+	}
+
+	function textAnimation(text){
+		var description = text.split('');
+
+		// Text animation
+		var interval = setInterval(function(){
+			My.description += description.shift();
+
+			if(description.length === 0)
+				clearInterval(interval);
+		}, 50);
+	}
+
+	My.cloneActive = false;
+	My.cloneContainer = function(){
+		My.cloneActive = !My.cloneActive;
+
+		if(My.cloneActive){
+			if(My.switchVFXActive === false)
+				My.switchVFX();
+
+			// Reset current container view
+			var container = sketch.scope('container');
+			container.pos.x = 0;
+			container.pos.y = 0;
+			container.scale = 1; // 100% scale
+
+			var mini = sketch.cloneContainer(); // Clone 1
+
+			// Remove the dropdown and SVG animation
+			// from mini container
+			$('sf-m[name="dropdown"], animate', mini).remove();
+
+			// Clone into new window
+			new sf.Window({
+				title: "Cloned Sketch Container",
+				templateHTML: sketch.cloneContainer() // Clone 2
+			}, refreshViewport);
+
+			// Put the mini container into DOM
+			$('.mini-blackprint').removeClass('hidden').append(mini); // Clone 1
+
+			// Refresh mini viewport size
+			// I put it like this for a reason
+			refreshViewport();
+			function refreshViewport(){
+				setTimeout(function(){
+					container.pos.x = -0.1;
+					setTimeout(function(){
+						container.pos.x = 0;
+					}, 500);
+				}, 1000);
+			}
+		}
+		else{
+			$('.mini-blackprint').addClass('hidden').text('');
+			sf.Window.destroy();
+		}
+	}
+
+	My.switchVFXActive = false;
+	My.switchVFX = function(){
+		My.switchVFXActive = !My.switchVFXActive;
+
+		if(My.switchVFXActive){
+			sketch.scope('container').$el.addClass('performance');
+			My.visualizeActive = false;
+			Blackprint.settings('visualizeFlow', false);
+		}
+		else sketch.scope('container').$el.removeClass('performance');
+	}
+
+	My.visualizeActive = true;
+	My.visualizeFlow = function(){
+		My.visualizeActive = !My.visualizeActive;
+		Blackprint.settings('visualizeFlow', My.visualizeActive);
+	}
+
+	My.saveSketch = function(ev){
+		sketch.scope('dropdown').show([{
+			title:'Copy JSON',
+			callback:function(){
+				var temp = sketch.exportJSON();
+				navigator.clipboard.writeText(temp);
+
+				swal({
+					title: "Copied to clipboard!",
+					text: temp
+				});
+			}
+		}, {
+			title:'To File',
+			callback:function(){
+				var btn = document.createElement("a");
+				var file = new Blob([sketch.exportJSON()], {type: 'application/json'});
+				btn.href = URL.createObjectURL(file);
+				btn.download = 'blackprint.json';
+				btn.click();
+
+				// Auto revoke after 10 sec
+				setTimeout(function(){
+					URL.revokeObjectURL(btn.href);
+				}, 10000);
+			}
+		}], ev.x, ev.y);
+	}
+
+	My.loadSketch = function(ev){
+		sketch.scope('dropdown').show([{
+			title:'Append from JSON',
+			callback:function(){
+				swal({
+					title:"Append from JSON",
+					content: "input",
+				}).then(function(val){
+					sketch.importJSON(val);
+				});
+			}
+		}, {
+			title:'Import JSON',
+			callback:function(){
+				swal({
+					title:"Import JSON",
+					content: "input",
+				}).then(function(val){
+					if(!val)
+						return;
+
+					sketch.clearNodes();
+					sketch.importJSON(val);
+				});
+			}
+		}, {
+			title:'From File',
+			callback:function(){
+				var el = document.createElement("input");
+				el.setAttribute('type', 'file');
+				el.onchange = function(){
+					console.log(345, this);
+				}
+				el.click();
+			}
+		}], ev.x, ev.y);
+	}
+});

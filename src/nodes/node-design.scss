@@ -12,12 +12,6 @@ sf-space[blackprint]{
 			}
 
 			&.trigger .header{
-				box-shadow: inset 0 0 3px #a05f5f;
-				background-image: -webkit-gradient(
-					linear, left top, right bottom, from(rgba(226, 18, 18, 0.7)),
-					to(rgba(229, 41, 41, 0.2)), color-stop(0.8, rgba(229, 32, 32, 0.1))
-				);
-
 				.icon{
 					font-family: "Font Awesome 5 Free";
 					font-weight: 900;
@@ -33,12 +27,6 @@ sf-space[blackprint]{
 			}
 
 			&.input .header{
-				box-shadow: inset 0 0 3px #75a05f;
-				background-image: -webkit-gradient(
-					linear, left top, right bottom, from(rgba(108, 232, 93, 0.7)),
-					to(rgba(103, 255, 108, 0.2)), color-stop(0.8, rgba(130, 226, 124, 0.1))
-				);
-
 				.icon{
 					font-family: "Font Awesome 5 Free";
 					font-weight: 900;

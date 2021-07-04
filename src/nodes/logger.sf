@@ -1,0 +1,90 @@
+## html
+<div class="node function" style="transform: translate({{ x }}px, {{ y }}px)">
+  <sf-template path="Blackprint/nodes/template/header.html"></sf-template>
+
+  <div class="content">
+    <textarea value="{{ log }}"></textarea>
+
+    <div class="left-port">
+      <sf-template path="Blackprint/nodes/template/input-port.html"></sf-template>
+    </div>
+  </div>
+</div>
+
+## js-global
+// == Blackprint Visual Engine ==
+// You're allowed tp control related DOM element here
+Blackprint.registerInterface('nodes/logger', function(iface){
+	// Property of this scope
+	/* iface == {
+		x: 0,
+		y: 0,
+		inputs: [],
+		outputs: [],
+		properties: [],
+	} */
+
+	// One way binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
+	iface.log = '...';
+
+	// Listener when log value is being send to HTML input element by the framework
+	// I'm using this for auto scale the width/height of the textarea
+	iface.m2v$log = function(now){
+		// Scale the input box depend on character length
+		var el = iface.$el('textarea');
+
+		// Skip if textarea was larger than our auto control
+		// I mean, if user have change the size manually
+		if(el[0].offsetWidth > 150 || el[0].offsetHeight > 60)
+			return;
+
+		if(now.length < 8)
+			el.attr('style', '');
+		else if(now.length >= 8 && now.length < 14)
+			el.attr('style', 'width:'+(10*now.length)+'px');
+		else if(now.length >= 14)
+			el.attr('style', 'width:140px;height:50px');
+	}
+});
+
+// Logic only, to control HTML or graphical interface we need to use iface
+Blackprint.registerNode('example/display/logger', function(node, iface){
+	iface.title = "Logger";
+	iface.description = 'Print anything into text';
+
+	// Let's use ../nodes/logger.js
+	iface.interface = 'nodes/logger';
+
+	const Input = node.inputs = {
+		Any: Blackprint.PortArrayOf(null) // Any data type, and can be used for many cable
+	};
+
+	function refreshLogger(val){
+		if(val === null)
+			iface.log = 'null';
+		else if(val === undefined)
+			iface.log = 'undefined';
+		else if(val.constructor === Function)
+			iface.log = val.toString();
+		else if(val.constructor === String || val.constructor === Number)
+			iface.log = val;
+		else
+			iface.log = JSON.stringify(val);
+	}
+
+	node.init = function(){
+		// Let's show data after new cable was connected or disconnected
+		iface.on('cable.connect cable.disconnect', function(){
+			console.log("A cable was changed on Logger, now refresing the input element");
+			refreshLogger(Input.Any);
+		});
+
+		iface.inputs.Any.on('value', function(port){
+			console.log("I connected to", port.name, "port from", port.iface.title, "that have new value:", port.value);
+
+			// Let's take all data from all connected nodes
+			// Instead showing new single data-> val
+			refreshLogger(Input.Any);
+		});
+	}
+});

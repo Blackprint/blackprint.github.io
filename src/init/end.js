@@ -1,2 +1,0 @@
-});
-// End of compiled file

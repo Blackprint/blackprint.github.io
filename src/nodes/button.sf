@@ -1,0 +1,61 @@
+## html
+<div class="node trigger" style="transform: translate({{ x }}px, {{ y }}px)">
+  <sf-template path="Blackprint/nodes/template/header.html"></sf-template>
+
+  <div class="content">
+    <div class="button" @click="clicked(event)">
+      <div class="arrow"><img src="/assets/img/icon/trigger-button.png" alt="" /></div>
+      <a>Trigger</a>
+    </div>
+
+    <div class="right-port">
+      <sf-template path="Blackprint/nodes/template/output-port.html"></sf-template>
+    </div>
+  </div>
+</div>
+
+## js-global
+// == Blackprint Visual Engine ==
+// You're allowed tp control related DOM element here
+Blackprint.registerInterface('nodes/button', function(iface){
+  // Property of this scope
+  /* iface == {
+    x: 0,
+    y: 0,
+    inputs: [],
+    outputs: [],
+    properties: [],
+  } */
+
+  // To get the button element
+  // iface.$el('.button')
+
+  // iface.$el only available after component was initialized
+  // iface.init = function(){ ... }
+
+  // Element event binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Element-Event
+  iface.clicked = function(ev){
+    console.log("Element: 'Trigger' button clicked, going to run the handler");
+    iface.node.clicked && iface.node.clicked(ev);
+  }
+});
+
+// Logic only, to control HTML or graphical interface we need to use iface
+Blackprint.registerNode('example/button/simple', function(node, iface){
+  // node = under ScarletsFrame element control
+  iface.title = "Button";
+
+  // Let's use ../nodes/button.js
+  iface.interface = 'nodes/button';
+
+  // handle = under Blackprint node flow control
+  const Output = node.outputs = {
+    Clicked: Function
+  };
+
+  // Proxy event object from: node.clicked -> node.clicked -> outputs.Clicked
+  node.clicked = function(ev){
+    console.log('button/simple: got', ev, "time to trigger to the other node");
+    Output.Clicked(ev);
+  }
+});

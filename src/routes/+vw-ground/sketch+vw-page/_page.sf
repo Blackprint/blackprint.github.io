@@ -1,3 +1,55 @@
+## html
+<sketch-page>
+	<!-- Import template from Blackprint library -->
+	<sf-template path="Blackprint/page.html"></sf-template>
+
+	<div class="mini-blackprint disable-effect hidden"></div>
+	<div class="bottom-message">Try right clicking something and have fun (≧▽≦)／</div>
+</sketch-page>
+
+## scss-global
+sketch-page{
+	.mini-blackprint{
+		width: 240px;
+		height: 190px;
+		position: absolute;
+		top: 5px;
+		right: 0;
+		overflow: hidden;
+		box-shadow: 0 0 6px #ffffff6b;
+		background: #ffffff40;
+		border-radius: 10px;
+		pointer-events: none;
+
+		&.hidden{
+			display: none;
+		}
+
+		sf-space{
+			transform: scale(0.3);
+		}
+	}
+
+	.bottom-message{
+		position: absolute;
+		bottom: 50px;
+		left: 10px;
+	}
+}
+
+## js-global.router
+={
+	on:{
+		coming(){
+			console.log("Sketch page data:", arguments);
+		},
+		leaving(){
+			console.log("Leaving from sketch page data:", arguments);
+		}
+	}
+}
+
+## js-global
 var sampleImported = false;
 sf.component('sketch-page', function(self){
 
