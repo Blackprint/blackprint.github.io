@@ -1,6 +1,6 @@
 ## html
 <div class="node trigger" style="transform: translate({{ x }}px, {{ y }}px)">
-  <sf-template path="Blackprint/nodes/template/header.html"></sf-template>
+  <sf-template path="Blackprint/nodes/template/header.sf"></sf-template>
 
   <div class="content">
     <div class="button" @click="clicked(event)">
@@ -9,7 +9,7 @@
     </div>
 
     <div class="right-port">
-      <sf-template path="Blackprint/nodes/template/output-port.html"></sf-template>
+      <sf-template path="Blackprint/nodes/template/output-port.sf"></sf-template>
     </div>
   </div>
 </div>

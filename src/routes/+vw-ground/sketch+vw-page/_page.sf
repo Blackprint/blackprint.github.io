@@ -1,7 +1,7 @@
 ## html
 <sketch-page>
 	<!-- Import template from Blackprint library -->
-	<sf-template path="Blackprint/page.html"></sf-template>
+	<sf-template path="Blackprint/page.sf"></sf-template>
 
 	<div class="mini-blackprint disable-effect hidden"></div>
 	<div class="bottom-message">Try right clicking something and have fun (≧▽≦)／</div>
