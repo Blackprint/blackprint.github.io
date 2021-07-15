@@ -3,7 +3,7 @@
   <sf-template path="Blackprint/nodes/template/header.sf"></sf-template>
 
   <div class="content">
-    <textarea sf-bind="options.value"></textarea>
+    <textarea sf-bind="options.value" @input="textChanged"></textarea>
 
     <div class="right-port">
       <sf-template path="Blackprint/nodes/template/output-port.sf"></sf-template>
@@ -24,6 +24,8 @@ Blackprint.registerInterface('nodes/input', function(iface){
 		properties: [],
 	} */
 
+	let waitRepaint = false;
+
 	// Must be placed on 'options' if we want to export the properties as JSON
 	iface.options = {
 		// Two way binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
@@ -31,33 +33,33 @@ Blackprint.registerInterface('nodes/input', function(iface){
 
 		// Listener for two way binding when value from HTML input element is being received by the framework
 		// I'm using this for auto scale the width/height of the textarea
-		on$value:function(now){
-			// Scale the input box depend on character length
-			var el = iface.$el('textarea');
+		on$value(now){
+			if(waitRepaint) return;
 
-			// Skip if textarea was larger than our auto control
-			// I mean, if user have change the size manually
-			if(el[0].offsetWidth > 150 || el[0].offsetHeight > 60)
-				return;
+			waitRepaint = true;
+			$.afterRepaint().then(function(){
+				waitRepaint = false;
 
-			if(now.length < 8)
-				el.attr('style', '');
-			else if(now.length >= 8 && now.length < 14)
-				el.attr('style', 'width:'+(10*now.length)+'px');
-			else if(now.length >= 14)
-				el.attr('style', 'width:140px;height:50px');
+				// Scale the input box depend on character length
+				var el = iface.$el('textarea');
+
+				// Skip if textarea was larger than our auto control
+				// I mean, if user have change the size manually
+				if(el[0].offsetWidth > 150 || el[0].offsetHeight > 60)
+					return;
+
+				if(now.length < 8)
+					el.attr('style', '');
+				else if(now.length >= 8 && now.length < 14)
+					el.attr('style', 'width:'+(10*now.length)+'px');
+				else if(now.length >= 14)
+					el.attr('style', 'width:140px;height:50px');
+			});
 		}
 	};
 
 	iface.textChanged = function(ev){
 		iface.node.changed(ev.target.value);
-	}
-
-	// Add event listener to textarea after element initialized
-	iface.init = iface.hotReloaded = function(){
-		// Only create if the Blackprint handler need this
-		if(iface.node.changed)
-			iface.$el('textarea').on('input', iface.textChanged);
 	}
 });
 
