@@ -4,6 +4,26 @@ For adding library or style, please modify /public/index.html
 ## html.append-to-body
 <img class="background" src="/assets/img/background/blackprint.jpg?1">
 
+<!-- Model on ./blackprint/header.js -->
+<sf-m name="header" class="header">
+	<div class="left" @click="toHome">{{ message }}</div>
+	<div class="right" @click="toWorkspace">{{ description }}</div>
+	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
+		<div class="item-list">
+			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></i></div>
+			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
+			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
+			<div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
+			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div>
+		</div>
+		<div class="header-zoom">
+			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
+				<i class="fas fa-search"></i> {{ info.scale }}%
+			</div>
+		</div>
+	</div>
+</sf-m>
+
 <!-- Ground viewport -->
 <!-- ./src/vw-ground/router.js -->
 <vw-ground style="display: none"></vw-ground>
@@ -19,4 +39,12 @@ body > .background{
 	width: 100%;
 	box-shadow: inset 0 0 11rem 0px black;
 	height: 100%;
+}
+
+vw-ground{
+	position: relative;
+	overflow: hidden;
+	display: block;
+	height: calc(100vh - 50px);
+	width: 100vw;
 }

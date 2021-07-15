@@ -19,13 +19,6 @@ sf-m{
 	display: block;
 }
 
-vw-ground{
-	overflow: hidden;
-	display: block;
-	height: 100vh;
-	width: 100vw;
-}
-
 sf-page-view{
 	display: block;
 	visibility: hidden;
@@ -42,17 +35,6 @@ sf-page-view{
 		&.anim-pending .page-current{
 			visibility: hidden;
 		}
-	}
-}
-
-vw-page{
-	position: absolute;
-	height: 100%;
-	width: 100%;
-	top: 45px; // Because there are navbar on the top
-
-	&.page-current{
-		top: 0;
 	}
 }
 

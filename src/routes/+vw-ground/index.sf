@@ -1,24 +1,4 @@
 ## html
-<!-- Model on ./blackprint/header.js -->
-<sf-m name="header" class="header">
-	<div class="left" @click="toHome">{{ message }}</div>
-	<div class="right" @click="toWorkspace">{{ description }}</div>
-	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
-		<div class="item-list">
-			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></i></div>
-			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
-			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
-			<div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
-			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div>
-		</div>
-		<div class="header-zoom">
-			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
-				<i class="fas fa-search"></i> {{ info.scale }}%
-			</div>
-		</div>
-	</div>
-</sf-m>
-
 <!-- Filling the default page if haven't being routed -->
 <div class="welcome-text">
 	<h1>Welcome to Blackprint!</h1>
@@ -57,7 +37,7 @@ a{
 	display: grid;
 	position: absolute;
 	color: #a0a0a0;
-	bottom: 55px;
+	bottom: 0;
 	left: 10px;
 	i{
 		margin-right: 5px;
@@ -244,7 +224,7 @@ sf.model('header', function(My, root){
 	My.saveSketch = function(ev){
 		sketch.scope('dropdown').show([{
 			title:'Copy JSON',
-			callback:function(){
+			callback(){
 				var temp = sketch.exportJSON();
 				navigator.clipboard.writeText(temp);
 
@@ -255,7 +235,7 @@ sf.model('header', function(My, root){
 			}
 		}, {
 			title:'To File',
-			callback:function(){
+			callback(){
 				var btn = document.createElement("a");
 				var file = new Blob([sketch.exportJSON()], {type: 'application/json'});
 				btn.href = URL.createObjectURL(file);
@@ -273,7 +253,7 @@ sf.model('header', function(My, root){
 	My.loadSketch = function(ev){
 		sketch.scope('dropdown').show([{
 			title:'Append from JSON',
-			callback:function(){
+			callback(){
 				swal({
 					title:"Append from JSON",
 					content: "input",
@@ -283,7 +263,7 @@ sf.model('header', function(My, root){
 			}
 		}, {
 			title:'Import JSON',
-			callback:function(){
+			callback(){
 				swal({
 					title:"Import JSON",
 					content: "input",
@@ -297,7 +277,7 @@ sf.model('header', function(My, root){
 			}
 		}, {
 			title:'From File',
-			callback:function(){
+			callback(){
 				var el = document.createElement("input");
 				el.setAttribute('type', 'file');
 				el.onchange = function(){

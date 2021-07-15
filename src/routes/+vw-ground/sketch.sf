@@ -9,7 +9,7 @@
 			// Show sketch options
 			sf.model('header').showOptions = true;
 		},
-		leaving(){
+		hidden(){
 			sf.model('header').showOptions = false;
 		}
 
@@ -19,5 +19,16 @@
 		leaving: Maybe we can uninitialize something,
 		hidden: Animate something maybe
 		*/
+	}
+}
+
+## scss-global
+vw-page{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+
+	&.page-current{
+		top: 0;
 	}
 }
