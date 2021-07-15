@@ -43,16 +43,6 @@ sf-space[blackprint]{
 		}
 	}
 
-	sf-m.performance{
-		.cables > svg{
-			filter: none;
-		}
-		.nodes .node{
-			box-shadow: none;
-			transition: none;
-		}
-	}
-
 	.description{
 		margin-top: 3px;
 		white-space: pre-line;
@@ -118,8 +108,6 @@ sf-space[blackprint]{
 
 	.node{
 		textarea{
-			height: 20px;
-			width: 60px;
 			margin: 0px 5px 0px -10px;
 			background: rgba(0, 0, 0, 0.63);
 			color: white;
