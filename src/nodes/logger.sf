@@ -11,6 +11,13 @@
   </div>
 </div>
 
+## scss-global
+nodes-logger{
+	textarea{
+		width: 100px;
+	}
+}
+
 ## js-global
 // == Blackprint Visual Engine ==
 // You're allowed tp control related DOM element here
@@ -48,7 +55,7 @@ Blackprint.registerInterface('nodes/logger', function(iface){
 });
 
 // Logic only, to control HTML or graphical interface we need to use iface
-Blackprint.registerNode('example/display/logger', function(node, iface){
+Blackprint.registerNode('Example/Display/Logger', function(node, iface){
 	iface.title = "Logger";
 	iface.description = 'Print anything into text';
 

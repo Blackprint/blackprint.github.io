@@ -4,7 +4,7 @@
 Blackprint.Engine.registerInterface('nodes/input', function(iface, bind){
 	var theValue = '...';
 	bind({
-		options:{
+		data:{
 			set value(val){
 				theValue = val;
 

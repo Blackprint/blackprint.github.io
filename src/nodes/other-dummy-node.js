@@ -1,7 +1,7 @@
 // Node here will use 'default' node interface
 // and only being used as an example, this may get removed
 
-Blackprint.registerNode('example/math/multiply', function(node, iface){
+Blackprint.registerNode('Example/Math/Multiply', function(node, iface){
 	iface.title = "Multiply";
 	// Let's use default node interface
 
@@ -57,7 +57,7 @@ Blackprint.registerNode('example/math/multiply', function(node, iface){
 	}, 10);
 });
 
-Blackprint.registerNode('example/math/random', function(node, iface){
+Blackprint.registerNode('Example/Math/Random', function(node, iface){
 	iface.title = "Random";
 	iface.description = "Number (0-100)";
 
@@ -90,7 +90,7 @@ Blackprint.registerNode('example/math/random', function(node, iface){
 });
 
 // Does nothing :3
-Blackprint.registerNode('example/dummy/test', function(node, iface){
+Blackprint.registerNode('Example/Dummy/Test', function(node, iface){
 	iface.title = "Do nothing";
 
 	// PortName must different any port
