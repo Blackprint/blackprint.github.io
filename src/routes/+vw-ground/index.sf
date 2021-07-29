@@ -1,19 +1,59 @@
 ## html
 <!-- Filling the default page if haven't being routed -->
-<div class="welcome-text">
-	<h1>Welcome to Blackprint!</h1>
-	<div class="description">This project haven't been finished yet.
-		To open the sketch page, please click that blinking text on the top left.
+<sf-m name="welcome-text" class="welcome-text">
+	<h1>Welcome to Blackprint Editor!</h1>
+	<div class="description">This editor haven't being designed for mobile screen.</div>
+	<div>
+		<div class="item" @click="toWorkspace">
+			<i class="fas fa-torii-gate"></i> Go to sketch page
+		</div>
+		<div class="item">
+			<i class='fa fa-map-signs'></i> <span style="text-decoration: line-through">Open examples</span>
+		</div>
 	</div>
-</div>
+	<div class="available-engine">
+		<div class="title">Blackprint Engine also available for:</div>
+		<div class="list">
+			<!-- python, csharp, java/kotlin, cplusplus, go, rust, docker -->
+			<!-- css3, html5 -->
+			<a class="item" href="https://github.com/Blackprint/engine-js" target="_blank">
+				<img src="/assets/img/icon/denojs.svg">
+				<div class="name">Deno</div>
+			</a>
+			<a class="item" href="https://github.com/Blackprint/engine-js" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.12.0/icons/nodejs/nodejs-plain.svg">
+				<div class="name">Node.js</div>
+			</a>
+			<a class="item" href="https://github.com/Blackprint/engine-php" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.12.0/icons/php/php-plain.svg">
+				<div class="name">PHP</div>
+			</a>
+		</div>
+	</div>
+</sf-m>
 
-<!-- Featured link -->
-<div class="welcome-featured">
+<div class="welcome-left">
 	<a target="_blank" href="https://ko-fi.com/stefansarya">
 		<i class="fas fa-mug-hot"></i> Ko-fi
 	</a>
 	<a target="_blank" href="https://github.com/Blackprint/Blackprint">
-		<i class="fab fa-github"></i> Github
+		<i class="fab fa-github"></i> GitHub
+	</a>
+	<a target="_blank" href="https://stefansarya.gitbook.io/blackprint">
+		<i class="fa fa-book-open"></i> Documentation
+	</a>
+	<a target="_blank" href="https://github.com/Blackprint/Blackprint/discussions">
+		<i class="fa fa-comments"></i> Discussions
+	</a>
+
+</div>
+
+<div class="welcome-right">
+	<a style="text-decoration: line-through">
+		Package List <i class="fas fa-boxes"></i>
+	</a>
+	<a target="_blank" href="https://www.npmjs.com/search?q=keywords:blackprint">
+		NPMjs <i class="fas fa-box"></i>
 	</a>
 </div>
 
@@ -26,14 +66,30 @@
 	.description{
 		white-space: pre-line;
 	}
+
+	.available-engine{
+		bottom: 0;
+		width: 100vw;
+		left: 0;
+		position: absolute;
+		.title{
+
+		}
+		.list .item{
+			width: 50px;
+			img{
+				max-width: 50px;
+				filter: brightness(0) invert(1);
+			}
+
+			display: inline-block;
+			color: white;
+			margin: 0 5px;
+		}
+	}
 }
 
-a{
-    color: inherit;
-    text-decoration: none;
-}
-
-.welcome-featured{
+.welcome-left{
 	display: grid;
 	position: absolute;
 	color: #a0a0a0;
@@ -44,247 +100,25 @@ a{
 	}
 }
 
-.header{
-	position: relative;
-	background: #00000085;
-	align-items: center;
-	border-bottom: 1px solid black;
-	display: flex;
-	box-shadow: 0 0 8px 0 black;
-
-	.left {
-		border-right: 2px solid;
-		font-size: 26px;
-		padding: 0 15px 0 15px;
-		cursor: pointer;
-		text-align: center;
-	}
-
-	.right {
-		font-size: 18px;
-		text-align: center;
-		padding: 10px;
-		cursor: pointer;
-		height: 24px;
-	}
-}
-
-.header-menu{
-	.item-list{
-		display: flex;
-		position: absolute;
-		right: 0px;
-		top: 7px;
-		font-size: 24px;
-		.item{
-		    padding: 0 10px;
-		    cursor: pointer;
-
-		    &.active{
-		    	color: white;
-		    }
-		}
-	}
-	.header-zoom{
-		position: absolute;
-		right: 10px;
-		color: white;
-		opacity: 0.8;
-		top: 50px;
-		font-size: 22px;
+.welcome-right{
+	display: grid;
+	position: absolute;
+	color: #a0a0a0;
+	bottom: 0;
+	right: 10px;
+	text-align: right;
+	i{
+		margin-left: 5px;
 	}
 }
 
 ## js-global
-// https://www.npmjs.com/package/scarletsframe#initializedefine-model
-sf.model('header', function(My, root){
-	My.message = "Hello";
-	My.description = "Developers! ";
-	My.showOptions = false;
-
-	My.info = {scale:100};
-
-	var onHomepage;
-	My.init = function(){
-		sf.URI.parse(); // Trigger to reparse current URL
-
-		if(!sf.URI.routes.ground || sf.URI.routes.ground === '/'){
-			setTimeout(function(){
-				textAnimation("Let's getting started!");
-
-				onHomepage = setInterval(function(){
-					My.$el('.right').animateKey('fadeOut');
-				}, 2000);
-			}, 2000);
-		}
-		else{
-			My.description = "Developers! ";
-			textAnimation("Welcome to the example!");
-
-			My.showOptions = true;
-
-			sketch.scope('container').onScale = function(scale){
-				My.info.scale = Math.round(scale*100);
-			}
-		}
+sf.model('welcome-text', function(My){
+	My.toWorkspace = function(){
+		views.goto('/sketch/1');
 	}
 
 	My.toHome = function(){
-		views.goto('/');
-	}
 
-	My.toWorkspace = function(){
-		clearInterval(onHomepage);
-
-		views.goto('/sketch/1', function(){
-			My.description = 'Developers! ';
-			setTimeout(function(){
-				textAnimation("Welcome to the example!");
-			}, 1000);
-		});
-	}
-
-	function textAnimation(text){
-		var description = text.split('');
-
-		// Text animation
-		var interval = setInterval(function(){
-			My.description += description.shift();
-
-			if(description.length === 0)
-				clearInterval(interval);
-		}, 50);
-	}
-
-	My.cloneActive = false;
-	My.cloneContainer = function(){
-		My.cloneActive = !My.cloneActive;
-
-		if(My.cloneActive){
-			if(My.switchVFXActive === false)
-				My.switchVFX();
-
-			// Reset current container view
-			var container = sketch.scope('container');
-			container.pos.x = 0;
-			container.pos.y = 0;
-			container.scale = 1; // 100% scale
-
-			var mini = sketch.cloneContainer(); // Clone 1
-
-			// Remove the dropdown and SVG animation
-			// from mini container
-			$('sf-m[name="dropdown"], animate', mini).remove();
-
-			// Clone into new window
-			new sf.Window({
-				title: "Cloned Sketch Container",
-				templateHTML: sketch.cloneContainer() // Clone 2
-			}, refreshViewport);
-
-			// Put the mini container into DOM
-			$('.mini-blackprint').removeClass('hidden').append(mini); // Clone 1
-
-			// Refresh mini viewport size
-			// I put it like this for a reason
-			refreshViewport();
-			function refreshViewport(){
-				setTimeout(function(){
-					container.pos.x = -0.1;
-					setTimeout(function(){
-						container.pos.x = 0;
-					}, 500);
-				}, 1000);
-			}
-		}
-		else{
-			$('.mini-blackprint').addClass('hidden').text('');
-			sf.Window.destroy();
-		}
-	}
-
-	My.switchVFXActive = false;
-	My.switchVFX = function(){
-		My.switchVFXActive = !My.switchVFXActive;
-
-		if(My.switchVFXActive){
-			sketch.scope('container').$el.addClass('performance');
-			My.visualizeActive = false;
-			Blackprint.settings('visualizeFlow', false);
-		}
-		else sketch.scope('container').$el.removeClass('performance');
-	}
-
-	My.visualizeActive = true;
-	My.visualizeFlow = function(){
-		My.visualizeActive = !My.visualizeActive;
-		Blackprint.settings('visualizeFlow', My.visualizeActive);
-	}
-
-	My.saveSketch = function(ev){
-		sketch.scope('dropdown').show([{
-			title:'Copy JSON',
-			callback(){
-				var temp = sketch.exportJSON();
-				navigator.clipboard.writeText(temp);
-
-				swal({
-					title: "Copied to clipboard!",
-					text: temp
-				});
-			}
-		}, {
-			title:'To File',
-			callback(){
-				var btn = document.createElement("a");
-				var file = new Blob([sketch.exportJSON()], {type: 'application/json'});
-				btn.href = URL.createObjectURL(file);
-				btn.download = 'blackprint.json';
-				btn.click();
-
-				// Auto revoke after 10 sec
-				setTimeout(function(){
-					URL.revokeObjectURL(btn.href);
-				}, 10000);
-			}
-		}], ev.x, ev.y);
-	}
-
-	My.loadSketch = function(ev){
-		sketch.scope('dropdown').show([{
-			title:'Append from JSON',
-			callback(){
-				swal({
-					title:"Append from JSON",
-					content: "input",
-				}).then(function(val){
-					sketch.importJSON(val);
-				});
-			}
-		}, {
-			title:'Import JSON',
-			callback(){
-				swal({
-					title:"Import JSON",
-					content: "input",
-				}).then(function(val){
-					if(!val)
-						return;
-
-					sketch.clearNodes();
-					sketch.importJSON(val);
-				});
-			}
-		}, {
-			title:'From File',
-			callback(){
-				var el = document.createElement("input");
-				el.setAttribute('type', 'file');
-				el.onchange = function(){
-					console.log(345, this);
-				}
-				el.click();
-			}
-		}], ev.x, ev.y);
 	}
 });

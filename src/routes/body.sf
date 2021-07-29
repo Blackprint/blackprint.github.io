@@ -6,15 +6,28 @@ For adding library or style, please modify /public/index.html
 
 <!-- Model on ./blackprint/header.js -->
 <sf-m name="header" class="header">
-	<div class="left" @click="toHome">{{ message }}</div>
-	<div class="right" @click="toWorkspace">{{ description }}</div>
+	<div class="header-left" @click="mainMenu">
+		<img src="/assets/img/icon/blackprint.png">
+		<div>Blackprint</div>
+	</div>
+	<div class="header-center">
+		<div>A node to node general purpose visual programming</div>
+<!-- 		<div class="item-list">
+<i class="fas fa-pencil-ruler"></i>
+<i class="fas fa-toolbox"></i>
+<i class="fas fa-clipboard-list"></i>
+<i class="fas fa-bars"></i>
+			<div class="item" @click="toHome" title="Back to home"><i class='fa fa-arrow-left'></i></div>
+			<div class="item" @click="toHome" title="Loaded Addons"><i class='fas fa-layer-group'></i></div>
+		</div> -->
+	</div>
 	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
 		<div class="item-list">
-			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></i></div>
+			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></div>
 			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
 			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
-			<div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
-			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div>
+			<!-- <div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
+			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div> -->
 		</div>
 		<div class="header-zoom">
 			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
@@ -41,10 +54,97 @@ body > .background{
 	height: 100%;
 }
 
+.large-header{
+	vw-ground{
+		height: calc(100vh - 86px);
+	}
+	.header .header-left div{
+		display: block;
+	}
+}
+
 vw-ground{
-	position: relative;
+	position: absolute;
 	overflow: hidden;
 	display: block;
+	top: 50px;
 	height: calc(100vh - 50px);
 	width: 100vw;
+}
+
+.header{
+	z-index: 1;
+	position: relative;
+	background: #00000085;
+	align-items: center;
+	border-bottom: 1px solid black;
+	display: flex;
+	box-shadow: 0 0 8px 0 black;
+
+	.header-left {
+		border-right: 2px solid;
+		font-size: 24px;
+		padding: 0 15px 0 15px;
+		text-align: center;
+		img{
+			height: 50px;
+			filter: drop-shadow(0 0 2px white);
+			display: inline-block;
+			vertical-align: middle;
+		}
+		div{
+			vertical-align: middle;
+			display: inline-block;
+		}
+	}
+
+	.header-center {
+		font-size: 18px;
+		text-align: center;
+		padding: 10px;
+		height: 24px;
+	}
+}
+
+.header-menu{
+	.item-list{
+		display: flex;
+		position: absolute;
+		right: 0px;
+		top: 12px;
+		font-size: 22px;
+		.item{
+		    padding: 0 10px;
+		    cursor: pointer;
+
+		    &.active{
+		    	color: white;
+		    }
+		}
+	}
+	.header-zoom{
+		position: absolute;
+		right: 10px;
+		color: white;
+		opacity: 0.8;
+		top: 50px;
+		font-size: 22px;
+	}
+}
+
+.header-center{
+	.item-list{
+		display: flex;
+		position: absolute;
+		top: 12px;
+		font-size: 22px;
+		.item{
+		    padding: 0 10px;
+		    cursor: pointer;
+
+		    &.active{
+		    	color: white;
+		    }
+		}
+	}
 }
