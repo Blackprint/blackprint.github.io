@@ -8,12 +8,19 @@ console.log("-- Call engineTest() from this console");
 window.engineTest = async function(){
 	await sf.loader.task; // Wait until every script has been loaded
 
+	if(!window.confirm("This action will clear current workspace, are you sure to continue?"))
+		return;
+
 	// These nodes are the handler that registered from ./register-handler.js
 	var registered = Blackprint.nodes;
 
 	console.log("-- The sketch and the console was imported from same JSON example, but they're imported in different engine. Any modification from the sketch page will not change the imported console nodes.");
-	sketch.clearNodes();
-	sketch.importJSON(sampleList["Default sample"]);
+
+	await views.goto('/sketch/1');
+
+	// Clear and import JSON
+	SketchList.forEach(sketch => sketch.clearNodes());
+	SketchList[0].importJSON(sampleList["Default sample"]);
 
 	// We must register the node handler first
 	Blackprint.Engine.registerNode('Example/Math/Multiply', registered.Example.Math.Multiply);

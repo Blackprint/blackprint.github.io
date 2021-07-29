@@ -1,8 +1,9 @@
 ## html
 <sketch-page>
 	<!-- <div>zxc</div> -->
-	<!-- Import template from Blackprint library -->
-	<sf-template path="Blackprint/page.sf"></sf-template>
+
+	<!-- This element will be replaced with 'My.space' -->
+	<sf-slot for="space"></sf-slot>
 
 	<div class="mini-blackprint disable-effect hidden"></div>
 	<div class="bottom-message">This editor still in development (≧▽≦)／
@@ -47,8 +48,11 @@ sketch-page{
 ## js-global.router
 ={
 	on:{
-		coming(){
+		coming(data){ // data === views.data
 			console.log("Sketch page data:", arguments);
+			let sketch = SketchList[data.page - 1];
+
+			sf.model('header').cloneActive = sketch.page.cloneActive;
 		},
 		leaving(){
 			console.log("Leaving from sketch page data:", arguments);
@@ -57,22 +61,88 @@ sketch-page{
 }
 
 ## js-global
-var sampleImported = false;
-sf.component('sketch-page', function(self){
+// Blackprint.space = Namespace (https://github.com/ScarletsFiction/ScarletsFrame/wiki/Namespace)
+// sketch.scope = shortcut to obtain your model scope/context
+
+var SketchList = [];
+sf.component('sketch-page', function(My){
+	// URL: #page/sketch/{data.page}
+	let sketch = SketchList[views.data.page - 1] ??= new Blackprint.Sketch();
+	sketch.page = My;
+
+    sketch.settings('visualizeFlow', true);
+	My.space ??= sketch.cloneContainer();
+
+	sketch.scope('container').onScale = function(scale){
+		My.info.scale = Math.round(scale*100);
+	}
 
 	// Will run when <sketch-page> inserted on DOM
-	self.init = async function(){
-		if(sampleImported)
-			return;
-
-		sampleImported = true;
-		await sf.loader.task; // Wait until every script has been loaded
+	My.sampleImported = false;
+	My.init = async function(){
+		if(My.sampleImported) return;
+		My.sampleImported = true;
 
 		// This could be string instead of object
-		// sketch.clearNodes();
-		// sketch.importJSON(sampleList["Default sample"]);
+		setTimeout(()=>{My.importData(sampleList["Default sample"])}, 1000);
 
-		sketch.importJSON(sampleList["Default sample"]);
-		// sketch.importJSON({"Input/File":[{"i":0,"x":74,"y":26,"outputs":{"URL":[{"i":7,"name":"URL"}]}},{"i":1,"x":47,"y":557}],"WebAudio/Input/Microphone":[{"i":2,"x":21,"y":321}],"WebAudio/Output/Destination":[{"i":3,"x":597,"y":273}],"WebAudio/Effect/PingPongDelay":[{"i":4,"x":322,"y":222,"data":{"mix":0.5,"time":0.3,"feedback":0.5},"outputs":{"Out":[{"i":3,"name":"In"}]}}],"Example/Button/Simple":[{"i":5,"x":35,"y":139,"outputs":{"Clicked":[{"i":7,"name":"Play"}]}},{"i":6,"x":39,"y":225,"outputs":{"Clicked":[{"i":7,"name":"Pause"}]}}],"WebAudio/Player":[{"i":7,"x":325,"y":34,"outputs":{"AudioNode":[],"Element":[],"VideoTrack":[{"i":9,"name":"VideoTrack"}],"AudioTrack":[]}}],"Input/SliderBox":[{"i":8,"x":141,"y":417,"data":{"0":{"value":0,"min":-100,"max":100,"step":0.1},"1":{"value":0,"min":-100,"max":100,"step":0.1},"2":{"value":1,"min":-100,"max":100,"step":0.1},"3":{"value":1,"min":-100,"max":100,"step":0.1},"4":{"value":0,"min":-100,"max":100,"step":0.1}},"outputs":{"0":[{"i":10,"name":"x"}],"1":[{"i":10,"name":"y"}],"2":[{"i":10,"name":"ScaleX"}],"3":[{"i":10,"name":"ScaleY"}],"4":[{"i":10,"name":"Rotate"}]}}],"WebAudio/Visualize/Video":[{"i":9,"x":593,"y":25}],"Graphics/Sprite":[{"i":10,"x":364,"y":374},{"i":11,"x":510,"y":544}],"Graphics/Visualize/Canvas":[{"i":12,"x":756,"y":269},{"i":13,"x":749,"y":490}],"Graphics/Converter/GIF":[{"i":14,"x":246,"y":643}],"Decoration/Text/Notes":[{"i":15,"x":931,"y":27,"data":{"value":"Sorry it's messy here ｡ﾟ( ﾟ^∀^ﾟ)ﾟ｡\n\nFirst you need to open video file.\nTrigger the play, or connect AudioNode to PingPongDelay first.\n\nThe AudioNode can be connected directly to WebAudio Destination.\n\nMedia Player's Element can be connected to Sprite Source."}},{"i":16,"x":58,"y":737,"data":{"value":"To begin with GIF animation, open your GIF file.\n\nThen connect to GIF Player.\nConnect the Canvas to Sprite's Source\nthen connect the Sprite to Canvas Visualization."}}]});
+		// My.importData({"Input/File":[{"i":0,"x":74,"y":26,"outputs":{"URL":[{"i":7,"name":"URL"}]}},{"i":1,"x":47,"y":557}],"WebAudio/Input/Microphone":[{"i":2,"x":21,"y":321}],"WebAudio/Output/Destination":[{"i":3,"x":597,"y":273}],"WebAudio/Effect/PingPongDelay":[{"i":4,"x":322,"y":222,"data":{"mix":0.5,"time":0.3,"feedback":0.5},"outputs":{"Out":[{"i":3,"name":"In"}]}}],"Example/Button/Simple":[{"i":5,"x":35,"y":139,"outputs":{"Clicked":[{"i":7,"name":"Play"}]}},{"i":6,"x":39,"y":225,"outputs":{"Clicked":[{"i":7,"name":"Pause"}]}}],"WebAudio/Player":[{"i":7,"x":325,"y":34,"outputs":{"AudioNode":[],"Element":[],"VideoTrack":[{"i":9,"name":"VideoTrack"}],"AudioTrack":[]}}],"Input/SliderBox":[{"i":8,"x":141,"y":417,"data":{"0":{"value":0,"min":-100,"max":100,"step":0.1},"1":{"value":0,"min":-100,"max":100,"step":0.1},"2":{"value":1,"min":-100,"max":100,"step":0.1},"3":{"value":1,"min":-100,"max":100,"step":0.1},"4":{"value":0,"min":-100,"max":100,"step":0.1}},"outputs":{"0":[{"i":10,"name":"x"}],"1":[{"i":10,"name":"y"}],"2":[{"i":10,"name":"ScaleX"}],"3":[{"i":10,"name":"ScaleY"}],"4":[{"i":10,"name":"Rotate"}]}}],"WebAudio/Visualize/Video":[{"i":9,"x":593,"y":25}],"Graphics/Sprite":[{"i":10,"x":364,"y":374},{"i":11,"x":510,"y":544}],"Graphics/Visualize/Canvas":[{"i":12,"x":756,"y":269},{"i":13,"x":749,"y":490}],"Graphics/Converter/GIF":[{"i":14,"x":246,"y":643}],"Decoration/Text/Notes":[{"i":15,"x":931,"y":27,"data":{"value":"Sorry it's messy here ｡ﾟ( ﾟ^∀^ﾟ)ﾟ｡\n\nFirst you need to open video file.\nTrigger the play, or connect AudioNode to PingPongDelay first.\n\nThe AudioNode can be connected directly to WebAudio Destination.\n\nMedia Player's Element can be connected to Sprite Source."}},{"i":16,"x":58,"y":737,"data":{"value":"To begin with GIF animation, open your GIF file.\n\nThen connect to GIF Player.\nConnect the Canvas to Sprite's Source\nthen connect the Sprite to Canvas Visualization."}}]});
+	}
+
+	My.importData = async function(nodes, modules){
+		if(modules !== void 0)
+			await sf.loader.mjs(modules);
+
+		await sf.loader.task; // Wait until every script has been loaded
+		return sketch.importJSON(nodes);
+	}
+
+	My.clearNodes = ()=> sketch.clearNodes();
+
+	My.cloneActive = false;
+	My.cloneContainer = function(){
+		My.cloneActive = !My.cloneActive;
+
+		if(My.cloneActive){
+			if(My.switchVFXActive === false)
+				My.switchVFX();
+
+			// Reset current container view
+			var container = sketch.scope('container');
+			container.pos.x = 0;
+			container.pos.y = 0;
+			container.scale = 1; // 100% scale
+
+			var mini = sketch.cloneContainer(); // Clone 1
+
+			// Remove the dropdown and SVG animation
+			// from mini container
+			$('sf-m[name="dropdown"]', mini).remove();
+
+			// Clone into new window
+			new sf.Window({
+				title: "Cloned Sketch Container",
+				templateHTML: sketch.cloneContainer() // Clone 2
+			}, refreshViewport);
+
+			// Put the mini container into DOM
+			$('.mini-blackprint').removeClass('hidden').append(mini); // Clone 1
+
+			// Refresh mini viewport size
+			// I put it like this for a reason
+			refreshViewport();
+			function refreshViewport(){
+				setTimeout(function(){
+					container.pos.x = -0.1;
+					setTimeout(function(){
+						container.pos.x = 0;
+					}, 500);
+				}, 1000);
+			}
+		}
+		else{
+			$('.mini-blackprint').addClass('hidden').text('');
+			sf.Window.destroy();
+		}
 	}
 });
