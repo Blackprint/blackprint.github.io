@@ -1,6 +1,12 @@
 ## html
-<!-- /src/routes/+vw-ground/sketch.sf -->
-<vw-page></vw-page>
+<sf-m name="sketch-pages">
+	<!-- /src/routes/+vw-ground/sketch.sf -->
+	<vw-page></vw-page>
+
+	<div class="mini-blackprint disable-effect {{ miniViewer.topRightHidden && 'hidden' }}">
+		<sf-slot for="miniViewer.topRight"></sf-slot>
+	</div>
+</sf-m>
 
 ## js-global.router
 ={
@@ -32,3 +38,35 @@ vw-page{
 		top: 0;
 	}
 }
+.mini-blackprint{
+	width: 240px;
+	height: 190px;
+	position: absolute;
+	top: 5px;
+	right: 0;
+	overflow: hidden;
+	box-shadow: 0 0 6px #ffffff6b;
+	background: #ffffff40;
+	border-radius: 10px;
+	pointer-events: none;
+
+	&.hidden{
+		display: none;
+	}
+}
+
+## js-global
+sf.model('sketch-pages', function(My){
+	My.miniViewer = {
+		topRight: null,
+		topRightHidden: true,
+		on$topRight(now){
+			if(now === null)
+				return My.miniViewer.topRightHidden = true;
+
+			My.miniViewer.topRightHidden = false;
+			// now => <sf-space>
+			// $(now)
+		}
+	};
+});

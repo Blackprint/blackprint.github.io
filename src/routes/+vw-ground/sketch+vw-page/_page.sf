@@ -1,11 +1,8 @@
 ## html
 <sketch-page>
-	<!-- <div>zxc</div> -->
-
 	<!-- This element will be replaced with 'My.space' -->
 	<sf-slot for="space"></sf-slot>
 
-	<div class="mini-blackprint disable-effect hidden"></div>
 	<div class="bottom-message">This editor still in development (≧▽≦)／
 I want to make it better and easier to use.
 Please use right click to open drop down menu for the cable, node, container, or port.</div>
@@ -13,27 +10,6 @@ Please use right click to open drop down menu for the cable, node, container, or
 
 ## scss-global
 sketch-page{
-	.mini-blackprint{
-		width: 240px;
-		height: 190px;
-		position: absolute;
-		top: 5px;
-		right: 0;
-		overflow: hidden;
-		box-shadow: 0 0 6px #ffffff6b;
-		background: #ffffff40;
-		border-radius: 10px;
-		pointer-events: none;
-
-		&.hidden{
-			display: none;
-		}
-
-		sf-space{
-			transform: scale(0.3);
-		}
-	}
-
 	.bottom-message{
 		position: absolute;
 		bottom: 0;
@@ -73,8 +49,12 @@ sf.component('sketch-page', function(My){
     sketch.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();
 
-	sketch.scope('container').onScale = function(scale){
-		My.info.scale = Math.round(scale*100);
+	let SketchPages = sf.model('sketch-pages');
+	let container = sketch.scope('container');
+	let header = sf.model('header');
+
+	container.onScale = function(scale){
+		header.info.scale = Math.round(scale * 100);
 	}
 
 	// Will run when <sketch-page> inserted on DOM
@@ -113,20 +93,20 @@ sf.component('sketch-page', function(My){
 			container.pos.y = 0;
 			container.scale = 1; // 100% scale
 
-			var mini = sketch.cloneContainer(); // Clone 1
+			var mini = sketch.cloneContainer(true); // Clone and get the MiniMap
 
 			// Remove the dropdown and SVG animation
 			// from mini container
 			$('sf-m[name="dropdown"]', mini).remove();
 
 			// Clone into new window
-			new sf.Window({
-				title: "Cloned Sketch Container",
-				templateHTML: sketch.cloneContainer() // Clone 2
-			}, refreshViewport);
+			// new sf.Window({
+			// 	title: "Cloned Sketch Container",
+			// 	templateHTML: sketch.cloneContainer() // Clone 2
+			// }, refreshViewport);
 
 			// Put the mini container into DOM
-			$('.mini-blackprint').removeClass('hidden').append(mini); // Clone 1
+			SketchPages.miniViewer.topRight = mini;
 
 			// Refresh mini viewport size
 			// I put it like this for a reason
