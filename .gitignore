@@ -5,5 +5,6 @@ node_modules/
 /pnpm-lock.yaml
 *.lock
 dist
-assets/scarleetsframe.*
+assets/scarletsframe.*
 assets/inspector.*
+assets/
