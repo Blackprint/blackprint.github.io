@@ -121,7 +121,7 @@ sf.component('sketch-page', function(My){
 			}
 		}
 		else{
-			$('.mini-blackprint').addClass('hidden').text('');
+			SketchPages.miniViewer.topRight = null;
 			sf.Window.destroy();
 		}
 	}
