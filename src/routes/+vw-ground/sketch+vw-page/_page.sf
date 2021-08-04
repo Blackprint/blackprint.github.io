@@ -3,8 +3,8 @@
 	<!-- This element will be replaced with 'My.space' -->
 	<sf-slot for="space"></sf-slot>
 
-	<div class="bottom-message">This editor still in development (≧▽≦)／
-I want to make it better and easier to use.
+	<div class="bottom-message">This editor still in development (≧▽≦)／<br>
+I want to make it better and easier to use.<br>
 Please use right click to open drop down menu for the cable, node, container, or port.</div>
 </sketch-page>
 
@@ -17,7 +17,6 @@ sketch-page{
 		width: 100%;
 		padding: 20px;
 		text-align: center;
-		white-space: pre-line;
 	}
 }
 
@@ -93,17 +92,21 @@ sf.component('sketch-page', function(My){
 			container.pos.y = 0;
 			container.scale = 1; // 100% scale
 
-			var mini = sketch.cloneContainer(true); // Clone and get the MiniMap
+			var mini;
+			if(container.minimap)
+				mini = container.minimap;
+			else{
+				mini = sketch.cloneContainer(true); // Clone and get the MiniMap
 
-			// Remove the dropdown and SVG animation
-			// from mini container
-			$('sf-m[name="dropdown"]', mini).remove();
+				// Remove the dropdown from minimap
+				$('sf-m[name="dropdown"]', mini).remove();
+			}
 
 			// Clone into new window
-			// new sf.Window({
-			// 	title: "Cloned Sketch Container",
-			// 	templateHTML: sketch.cloneContainer() // Clone 2
-			// }, refreshViewport);
+			new sf.Window({
+				title: "Cloned Sketch Container",
+				templateHTML: sketch.cloneContainer() // Clone 2
+			}, refreshViewport);
 
 			// Put the mini container into DOM
 			SketchPages.miniViewer.topRight = mini;
