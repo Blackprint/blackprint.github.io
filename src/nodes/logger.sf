@@ -26,9 +26,9 @@ Blackprint.registerInterface('nodes/logger', function(iface){
 	/* iface == {
 		x: 0,
 		y: 0,
-		inputs: [],
-		outputs: [],
-		properties: [],
+		input: [],
+		output: [],
+		property: [],
 	} */
 
 	// One way binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
@@ -62,7 +62,7 @@ Blackprint.registerNode('Example/Display/Logger', function(node, iface){
 	// Let's use ../nodes/logger.js
 	iface.interface = 'nodes/logger';
 
-	const Input = node.inputs = {
+	const Input = node.input = {
 		Any: Blackprint.PortArrayOf(null) // Any data type, and can be used for many cable
 	};
 
@@ -86,7 +86,7 @@ Blackprint.registerNode('Example/Display/Logger', function(node, iface){
 			refreshLogger(Input.Any);
 		});
 
-		iface.inputs.Any.on('value', function(port){
+		iface.input.Any.on('value', function(port){
 			console.log("I connected to", port.name, "port from", port.iface.title, "that have new value:", port.value);
 
 			// Let's take all data from all connected nodes

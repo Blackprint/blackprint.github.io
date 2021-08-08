@@ -6,22 +6,22 @@ Blackprint.registerNode('Example/Math/Multiply', function(node, iface){
 	// Let's use default node interface
 
 	// Handle all output port here
-	node.outputs = {
+	node.output = {
 		Result: Number,
 	};
 
 	// Kind of shortcut
-	const Output = node.outputs;
+	const Output = node.output;
 
 	// Handle all input port here
-	const Input = node.inputs = {
+	const Input = node.input = {
 		Exec: Blackprint.PortTrigger(function(){
 			Output.Result = multiply();
 			console.log("Result has been set:", Output.Result);
 		}),
 		A: Number,
 		B: Blackprint.PortValidator(Number, function(val){
-			// Executed when inputs.B is being obtained
+			// Executed when input.B is being obtained
 			// And the output from other node is being assigned
 			// as current port value in this node
 			console.log(iface.title, '- Port B got input:', val);
@@ -63,12 +63,12 @@ Blackprint.registerNode('Example/Math/Random', function(node, iface){
 
 	// Let's use default node interface
 
-	const Output = node.outputs = {
+	const Output = node.output = {
 		Out: Number
 	};
 
 	var executed = false;
-	node.inputs = {
+	node.input = {
 		'Re-seed': Blackprint.PortTrigger(function(){
 			executed = true;
 			Output.Out = Math.round(Math.random()*100);
@@ -85,7 +85,7 @@ Blackprint.registerNode('Example/Math/Random', function(node, iface){
 		console.warn('Value request for port:', port.name, "from node:", iface2.title);
 
 		// Let's create the value for him
-		node.inputs['Re-seed']();
+		node.input['Re-seed']();
 	}
 });
 
@@ -94,17 +94,17 @@ Blackprint.registerNode('Example/Dummy/Test', function(node, iface){
 	iface.title = "Do nothing";
 
 	// PortName must different any port
-	node.inputs = {
+	node.input = {
 		"Input 1": Boolean,
 		"Input 2": String
 	};
 
-	node.outputs = {
+	node.output = {
 		"Output 1": Object,
 		"Output 2": Number
 	};
 
-	node.properties = {
+	node.property = {
 		"Property 1": Boolean,
 		"Property 2": Number
 	};

@@ -22,9 +22,9 @@ Blackprint.registerInterface('nodes/button', function(iface){
   /* iface == {
     x: 0,
     y: 0,
-    inputs: [],
-    outputs: [],
-    properties: [],
+    input: [],
+    output: [],
+    property: [],
   } */
 
   // To get the button element
@@ -49,11 +49,11 @@ Blackprint.registerNode('Example/Button/Simple', function(node, iface){
   iface.interface = 'nodes/button';
 
   // handle = under Blackprint node flow control
-  const Output = node.outputs = {
+  const Output = node.output = {
     Clicked: Function
   };
 
-  // Proxy event object from: node.clicked -> node.clicked -> outputs.Clicked
+  // Proxy event object from: node.clicked -> node.clicked -> output.Clicked
   node.clicked = function(ev){
     console.log('Button/Simple: got', ev, "time to trigger to the other node");
     Output.Clicked(ev);

@@ -26,14 +26,14 @@ Blackprint.registerInterface('nodes/input', function(iface){
 	/* iface == {
 		x: 0,
 		y: 0,
-		inputs: [],
-		outputs: [],
-		properties: [],
+		input: [],
+		output: [],
+		property: [],
 	} */
 
 	let waitRepaint = false;
 
-	// Must be placed on 'data' if we want to export the properties as JSON
+	// Must be placed on 'data' if we want to export the property as JSON
 	iface.data = {
 		// Two way binding-> https://github.com/ScarletsFiction/ScarletsFrame/wiki/Input-Binding
 		value:'',
@@ -81,7 +81,7 @@ Blackprint.registerNode('Example/Input/Simple', function(node, iface){
 	iface.interface = 'nodes/input';
 
 	// handle = under Blackprint node flow control
-	const Output = node.outputs = {
+	const Output = node.output = {
 		Changed: Function,
 		Value: String, // Default to empty string
 	};
@@ -100,8 +100,8 @@ Blackprint.registerNode('Example/Input/Simple', function(node, iface){
 		Output.Value = data.value;
 	}
 
-	// Proxy string value from: node.changed -> node.changed -> outputs.Value
-	// And also call outputs.Changed() if connected to other node
+	// Proxy string value from: node.changed -> node.changed -> output.Value
+	// And also call output.Changed() if connected to other node
 	node.changed = function(text, ev){
 		// This node still being imported
 		if(iface.importing !== false)
