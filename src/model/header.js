@@ -21,21 +21,23 @@ sf.model('header', function(My, include){
 				deep:[{
 					title:'Append JSON',
 					async callback(){
-						let val = await swal({
+						let val = await Swal.fire({
 							title:"Import from JSON and append to sketch",
-							content: "input",
+							input: "text",
 						})
 
-						if(val) sketch.importJSON();
+						val = val.value;
+						if(val) sketch.importJSON(val);
 					}
 				}, {
 					title: 'Load JSON',
 					async callback(){
-						let val = await swal({
+						let val = await Swal.fire({
 							title:"Clean sketch and import from JSON",
-							content: "input",
+							input: "text",
 						});
 
+						val = val.value;
 						if(!val) return;
 
 						sketch.clearNodes();
@@ -65,12 +67,31 @@ sf.model('header', function(My, include){
 				title:'Export',
 				icon: 'fa fa-save',
 				deep:[{
-					title: 'Copy JSON',
-					callback(){
-						var temp = sketch.exportJSON();
+					title: 'To Clipboard',
+					async callback(){
+						let confirm = await Swal.fire({
+							title: "Choose one of the export mode",
+							cancelButtonText: 'Minified JSON',
+							confirmButtonText: 'Prettified JS',
+							denyButtonText: 'Minimal JSON',
+							denyButtonColor: 'gray',
+							showCancelButton: true,
+							showDenyButton: true,
+							showCloseButton: true
+						});
+
+						let option = {};
+						if(confirm.isConfirmed){
+							option.toJS = true;
+							option.space = '\t';
+						}
+						else if(confirm.isDenied)
+							option.position = false;
+
+						var temp = sketch.exportJSON(option);
 						navigator.clipboard.writeText(temp);
 
-						swal({
+						Swal.fire({
 							title: "Copied to clipboard!",
 							text: temp
 						});
@@ -115,7 +136,7 @@ sf.model('header', function(My, include){
 			title: 'Home',
 			icon: 'fa fa-home',
 			callback(){
-				views.goto('/')
+				views.goto('/');
 			}
 		}], {
 			element: My.$el('.header-left')[0],
