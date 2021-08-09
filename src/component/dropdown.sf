@@ -6,7 +6,7 @@
   ">
   <div class="first" style="display: {{ !title && 'none' }}">{{ title || '' }}</div>
   <ul>
-    <li sf-each="x in options" :class="{{x.divider ? 'divider' : ''}}">
+    <li sf-each="x in options" :class="{{x.divider ? 'divider' : ''}} {{ x.disabled && 'disabled' }}">
       {{@if x.title !== undefined:
       	{[ <a> ]} // Begin
 
@@ -72,8 +72,6 @@
 		&:hover{
 			background: lightgray;
 		}
-	}
-	a {
 		cursor: pointer;
     	color: black;
 	}
@@ -127,6 +125,11 @@ drop-down{
 
 		.dropdown-icon {
 			padding-right: 5px;
+		}
+
+		li.disabled, li.disabled:hover{
+			cursor: default !important;
+			background: #888;
 		}
 	}
 }
@@ -234,6 +237,7 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 	My.root = include('dropdown');
 	My.width = 0;
 	My.height = 0;
+	My.disabled = $item.disabled === true;
 
 	// First dropdown title
 	My.title = $item.title;

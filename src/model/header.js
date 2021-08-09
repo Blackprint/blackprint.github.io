@@ -40,6 +40,7 @@ sf.model('header', function(My, include){
 					}
 				}, {
 					title: 'Load File',
+					disabled: true,
 					callback(){
 						var el = document.createElement("input");
 						el.setAttribute('type', 'file');
@@ -82,18 +83,22 @@ sf.model('header', function(My, include){
 		}, {
 			title: 'Modules',
 			icon: 'fa fa-layer-group',
+			disabled: true,
 			deep:[{
 				title: 'Create Custom',
 				icon: 'fa fa-plus',
+				disabled: true,
 				callback(){}
 			}, {
 				title: 'Load from URL',
 				icon: 'fa fa-truck-loading',
+				disabled: true,
 				callback(){}
 			}]
 		}, {
 			title: 'Environment',
 			icon: 'fa fa-key',
+			disabled: true,
 			callback(){}
 		}, {
 			title: 'Home',
