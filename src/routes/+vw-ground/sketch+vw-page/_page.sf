@@ -1,11 +1,11 @@
 ## html
 <sketch-page>
-	<!-- This element will be replaced with 'My.space' -->
-	<sf-slot for="space"></sf-slot>
-
 	<div class="bottom-message">This editor still in development (≧▽≦)／<br>
 I want to make it better and easier to use.<br>
 Please use right click to open drop down menu for the cable, node, container, or port.</div>
+
+	<!-- This element will be replaced with 'My.space' -->
+	<sf-slot for="space"></sf-slot>
 </sketch-page>
 
 ## scss-global
