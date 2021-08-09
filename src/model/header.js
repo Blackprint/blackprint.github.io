@@ -10,6 +10,7 @@ sf.model('header', function(My, include){
 
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
+		let sketch = SketchList[views.data.page - 1];
 
 		include('dropdown').show([{
 			title: 'Sketch',
@@ -20,10 +21,12 @@ sf.model('header', function(My, include){
 				deep:[{
 					title:'Append JSON',
 					async callback(){
-						sketch.importJSON(await swal({
+						let val = await swal({
 							title:"Import from JSON and append to sketch",
 							content: "input",
-						}));
+						})
+
+						if(val) sketch.importJSON();
 					}
 				}, {
 					title: 'Load JSON',
@@ -40,12 +43,20 @@ sf.model('header', function(My, include){
 					}
 				}, {
 					title: 'Load File',
-					disabled: true,
 					callback(){
 						var el = document.createElement("input");
 						el.setAttribute('type', 'file');
-						el.onchange = function(){
-							console.log(345, this);
+						el.onchange = async function(){
+							if(this.files.length === 0) return;
+							if(this.files.length !== 1){
+								console.log(this.files);
+								console.log("Currently only support 1 file");
+								return;
+							}
+
+							let text = JSON.parse(await this.files[0].text());
+							sketch.clearNodes();
+							sketch.importJSON(text);
 						}
 						el.click();
 					}
