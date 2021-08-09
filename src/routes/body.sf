@@ -6,7 +6,7 @@ For adding library or style, please modify /public/index.html
 
 <!-- Model on ./blackprint/header.js -->
 <sf-m name="header" class="header">
-	<div class="header-left" @click="mainMenu">
+	<div class="header-left" @click="mainMenu" style="cursor: {{ showOptions && 'pointer' }};">
 		<img src="/assets/img/icon/blackprint.png">
 		<div>Blackprint</div>
 	</div>
@@ -42,6 +42,10 @@ For adding library or style, please modify /public/index.html
 <vw-ground style="display: none"></vw-ground>
 
 <input type="text" id="hidden_text" style="position: fixed; top: 100vh;">
+
+<sf-m name="dropdown" class="{{className}}">
+  <drop-down sf-each="val in menus"></drop-down>
+</sf-m>
 
 ## scss-global
 body > .background{
@@ -146,5 +150,11 @@ vw-ground{
 		    	color: white;
 		    }
 		}
+	}
+}
+
+.header-left-menu{
+	.dropdown-menu li{
+		min-width: 175px;
 	}
 }

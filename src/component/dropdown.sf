@@ -1,0 +1,348 @@
+## comment, This will be used for sf-each for above element
+## html
+<drop-down class="dropdown-menu {{hidden}}" style="
+    display: {{visible ? 'block' : 'none'}};
+    transform: translate({{ x }}px, {{ y }}px);
+  ">
+  <div class="first" style="display: {{ !title && 'none' }}">{{ title || '' }}</div>
+  <ul>
+    <li sf-each="x in options" :class="{{x.divider ? 'divider' : ''}}">
+      {{@if x.title !== undefined:
+      	{[ <a> ]} // Begin
+
+      	// Icon on the left
+      	if(x.icon !== void 0){
+      		if(x.icon.includes('//'))
+      			{[ <img class="dropdown-icon" :src="{{x.icon}}"> ]};
+      		else
+      			{[ <i class="dropdown-icon {{x.icon}}"></i> ]};
+      	}
+
+      	// Always use { [ enclosed template ]} to avoid vulnerability
+      	// like the text being parsed as HTML
+      	{[ <span>{{ x.title }}</span> ]} // Content
+
+      	// Add icon if the has deep menu
+      	if(x.deep !== void 0)
+      		{[ <i class="{{ root.icon.more }} has-deep"></i> ]};
+
+      	{[ </a> ]} // End
+      }}
+    </li>
+  </ul>
+</drop-down>
+
+## scss-global
+.dropdown-menu {
+	z-index: 10000;
+	opacity: 0.9;
+
+	margin-top: 7px;
+	background-color: rgba(255, 255, 255, 0.96);
+	box-shadow: 1px 1px 11px 3px black;
+    border: inherit;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0;
+    border-radius: 3px;
+    background: white;
+
+    // transition: 0.3s ease-out;
+    // transition-property: visibility, opacity;
+    &.hidden{
+		visibility: hidden;
+		opacity: 0;
+    }
+    ul{
+    	overflow-x: hidden;
+    	overflow-y: auto;
+    	max-height: 300px;
+    }
+
+	li {
+		position: relative;
+		vertical-align: baseline;
+		display: inherit !important;
+		padding: 8px;
+		min-width: 110px;
+		border-bottom: 1px dashed darkgray;
+		font-size: 16px;
+
+		&:hover{
+			background: lightgray;
+		}
+	}
+	a {
+		cursor: pointer;
+    	color: black;
+	}
+}
+
+drop-down.dropdown-menu drop-down{
+	opacity: 1;
+}
+
+.ground-backdrop{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,.4);
+	z-index: 10000;
+	visibility: hidden;
+	opacity: 0;
+	-webkit-transition-duration: .4s;
+	transition-duration: .4s;
+
+	&.show{
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
+ul li .has-deep{
+	top: 11px;
+	position: absolute;
+	right: 5px;
+}
+
+drop-down{
+	&> .first {
+		display: block;
+		padding: 5px 10px;
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		text-transform: capitalize;
+		letter-spacing: 1px;
+		color: white;
+		background: #ba2f63;
+		box-shadow: 0 0 5px #d12867;
+	}
+	ul{
+		margin: 0;
+		padding: 0;
+
+		.dropdown-icon {
+			padding-right: 5px;
+		}
+	}
+}
+
+## js-global
+// =====================================================================
+// ============== Model <sf-m name="dropdown"></sf-m> ==================
+// =====================================================================
+sf.model('dropdown', function(My){
+	My.menus = [];
+	My.onCancel = void 0;
+	My.className = '';
+
+	My.icon = {
+		more: 'fa fa-chevron-right'
+	};
+
+	// menus: [{title, callback}, {title, deep:[{...}]}, ...]
+	My.show = function(menus, { x, y, event, element, title, className }){
+		// Remove last dropdown if haven't been closed
+		if(My.menus.length !== 0)
+			My.menus.splice(0);
+		else
+			addBackdrop();
+
+		menus.title = title;
+
+		if(element !== void 0){
+			let rect = element.getBoundingClientRect();
+			menus.x = rect.x + 5;
+			menus.y = rect.y + rect.height;
+		}
+		else if(x !== void 0){
+			menus.x = x;
+			menus.y = y;
+		}
+		else{
+			menus.x = event.x;
+			menus.y = event.y;
+			menus.event = event;
+		}
+
+		My.className = className || '';
+		My.menus.push(menus);
+		return My;
+	}
+
+	My.hide = function(){
+		for (var i = 0; i < My.menus.length; i++)
+			My.menus.getElement(i).model.deepRemove();
+
+		My.menus.splice(0);
+		removeBackdrop();
+
+		My.className = '';
+	}
+
+	var backdropCreated = false;
+	function backdropListener(ev){
+		if($(ev.target).parent('sf-m')[0] === sf.Window.source(My.$el))
+			return;
+
+		removeBackdrop();
+
+		My.hide();
+		My.onCancel && My.onCancel();
+	}
+
+	var backdrop = $('<div class="ground-backdrop"></div>');
+	function addBackdrop(){
+		if(backdropCreated) return;
+
+		backdrop.insertBefore(sf.Window.source(My.$el));
+		setTimeout(function(){
+			backdrop.addClass('show');
+			$(sf.Window).on('pointerdown', backdropListener);
+			$(sf.Window).once('contextmenu', ev => ev.preventDefault());
+			backdropCreated = true;
+		}, 10);
+	}
+
+	function removeBackdrop(){
+		backdropCreated = false;
+		backdrop.removeClass('show');
+
+		setTimeout(()=> {
+			backdrop.remove();
+		}, 500);
+
+		$(sf.Window).off('pointerdown', backdropListener);
+	}
+});
+
+// =====================================================================
+// ============== Component <drop-down></drop-down> ====================
+// =====================================================================
+sf.component('drop-down', {template: #this.path}, function(My, include, $item){
+	My.visible = false;
+	My.hidden = 'hidden'; // We also need to hide it before repaint
+
+	My.options = $item;
+	My._parent = $item._parent;
+	My.x = $item.x;
+	My.y = $item.y;
+	My.root = include('dropdown');
+	My.width = 0;
+	My.height = 0;
+
+	// First dropdown title
+	My.title = $item.title;
+
+	var currentDeepLevel, $el;
+	My.init = function(){
+		if($item.event !== void 0){
+			var el = sf.Window.source(My.$el, $item.event);
+			if(el === null) return;
+			$el = $(el);
+		}
+		else $el = My.$el;
+
+		My.visible = true;
+
+		// Check position when the element rendered
+		var ulElem = sf.Window.source(My.$el, $item.event).querySelector('ul');
+		$.afterRepaint().then(function(){
+			let x = 0, y = 0;
+			let parent = My._parent;
+			let w = parent !== void 0 ? parent.width : 0;
+
+			while(parent !== void 0){
+				x += parent.x;
+				y += parent.y;
+				parent = parent._parent;
+			}
+
+			My.width = ulElem.offsetWidth;
+			My.height = ulElem.offsetHeight;
+
+			if(x + My.x + My.width > sf.Window.focus.innerWidth)
+				My.x -= My.width + w;
+
+			if(y + My.y + My.height > sf.Window.focus.innerHeight)
+				My.y -= My.height;
+
+			My.hidden = '';
+		});
+
+		// Find nested options and add event listener on mouse hover
+		var options = My.options;
+		for (var i = 0; i < options.length; i++) {
+			let opt = options[i];
+			const elem = $(options.getElements(i));
+
+			if(opt.deep !== void 0){
+				elem.on('mouseover', function(ev){
+					if(currentDeepLevel !== void 0)
+						My.deepRemove();
+
+					if(opt.hover !== void 0)
+						opt.hover.apply(opt.context, opt.args);
+
+					var deep = opt.deep;
+					deep.event = ev;
+					deep._parent = My;
+
+					// Use the cache instead
+					if(deep.el !== void 0){
+						currentDeepLevel = deep.el;
+						$el.append(deep.el);
+						return;
+					}
+
+					// Initialize position once
+					deep.x = ulElem.offsetWidth;
+					deep.y = ev.target.offsetTop - 7;
+
+					// Create dropdown in current sf-space
+					deep.el = currentDeepLevel = new $DropDown(deep, My.$space);
+					$el.append(currentDeepLevel);
+				});
+
+				continue;
+			}
+
+			elem.on('mouseover', function(ev){
+				if(currentDeepLevel !== void 0){
+					My.deepRemove();
+					currentDeepLevel = void 0;
+				}
+
+				opt.hover && opt.hover.apply(opt.context, opt.args);
+			});
+
+			if(opt.callback){
+				elem.on('click', function(ev){
+					if(opt.unhover !== void 0)
+						opt.unhover.apply(opt.context, opt.args);
+
+					opt.callback.apply(opt.context, opt.args);
+					My.root.hide();
+				});
+			}
+
+			if(opt.unhover){
+				elem.on('mouseout', function(ev){
+					opt.unhover.apply(opt.context, opt.args);
+				});
+			}
+		}
+	}
+
+	My.deepRemove = function(){
+		if(currentDeepLevel === void 0)
+			return;
+
+		currentDeepLevel.remove();
+		currentDeepLevel.model.deepRemove();
+	}
+});
