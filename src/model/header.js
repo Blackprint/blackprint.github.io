@@ -80,6 +80,9 @@ sf.model('header', function(My, include){
 							showCloseButton: true
 						});
 
+						if(confirm.isDismissed)
+							return;
+
 						let option = {};
 						if(confirm.isConfirmed){
 							option.toJS = true;
@@ -115,12 +118,12 @@ sf.model('header', function(My, include){
 		}, {
 			title: 'Modules',
 			icon: 'fa fa-layer-group',
-			disabled: true,
 			deep:[{
 				title: 'Create Custom',
 				icon: 'fa fa-plus',
-				disabled: true,
-				callback(){}
+				callback(){
+					Modal.goto('/custom-node-editor');
+				}
 			}, {
 				title: 'Load from URL',
 				icon: 'fa fa-truck-loading',

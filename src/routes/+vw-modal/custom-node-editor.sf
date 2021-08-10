@@ -1,0 +1,100 @@
+## html
+<sf-m name="custom-node-editor">
+	<div class="editor" @keydown.ctrl.Enter.prevent="run">
+		<div class="bp-loading-status" style="color: white; padding: 20px">Loading Monaco Editor...</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="run" title="Execute (Ctrl + Enter)"><i class="fa fa-play"></i></div>
+		<div class="item" @click="Modal.hide()" title="Minimize"><i class="fa fa-window-minimize"></i></div>
+		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="custom-node-editor"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+
+	.editor{
+		width: 80vw;
+		max-width: 900px;
+		height: 90vh;
+	}
+
+	.menu{
+		position: absolute;
+		right: 0px;
+		top: 0;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global.router
+={
+	on:{
+		showed(){
+			let model = sf.model('custom-node-editor');
+			model.recreate();
+		}
+	}
+}
+
+## js-global
+sf.model('custom-node-editor', function(My){
+	My.content = "Blackprint.registerNode('Test/Hello', (node, iface) => {\n\tiface.title = 'Title';\n\tiface.description = 'Description';\n\n\t// You can remove this if you want to use default node interface/HTML\n\tiface.interface = 'BPAO/Test/Hello';\n\n\tnode.input = {\n\t\tIn: Number\n\t};\n\t\n\tnode.output = {\n\t\tOut: Number\n\t};\n});\n\n// You can remove this if you're using default node interface/HTML\nBlackprint.registerInterface('BPAO/Test/Hello', {\n\thtml: `<div>{{ log }}</div>`\n}, iface => {\n\tiface.log = 0;\n\n\tconst {\n\t\tIInput, IOutput, IProperty, // Port interface\n\t\tInput, Output, Property, // Port value\n\t} = iface.const;\n\n\tIInput.In.on('value', function(port2){\n\t\tiface.log = port2.value; // In -> {{ log }}\n\t\tOutput.Out = port2.value; // In -> Out\n\t});\n\n\tconst node = iface.node;\n\n\tiface.init = function(){} // HTML/Interface Init\n\tnode.init = function(){} // Node Init\n});";
+
+	My.init = async function(){
+		if(window.monaco === void 0){
+			await sf.loader.js(['https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.1.1/lib/umd/monaco-loader.min.js']);
+			await monaco_loader.init();
+		}
+
+		My.container = My.$el('.editor');
+		My.recreate();
+	}
+
+	My.recreate = function(){
+		if(window.monaco === void 0) return;
+		My.editor && My.editor.dispose();
+
+		setTimeout(()=> {
+			let statusEl = My.container.find('.bp-loading-status');
+
+			My.editor = monaco.editor.create(My.container[0], {
+				value: My.content,
+				language: 'javascript',
+				theme: 'vs-dark',
+				minimap: { enabled: false }
+			});
+
+			statusEl.css('display', 'none');
+		}, 1000);
+	}
+
+	My.run = function(){
+		eval(My.editor.getValue());
+	}
+
+	My.close = function(){
+		Modal.hide();
+
+		My.editor.dispose();
+		modal.goto('/');
+
+		My.container.find('.bp-loading-status').css('display', '');
+	}
+});
