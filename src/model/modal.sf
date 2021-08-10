@@ -25,9 +25,12 @@ sf-m.modal{
 	height: 100%;
 	padding: .625em .625em 0;
 	overflow-x: hidden;
+	background: #00000000;
+	transition: background 0.3 linear;
 
 	&.show{
 		display: grid;
+		background: #00000060;
 		.modal-dialog{
 			opacity: 1;
 		}
@@ -65,7 +68,7 @@ var Modal = sf.model('modal', function(My){
 		My.showed = true;
 
 		setTimeout(()=> {
-			My.$el('.modal-dialog').once('pointerup', My.hide, {outside: true});
+			My.$el('.modal-dialog').on('pointerup', My.hide, {outside: true});
 		}, 1000);
 	}
 });

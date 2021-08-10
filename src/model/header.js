@@ -128,13 +128,16 @@ sf.model('header', function(My, include){
 				title: 'Load from URL',
 				icon: 'fa fa-truck-loading',
 				disabled: true,
-				callback(){}
+				callback(){
+					Modal.goto('/module-url');
+				}
 			}]
 		}, {
 			title: 'Environment',
 			icon: 'fa fa-key',
-			disabled: true,
-			callback(){}
+			callback(){
+				Modal.goto('/environment-variables');
+			}
 		}, {
 			title: 'Home',
 			icon: 'fa fa-home',
