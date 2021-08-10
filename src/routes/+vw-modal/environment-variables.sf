@@ -1,0 +1,136 @@
+## html
+<sf-m name="environment-variables">
+	<div class="title">Environment Variables</div>
+	<div class="head">
+		<div class="row">Key</div>
+		<div class="row">Value</div>
+	</div>
+	<div class="content">
+		<div>
+			<div class="row" sf-each="x in list" @keyup="itemChanged(x)">
+				<input class="column key" type="text" @input="(this.value = x.key = validateKey(this.value))" sf-bind="x.key" placeholder="...">
+				<input class="column" type="text" sf-bind="x.value" placeholder="...">
+			</div>
+		</div>
+		<div class="row">
+			<input class="column key" type="text" @input="this.value = newKey = validateKey(this.value)" sf-bind="newKey" placeholder="Add new key...">
+			<input class="column" type="text" sf-bind="newValue" placeholder="...">
+		</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="environment-variables"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+
+	.title{
+		text-align: center;
+		min-width: 300px;
+		padding: 5px;
+		color: #fff;
+		font-weight: bold;
+		letter-spacing: 1px;
+		border-bottom: 1px solid #000;
+		background: #0009;
+		cursor: default;
+	}
+
+	.head{
+		text-align: center;
+		display: flex;
+		background: #00000070;
+		.row{
+			color: #fff;
+			display: inline-block;
+			width: 50%;
+			outline: 1px solid #000;
+			cursor: default;
+		}
+	}
+
+	.content{
+		.row{
+			display: flex;
+			.column{
+				color: #fff;
+				display: inline-block;
+				width: 50%;
+				padding: 8px;
+				outline: 1px solid #000;
+			}
+
+			input{
+				color: gray;
+				background: #00000094;
+				border: none;
+			}
+		}
+	}
+
+	.menu{
+		position: absolute;
+		right: -5px;
+		top: -10px;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global
+sf.model('environment-variables', function(My){
+	My.list = [{key: 'test', value:'123'}];
+	My.newValue = '';
+	My.newKey = '';
+
+	My.v2m$newKey = function(now){
+		now = My.validateKey(now);
+
+		if(now.length !== 0){
+			My.list.push({key: now, value: My.newValue});
+			My.newKey = My.newValue = '';
+			caretFocusOnLastItem();
+		}
+
+		return '';
+	}
+
+	function caretFocusOnLastItem(){
+		$('input', My.list.getElement(My.list.length-1))[0].focus();
+	}
+
+	My.itemChanged = function(item){
+		if(item.key.length === 0 && (Number.isNaN(item.value) || !item.value)){
+			My.list.splice(My.list.indexOf(item), 1);
+			caretFocusOnLastItem();
+			return;
+		}
+	}
+
+	My.init = function(){}
+
+	My.validateKey = function(value){
+		return value.replace(/[ \-]+/gm, '_').replace(/\W+/gm, '').replace(/^[0-9]+/gm, '').toUpperCase();
+	}
+
+	My.close = function(){
+		Modal.hide();
+		modal.goto('/');
+	}
+});
