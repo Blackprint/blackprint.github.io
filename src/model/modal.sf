@@ -1,0 +1,71 @@
+## html.append-to-body
+<sf-m name="modal" class="modal {{ showed && 'show' }}">
+  <div class="modal-dialog">
+    <vw-modal></vw-modal>
+  </div>
+</sf-m>
+
+## scss-global
+sf-m.modal{
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	display: none;
+	position: fixed;
+	z-index: 1001;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-sizing: border-box;
+	grid-template-areas:
+	    "top-start top top-end"
+	    "center-start center center-end"
+	    "bottom-start bottom-center bottom-end"
+	    "gap gap gap";
+	grid-template-rows: auto auto auto .625em;
+	height: 100%;
+	padding: .625em .625em 0;
+	overflow-x: hidden;
+
+	&.show{
+		display: grid;
+		.modal-dialog{
+			opacity: 1;
+		}
+	}
+
+	.modal-dialog{
+		display: grid;
+		transition: opacity;
+		opacity: 0;
+		grid-column: 2;
+		grid-row: 2;
+		align-self: center;
+		justify-self: center;
+		position: relative;
+		box-sizing: border-box;
+		max-width: 100%;
+	}
+}
+
+## js-global
+var Modal = sf.model('modal', function(My){
+	My.showed = false;
+
+	My.init = My.hotReloaded = function(){
+		My.views = sf.Views.listSelector['vw-modal'];
+	}
+
+	My.hide = function(){
+		My.showed = false;
+		My.$el('.modal-dialog').off('pointerup', My.hide, {outside: true});
+	}
+
+	My.goto = function(path){
+		My.views.goto(path);
+		My.showed = true;
+
+		setTimeout(()=> {
+			My.$el('.modal-dialog').once('pointerup', My.hide, {outside: true});
+		}, 1000);
+	}
+});
