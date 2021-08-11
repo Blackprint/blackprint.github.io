@@ -95,15 +95,17 @@ sf-m[name="environment-variables"] {
 
 ## js-global
 sf.model('environment-variables', function(My){
-	My.list = [{key: 'test', value:'123'}];
+	My.list = Blackprint.Environment.list;
 	My.newValue = '';
 	My.newKey = '';
+
+	// Blackprint.Environment.import([{key: 'TEST', value:'123'}]);
 
 	My.v2m$newKey = function(now){
 		now = My.validateKey(now);
 
 		if(now.length !== 0){
-			My.list.push({key: now, value: My.newValue});
+			Blackprint.Environment.set(now, My.newValue);
 			My.newKey = My.newValue = '';
 			caretFocusOnLastItem();
 		}
@@ -116,6 +118,8 @@ sf.model('environment-variables', function(My){
 	}
 
 	My.itemChanged = function(item){
+		refreshEnvironment();
+
 		if(item.key.length === 0 && (Number.isNaN(item.value) || !item.value)){
 			My.list.splice(My.list.indexOf(item), 1);
 			caretFocusOnLastItem();
@@ -123,7 +127,27 @@ sf.model('environment-variables', function(My){
 		}
 	}
 
-	My.init = function(){}
+	let _refreshEnvironment = 0;
+	function refreshEnvironment(){
+		clearTimeout(_refreshEnvironment);
+		_refreshEnvironment = setTimeout(function(){
+			let { map, list } =  Blackprint.Environment;
+			let uniq = new Set();
+
+			// Assign the value of each list on the map
+			for (var i = 0; i < list.length; i++) {
+				let item = list[i];
+				map[item.key] = item.value;
+				uniq.add(item.key);
+			}
+
+			// Remove key that not exist on the list
+			for(let key in map){
+				if(!uniq.has(key))
+					Blackprint.Environment.delete(key, true);
+			}
+		}, 1000);
+	}
 
 	My.validateKey = function(value){
 		return value.replace(/[ \-]+/gm, '_').replace(/\W+/gm, '').replace(/^[0-9]+/gm, '').toUpperCase();
