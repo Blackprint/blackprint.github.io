@@ -22,13 +22,6 @@ window.engineTest = async function(){
 	SketchList.forEach(sketch => sketch.clearNodes());
 	SketchList[0].importJSON(sampleList["Default sample"]);
 
-	// We must register the node handler first
-	Blackprint.Engine.registerNode('Example/Math/Multiply', registered.Example.Math.Multiply);
-	Blackprint.Engine.registerNode('Example/Math/Random', registered.Example.Math.Random);
-	Blackprint.Engine.registerNode('Example/Display/Logger', registered.Example.Display.Logger);
-	Blackprint.Engine.registerNode('Example/Button/Simple', registered.Example.Button.Simple);
-	Blackprint.Engine.registerNode('Example/Input/Simple', registered.Example.Input.Simple);
-
 	await engine.importJSON(sampleList['Default sample']);
 
 	console.warn('The engine nodes on this console is using default sample\n> sampleList["Default sample"]');
