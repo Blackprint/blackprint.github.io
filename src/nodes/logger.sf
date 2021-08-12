@@ -21,7 +21,7 @@ nodes-logger{
 ## js-global
 // == Blackprint Visual Engine ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('nodes/logger', function(iface){
+Blackprint.Browser.registerInterface('nodes/logger', function(iface){
 	// Property of this scope
 	/* iface == {
 		x: 0,

@@ -17,7 +17,7 @@
 ## js-global
 // == Blackprint Visual Engine ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('nodes/button', function(iface){
+Blackprint.Browser.registerInterface('nodes/button', function(iface){
   // Property of this scope
   /* iface == {
     x: 0,

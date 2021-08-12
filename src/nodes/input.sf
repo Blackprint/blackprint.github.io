@@ -21,7 +21,7 @@ nodes-input{
 ## js-global
 // == Blackprint Visual Engine ==
 // You're allowed tp control related DOM element here
-Blackprint.registerInterface('nodes/input', function(iface){
+Blackprint.Browser.registerInterface('nodes/input', function(iface){
 	// Property of this scope
 	/* iface == {
 		x: 0,

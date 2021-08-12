@@ -1,7 +1,7 @@
 // == For Standalone Engine ==
 // You must design this to support non-browser JavaScript
 // As you can just copy/import this into Node.js or Deno script
-Blackprint.Engine.registerInterface('nodes/input', function(iface, bind){
+Blackprint.registerInterface('nodes/input', function(iface, bind){
 	var theValue = '...';
 	bind({
 		data:{
