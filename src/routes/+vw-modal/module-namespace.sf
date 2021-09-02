@@ -1,0 +1,103 @@
+## html
+<sf-m name="module-namespace">
+	<div class="head">
+		<div class="row">Module Namespace</div>
+		<div class="row">Actions</div>
+	</div>
+	<div class="content">
+		<div class="row" sf-each="key, val in list">
+			<div class="column namespace">{{ key }}</div>
+			<div class="column actions">
+				<button title="Show this module on dropdown/module list">
+					<i class="fa fa-eye{{ val.hidden ? '-slash' : '' }}"></i>
+				</button>
+				<button title="Remove any related nodes and also remove this module">
+					<i class="fa fa-trash"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="module-namespace"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	min-width: 280px;
+
+	.head{
+		letter-spacing: 1px;
+		text-align: center;
+		display: flex;
+		background: #00000040;
+		.row{
+			color: #fff;
+			display: inline-block;
+			width: 50%;
+			outline: 1px solid #000;
+			cursor: default;
+		}
+	}
+
+	.content{
+		.row{
+			background: #00000094;
+			display: flex;
+			.column{
+				color: #fff;
+				display: inline-block;
+				width: 50%;
+				padding: 8px;
+				outline: 1px solid #000;
+			}
+		}
+		.actions{
+			button{
+				border: 0;
+				background: none;
+				color: #fff;
+				display: inline-block;
+				cursor: pointer;
+			}
+			.cross{
+				text-decoration: line-through;
+			}
+		}
+	}
+
+	.menu{
+		position: absolute;
+		right: -5px;
+		top: -10px;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global
+sf.model('module-namespace', function(My){
+	My.list = Blackprint.nodes;
+	My.init = async function(){
+	}
+
+	My.close = function(){
+		Modal.hide();
+		modal.goto('/');
+	}
+});

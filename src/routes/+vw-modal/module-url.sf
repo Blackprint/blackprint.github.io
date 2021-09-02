@@ -1,0 +1,182 @@
+## html
+<sf-m name="module-url">
+	<div class="head">
+		<div class="row url">Module URL</div>
+		<div class="row actions">Actions</div>
+	</div>
+	<div class="content">
+		<div>
+			<div class="row" sf-each="x in list">
+				<div class="column url"><div>{{ x.url }}</div></div>
+				<div class="column actions">
+					<button title="Show this module on dropdown/module list" @click="hideFromURL(x)">
+						<i class="fa fa-eye{{ x.hidden ? '-slash' : '' }}"></i>
+					</button>
+					<button title="Reload this module again from URL" @click="reloadURL(x)">
+						<i class="fa fa-sync"></i>
+					</button>
+					<button title="Remove any related nodes and also remove this module" @click="deleteFromURL(x)">
+						<i class="fa fa-trash"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<input class="column url-input" type="text" @keyup.Enter="addURL()" sf-bind="newURL" placeholder="Add module from URL here...">
+		</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="module-url"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	min-width: 600px;
+
+	.head{
+		letter-spacing: 1px;
+		text-align: center;
+		display: flex;
+		background: #00000040;
+		.row{
+			color: #fff;
+			display: inline-block;
+			outline: 1px solid #000;
+			cursor: default;
+			&.url{
+				width: 59.5%;
+			}
+			&.actions{
+				width: 40%;
+			}
+		}
+	}
+
+	.content{
+		.row{
+			background: #00000094;
+			display: flex;
+			.column{
+				color: #fff;
+				display: inline-block;
+				width: 50%;
+				padding: 8px;
+				outline: 1px solid #000;
+				&.url{
+					width: 60%;
+					overflow: hidden;
+					white-space: nowrap;
+					margin-bottom: -10px;
+					height: 20px;
+					font-size: 14px;
+					div{
+						overflow-x: scroll;
+						padding-bottom: 10px;
+					}
+				}
+				&.actions{
+					width: 40%;
+				}
+				&.url-input{
+					width: 100%;
+					color: gray;
+					background: #00000094;
+					border: none;
+				}
+			}
+		}
+		.actions{
+			button{
+				border: 0;
+				background: none;
+				color: #fff;
+				display: inline-block;
+				cursor: pointer;
+			}
+			.cross{
+				text-decoration: line-through;
+			}
+		}
+	}
+
+	.menu{
+		position: absolute;
+		right: -5px;
+		top: -10px;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global
+sf.model('module-url', function(My){
+	My.list = Blackprint._modulesURL;
+	My.newURL = '';
+
+	My.init = async function(){
+	}
+
+	My.addURL = function(){
+		let list = My.list;
+
+		for (var i = 0; i < list.length; i++) {
+			let temp = list[i];
+			if(My.newURL === temp.url)
+				return;
+
+			if(My.newURL.replace(/\?.*?$/m, '') === temp.url.replace(/\?.*?$/m, '')){
+				temp.url = My.newURL.replace(/\?.*?$/m, '');
+				Blackprint.loadModuleFromURL(temp.url);
+				My.newURL = '';
+				return;
+			}
+		}
+
+		Blackprint.loadModuleFromURL(My.newURL);
+		My.newURL = '';
+	}
+
+	My.reloadURL = function(item){
+		if(/\?[0-9]/.test(item.url))
+			item.url = item.url.replace(/\?([0-9]+)/, (full, num) => '?'+(1+Number(num)));
+		else if(item.url.includes('?'))
+			item.url = item.url.replace(/\?.*?$/m, '')+'?1';
+		else item.url += '?1';
+
+		Blackprint.loadModuleFromURL(My.newURL);
+	}
+
+	My.hideFromURL = function(item){
+		item.hidden = !item.hidden;
+	}
+
+	My.deleteFromURL = function(item){
+		let list = My.list;
+		let i = list.indexOf(item);
+
+		if(i === -1) return;
+		delete Blackprint.modulesURL[list[i].url];
+		list.splice(i, 1);
+	}
+
+	My.close = function(){
+		Modal.hide();
+		modal.goto('/');
+	}
+});

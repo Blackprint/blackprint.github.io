@@ -125,9 +125,14 @@ sf.model('header', function(My, include){
 					Modal.goto('/custom-node-editor');
 				}
 			}, {
-				title: 'Load from URL',
+				title: 'Namespace List',
+				icon: 'fas fa-boxes',
+				callback(){
+					Modal.goto('/module-namespace');
+				}
+			}, {
+				title: 'Loaded from URL',
 				icon: 'fa fa-truck-loading',
-				disabled: true,
 				callback(){
 					Modal.goto('/module-url');
 				}
