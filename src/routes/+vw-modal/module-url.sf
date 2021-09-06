@@ -1,16 +1,29 @@
 ## html
 <sf-m name="module-url">
 	<div class="head">
-		<div class="row url">Module URL</div>
+		<div class="row url">Shortened Module URL</div>
+		<div class="row nodes">Nodes</div>
 		<div class="row actions">Actions</div>
 	</div>
 	<div class="content">
 		<div>
 			<div class="row" sf-each="x in list">
-				<div class="column url"><div>{{ x.url }}</div></div>
+				<div class="column url"><div>
+					<b>{{ shortenLink(x._url, 'host') }}</b>
+					{{ shortenLink(x._url, 'path') }}
+					<b>{{ shortenLink(x._url, 'search') }}</b>
+					<a title="Right click to copy link address, click to open on new tab" target="_blank" href="{{x._url}}"><i class="fa fa-link"></i></a></div></div>
+				<div class="column nodes">
+					{{ x._nodeLength }}
+				</div>
 				<div class="column actions">
 					<button title="Show this module on dropdown/module list" @click="hideFromURL(x)">
-						<i class="fa fa-eye{{ x.hidden ? '-slash' : '' }}"></i>
+						 <i class="fa fa-list"></i>
+						 <i class="fa fa-slash" style="
+						    position: absolute;
+						    margin-left: -15px;
+						    display: {{ x._hidden ? 'inline-block' : 'none' }}
+						"></i>
 					</button>
 					<button title="Reload this module again from URL" @click="reloadURL(x)">
 						<i class="fa fa-sync"></i>
@@ -22,7 +35,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<input class="column url-input" type="text" @keyup.Enter="addURL()" sf-bind="newURL" placeholder="Add module from URL here...">
+			<input class="column url-input" type="text" @keyup.Enter="addURL()" sf-bind="newURL" placeholder="Add module from URL here... (Then press enter)">
 		</div>
 	</div>
 	<div class="menu">
@@ -49,10 +62,13 @@ sf-m[name="module-url"] {
 			outline: 1px solid #000;
 			cursor: default;
 			&.url{
-				width: 59.5%;
+				width: 58%;
+			}
+			&.nodes{
+				width: 19%;
 			}
 			&.actions{
-				width: 40%;
+				width: 22%;
 			}
 		}
 	}
@@ -74,13 +90,20 @@ sf-m[name="module-url"] {
 					margin-bottom: -10px;
 					height: 20px;
 					font-size: 14px;
+					b{
+						margin-right: 4px;
+						color: #696969;
+					}
 					div{
 						overflow-x: scroll;
 						padding-bottom: 10px;
 					}
 				}
+				&.nodes{
+					width: 17.5%;
+				}
 				&.actions{
-					width: 40%;
+					width: 22%;
 				}
 				&.url-input{
 					width: 100%;
@@ -130,6 +153,19 @@ sf.model('module-url', function(My){
 	My.newURL = '';
 
 	My.init = async function(){
+		// First initialization cycle
+	}
+
+	My.shortenLink = function(url, which){
+		url = new URL(url);
+
+		if(which === 'search')
+			return url.search;
+
+		if(which === 'host')
+			return url.host || location.host;
+
+		return url.pathname.replace(/(cjs|mjs|dist)\/|\.(min|mjs|js)/g, '').split('/').slice(-2).join('/');
 	}
 
 	My.addURL = function(){
@@ -137,42 +173,127 @@ sf.model('module-url', function(My){
 
 		for (var i = 0; i < list.length; i++) {
 			let temp = list[i];
-			if(My.newURL === temp.url)
+			if(My.newURL === temp._url)
 				return;
 
-			if(My.newURL.replace(/\?.*?$/m, '') === temp.url.replace(/\?.*?$/m, '')){
-				temp.url = My.newURL.replace(/\?.*?$/m, '');
-				Blackprint.loadModuleFromURL(temp.url);
+			if(My.newURL.replace(/\?.*?$/m, '') === temp._url.replace(/\?.*?$/m, '')){
+				temp._url = My.newURL.replace(/\?.*?$/m, '');
+				Blackprint.loadModuleFromURL(temp._url);
 				My.newURL = '';
 				return;
 			}
 		}
 
-		Blackprint.loadModuleFromURL(My.newURL);
+		let url = My.newURL.replace(/\?.*?$/m, '') + '?'+ (Date.now()/1000|0);
 		My.newURL = '';
+
+		Blackprint.loadModuleFromURL(url, {
+			loadBrowserInterface: true // Also load the related .sf.js and .sf.css if exist
+		});
 	}
 
 	My.reloadURL = function(item){
-		if(/\?[0-9]/.test(item.url))
-			item.url = item.url.replace(/\?([0-9]+)/, (full, num) => '?'+(1+Number(num)));
-		else if(item.url.includes('?'))
-			item.url = item.url.replace(/\?.*?$/m, '')+'?1';
-		else item.url += '?1';
+		if(/\?[0-9]/.test(item._url))
+			item._url = item._url.replace(/\?([0-9]+)/, (full, num) => '?'+(1+Number(num)));
+		else if(item._url.includes('?'))
+			item._url = item._url.replace(/\?.*?$/m, '')+'?1';
+		else item._url += '?1';
 
-		Blackprint.loadModuleFromURL(My.newURL);
+		Blackprint.loadModuleFromURL(item._url);
 	}
 
 	My.hideFromURL = function(item){
-		item.hidden = !item.hidden;
+		let url = item._url.replace(/\?.*?$/m, '');
+		let temp = Blackprint.modulesURL[url];
+
+		let hidden = item._hidden = !item._hidden;
+
+		diveModuleURL(temp, function(deepObject, deepProp, keys, bubble){
+			deepObject[deepProp].hidden = hidden;
+
+			// Bubbling check if the parent has no child anymore
+			for (var i = bubble.length-1; i >= 0; i--) {
+				let ref = bubble[i];
+
+				if(--ref.val._visibleNode <= 0){
+					if(i === 0){
+						Blackprint.nodes[keys[0]].hidden = hidden;
+						break;
+					}
+
+					let parent = bubble[i-1];
+					parent.val[ref.key].hidden = hidden;
+				}
+				else break;
+			}
+		});
 	}
 
 	My.deleteFromURL = function(item){
 		let list = My.list;
-		let i = list.indexOf(item);
+		var index = list.indexOf(item);
 
-		if(i === -1) return;
-		delete Blackprint.modulesURL[list[i].url];
-		list.splice(i, 1);
+		if(index === -1) return;
+		let url = item._url.replace(/[?#].*?$/m, '');
+
+		diveModuleURL(Blackprint.modulesURL[url], function(deepObject, deepProp, keys, bubble){
+			delete deepObject[deepProp];
+
+			// Bubbling check if the parent has no child anymore
+			for (var i = bubble.length-1; i >= 0; i--) {
+				let ref = bubble[i];
+
+				if(--ref.val._length <= 0){
+					if(i === 0){
+						delete Blackprint.nodes[keys[0]];
+						break;
+					}
+
+					let parent = bubble[i-1];
+					delete parent.val[ref.key];
+				}
+				else break;
+			}
+		});
+
+		let styles = document.styleSheets;
+		let simplifiedURL = url.replace(/\.(sf|js|css|min|mjs)/g, '');
+
+		for (var i = 0; i < styles.length; i++) {
+			let style = styles[i];
+			if(style.href == null) continue;
+
+			let temp = style.href.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)/g, '');
+			if(temp === simplifiedURL){
+				style.ownerNode.remove();
+				break;
+			}
+		}
+
+		delete Blackprint.modulesURL[url];
+		list.splice(index, 1);
+	}
+
+	function diveModuleURL(moduleInfo, onBubbling){
+		that:for(let key in moduleInfo){
+			if(key.slice(0, 1) === '_')
+				continue;
+
+			key = key.split('/');
+			let prop = key.pop();
+
+			// Dive
+			let obj = Blackprint.nodes;
+			let bubble = new Array(key.length);
+			for (var i = 0; i < key.length; i++){
+				let k = key[i];
+				obj = obj[k];
+				bubble[i] = {key:k, val:obj};
+				if(obj == null) continue that;
+			}
+
+			onBubbling(obj, prop, key, bubble);
+		}
 	}
 
 	My.close = function(){
