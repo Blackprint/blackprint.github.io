@@ -125,12 +125,6 @@ sf.model('header', function(My, include){
 					Modal.goto('/custom-node-editor');
 				}
 			}, {
-				title: 'Namespace List',
-				icon: 'fas fa-boxes',
-				callback(){
-					Modal.goto('/module-namespace');
-				}
-			}, {
 				title: 'Loaded from URL',
 				icon: 'fa fa-truck-loading',
 				callback(){
