@@ -4,10 +4,7 @@ let engine = new Blackprint.Engine();
 console.log("-- Do you want to run a sample for engine-js?");
 console.log("-- Call engineTest() from this console");
 
-// Wait after ./register-handler.js was executed
 window.engineTest = async function(){
-	await sf.loader.task; // Wait until every script has been loaded
-
 	if(!window.confirm("This action will clear current workspace, are you sure to continue?"))
 		return;
 
@@ -16,16 +13,23 @@ window.engineTest = async function(){
 
 	console.log("-- The sketch and the console was imported from same JSON example, but they're imported in different engine. Any modification from the sketch page will not change the imported console nodes.");
 
+	// Go to first sketch page
 	await views.goto('/sketch/1');
 
-	// Clear and import JSON
+	// Clear all sketch page
 	SketchList.forEach(sketch => sketch.clearNodes());
-	SketchList[0].importJSON(sampleList["Default sample"]);
 
-	await engine.importJSON(sampleList['Default sample']);
+	// For the editor (sketch page)
+	SketchList[0].importJSON(sampleList["Random Multiply"]);
 
-	console.warn('The engine nodes on this console is using default sample\n> sampleList["Default sample"]');
+	// For console (on DevTools)
+	await engine.importJSON(sampleList['Random Multiply']);
+
+
+	// Just some information when using on DevTools console
+	console.warn(`The engine nodes on this console is using sample from 'Random Multiply'\n> %csampleList["Random Multiply"]`, "color: gray");
 	console.warn('If you want to import your JSON, don\'t forget to run engine.clearNodes() first');
+
 	console.log(`For obtain engine node:%c
 var button = engine.getNodes('Example/Button/Simple')[0];
 var input = engine.getNodes('Example/Input/Simple')[0];

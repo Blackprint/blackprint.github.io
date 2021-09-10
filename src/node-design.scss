@@ -1,0 +1,72 @@
+sf-space[blackprint]{
+	.nodes{
+		.node{
+			.header .title{
+				height: 16px;
+				display: flex;
+			}
+
+			&.function .header .icon{
+				background: url('/assets/img/icon/function.png') no-repeat;
+				padding-left: 22px;
+			}
+
+			&.trigger .header{
+				.icon{
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					background: none;
+					&:before{
+						content: "\f542";
+					}
+
+					height: 16px;
+					padding-right: 4px;
+					display: inline-block;
+				}
+			}
+
+			&.input .header{
+				.icon{
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					background: none;
+					&:before{
+						content: "\f1de";
+					}
+
+					height: 16px;
+					padding-right: 4px;
+					display: inline-block;
+				}
+			}
+		}
+	}
+
+	.description{
+		margin-top: 3px;
+		white-space: pre-line;
+	}
+
+	.node.input{
+		textarea{
+			margin-left: 5px;
+			margin-right: -10px;
+		}
+	}
+
+	.node{
+		textarea{
+			margin: 0px 5px 0px -10px;
+			background: rgba(0, 0, 0, 0.63);
+			color: white;
+			border: none;
+		}
+
+		select{
+			background: #232323;
+			color: white;
+			border: 1px solid #6d6d6d;
+		}
+	}
+}
