@@ -12,22 +12,12 @@ For adding library or style, please modify /public/index.html
 	</div>
 	<div class="header-center">
 		<div>A node to node general purpose visual programming</div>
-<!-- 		<div class="item-list">
-<i class="fas fa-pencil-ruler"></i>
-<i class="fas fa-toolbox"></i>
-<i class="fas fa-clipboard-list"></i>
-<i class="fas fa-bars"></i>
-			<div class="item" @click="toHome" title="Back to home"><i class='fa fa-arrow-left'></i></div>
-			<div class="item" @click="toHome" title="Loaded Addons"><i class='fas fa-layer-group'></i></div>
-		</div> -->
 	</div>
 	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
 		<div class="item-list">
 			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></div>
 			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
 			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
-			<!-- <div class="item" @click="saveSketch" title="Save sketch"><i class="fas fa-save"></i></div>
-			<div class="item" @click="loadSketch" title="Load sketch"><i class="fas fa-folder-open"></i></div> -->
 		</div>
 		<div class="header-zoom">
 			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
