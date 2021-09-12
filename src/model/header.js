@@ -8,6 +8,18 @@ sf.model('header', function(My, include){
 		sf.URI.parse(); // Trigger to reparse current URL
 	}
 
+	async function importJSON(sketch, json){
+		Loading.set("Importing nodes");
+		sf.loader.onProgress(function(loaded, total){
+			if(loaded === total)
+				Loading.set("Importing nodes");
+			else Loading.set(`Downloading ${loaded}/${total}`);
+		});
+
+		await sketch.importJSON(json);
+		Loading.set('');
+	}
+
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
 		let sketch = SketchList[views.data.page - 1];
@@ -27,7 +39,7 @@ sf.model('header', function(My, include){
 						})
 
 						val = val.value;
-						if(val) sketch.importJSON(val);
+						if(val) importJSON(sketch, val);
 					}
 				}, {
 					title: 'Load JSON',
@@ -41,7 +53,7 @@ sf.model('header', function(My, include){
 						if(!val) return;
 
 						sketch.clearNodes();
-						sketch.importJSON(val);
+						importJSON(sketch, val);
 					}
 				}, {
 					title: 'Load File',
@@ -58,7 +70,7 @@ sf.model('header', function(My, include){
 
 							let text = JSON.parse(await this.files[0].text());
 							sketch.clearNodes();
-							sketch.importJSON(text);
+							importJSON(sketch, text);
 						}
 						el.click();
 					}
@@ -80,7 +92,7 @@ sf.model('header', function(My, include){
 							showCloseButton: true
 						});
 
-						if(confirm.isDismissed)
+						if(confirm.isDismissed && confirm.dismiss === 'backdrop')
 							return;
 
 						let option = {};
