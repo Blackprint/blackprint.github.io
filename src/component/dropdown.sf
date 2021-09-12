@@ -96,8 +96,7 @@ drop-down.dropdown-menu drop-down{
 	z-index: 10000;
 	visibility: hidden;
 	opacity: 0;
-	-webkit-transition-duration: .4s;
-	transition-duration: .4s;
+	transition-duration: .2s;
 
 	&.show{
 		opacity: 1;
@@ -226,7 +225,7 @@ sf.model('dropdown', function(My){
 
 		setTimeout(()=> {
 			backdrop.remove();
-		}, 500);
+		}, 200);
 
 		$(sf.Window).off('pointerdown', backdropListener);
 	}
