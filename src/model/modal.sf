@@ -69,6 +69,6 @@ var Modal = sf.model('modal', function(My){
 
 		setTimeout(()=> {
 			My.$el('.modal-dialog').on('pointerup', My.hide, {outside: true});
-		}, 1000);
+		}, 400);
 	}
 });
