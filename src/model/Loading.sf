@@ -1,0 +1,41 @@
+## html.append-to-body
+<sf-m name="loading" class="{{ showed && 'show' }}">
+	<span class="icon"><i class="fa fa-fan fa-spin"></i></span>
+	<span class="desc">{{ desc }}</span>
+</sf-m>
+
+## scss-global
+sf-m[name="loading"]{
+	display: none;
+	background: #000000ba;
+	pointer-events: none;
+	padding: 7px 15px;
+	border-radius: 20px;
+	box-shadow: 0 0 11px white;
+	position: fixed;
+	top: 60px;
+	color: white;
+	right: 10px;
+
+	&.show{
+		display: block;
+	}
+
+	.icon{
+		padding-right: 5px;
+	}
+}
+
+## js-global
+var Loading = sf.model('loading', function(My){
+	My.showed = false;
+	My.desc = '';
+
+	My.set = function(text){
+		if(text && My.showed === false)
+			My.showed = true;
+		else My.showed = false;
+
+		My.desc = text;
+	}
+});
