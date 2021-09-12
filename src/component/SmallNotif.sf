@@ -6,7 +6,7 @@ SmallNotif.add('message', 'color', /* delay in ms*/);
 ```
 
 ## comment, this will automatically appended to body
-## html.append-to-body
+## html
 <sf-m name="small.notif">
 	<div class="notify-container right-top">
 		<div sf-each="x in list" class="notify-base notify-{{ x.color }}">
@@ -38,7 +38,7 @@ var SmallNotif = sf.model('small.notif', function(My){
     My.initialized = true;
 
     if($('sf-m[name="small.notif"]').length !== 0) return;
-    $('body').append($(templates['other/SmallNotif.sf']));
+    $('body').append($(window.templates[#this.path]));
   }
 
   My.add = function(message, color, delay){
@@ -49,7 +49,7 @@ var SmallNotif = sf.model('small.notif', function(My){
 
     setTimeout(()=> {
       My.list.splice(My.list.indexOf(item), 1);
-    }, delay || (1000 + 150 * message.length));
+    }, delay || (1000 + 100 * message.length));
   }
 
   My.close = function(item){
