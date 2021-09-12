@@ -147,6 +147,8 @@ sf.model('dropdown', function(My){
 	My.menus = [];
 	My.onCancel = void 0;
 	My.className = '';
+	My.pendingDeepOpen = false;
+	My.pendingDeepOpen_ = 0;
 
 	My.icon = {
 		more: 'fa fa-chevron-right'
@@ -186,6 +188,8 @@ sf.model('dropdown', function(My){
 		for (var i = 0; i < My.menus.length; i++)
 			My.menus.getElement(i).model.deepRemove();
 
+		My.pendingDeepOpen = false;
+		My.pendingDeepOpen_ = 0;
 		My.menus.splice(0);
 		removeBackdrop();
 
@@ -290,7 +294,7 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 			const elem = $(options.getElements(i));
 
 			if(opt.deep !== void 0){
-				elem.on('mouseover', function(ev){
+				function openDeep(ev){
 					if(currentDeepLevel !== void 0)
 						My.deepRemove();
 
@@ -315,18 +319,34 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 					// Create dropdown in current sf-space
 					deep.el = currentDeepLevel = new $DropDown(deep, My.$space);
 					$el.append(currentDeepLevel);
+				}
+
+				elem.on('mouseover', function(ev){
+					My.root.pendingDeepOpen = ev.target;
+					clearTimeout(My.root.pendingDeepOpen_);
+
+					My.root.pendingDeepOpen_ = setTimeout(()=> {
+						if(My.root.pendingDeepOpen === ev.target)
+							openDeep(ev);
+					}, 400);
 				});
 
+				elem.on('click', openDeep);
 				continue;
 			}
 
 			elem.on('mouseover', function(ev){
-				if(currentDeepLevel !== void 0){
-					My.deepRemove();
-					currentDeepLevel = void 0;
-				}
+				My.root.pendingDeepOpen = ev.target;
+				clearTimeout(My.root.pendingDeepOpen_);
 
-				opt.hover && opt.hover.apply(opt.context, opt.args);
+				My.root.pendingDeepOpen_ = setTimeout(()=> {
+					if(currentDeepLevel !== void 0){
+						My.deepRemove();
+						currentDeepLevel = void 0;
+					}
+
+					opt.hover && opt.hover.apply(opt.context, opt.args);
+				}, 400);
 			});
 
 			if(opt.callback){
