@@ -28,52 +28,69 @@ sf.model('header', function(My, include){
 			title: 'Sketch',
 			icon: 'fa fa-pencil-ruler',
 			deep:[{
-				title: 'Import',
+				title: 'Open',
 				icon: 'fa fa-folder-open',
 				deep:[{
-					title:'Append JSON',
-					async callback(){
-						let val = await Swal.fire({
-							title:"Import from JSON and append to sketch",
-							input: "text",
-						})
+					title: 'Import JSON',
+					info: 'Append data from JSON to current sketch',
+					deep: [{
+						title: "from Clipboard",
+						async callback(){
+							let val = await Swal.fire({
+								title: "Append data from JSON to current sketch",
+								input: "text",
+							});
 
-						val = val.value;
-						if(val) importJSON(sketch, val);
-					}
+							val = val.value;
+							if(!val) return;
+
+							importJSON(sketch, val);
+						}
+					}],
 				}, {
 					title: 'Load JSON',
-					async callback(){
-						let val = await Swal.fire({
-							title:"Clean sketch and import from JSON",
-							input: "text",
-						});
+					info: 'Clean sketch and import from JSON',
+					deep: [{
+						title: "from Clipboard",
+						async callback(){
+							let val = await Swal.fire({
+								title: "Clean sketch and import from JSON",
+								input: "text",
+							});
 
-						val = val.value;
-						if(!val) return;
+							val = val.value;
+							if(!val) return;
 
-						sketch.clearNodes();
-						importJSON(sketch, val);
-					}
-				}, {
-					title: 'Load File',
-					callback(){
-						var el = document.createElement("input");
-						el.setAttribute('type', 'file');
-						el.onchange = async function(){
-							if(this.files.length === 0) return;
-							if(this.files.length !== 1){
-								console.log(this.files);
-								console.log("Currently only support 1 file");
-								return;
-							}
-
-							let text = JSON.parse(await this.files[0].text());
 							sketch.clearNodes();
-							importJSON(sketch, text);
+							importJSON(sketch, val);
 						}
-						el.click();
-					}
+					}, {
+						title: "from File",
+						callback(){
+							var el = document.createElement("input");
+							el.setAttribute('type', 'file');
+							el.onchange = async function(){
+								if(this.files.length === 0) return;
+								if(this.files.length !== 1){
+									console.log(this.files);
+									console.log("Currently only support 1 file");
+									SmallNotif.add('Currently only support 1 file', 'error');
+									return;
+								}
+
+								let text = JSON.parse(await this.files[0].text());
+								if(text){
+									text = text.trim();
+									if(text.slice(0, 1) !== '{')
+										SmallNotif.add('Data in the file is not a JSON', 'error');
+								}
+
+								sketch.clearNodes();
+								importJSON(sketch, text);
+							}
+							el.click();
+						}
+					}]
 				}]
 			}, {
 				title:'Export',
