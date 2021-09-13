@@ -1,0 +1,61 @@
+## html
+<sf-m name="example-list">
+	<div class="description">Please select one of these example (<a href="https://github.com/Blackprint/blackprint.github.io/blob/develop/src/global/sampleList.js">source</a>)</div>
+	<div class="list">
+		<div class="item" sf-each="x in list" @click="open(x)">
+			{{ x }}
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="example-list"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	.description{
+		padding: 10px;
+		color: white;
+		a{
+			color: skyblue;
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+		}
+	}
+}
+
+## js-global
+sf.model('example-list', function(My){
+	My.list = [];
+
+	My.init = function(){
+		My.list = Object.keys(sampleList);
+	}
+
+	My.open = function(key){
+		let obj = sampleList[key];
+		for (var i = 0; i < SketchList.length; i++)
+			SketchList[i].clearNodes();
+
+		Modal.hide();
+		views.goto('/sketch/1');
+
+		let sketch = SketchList[0] ??= new Blackprint.Sketch();
+		sketch.importJSON(obj);
+	}
+});

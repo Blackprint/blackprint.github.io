@@ -58,6 +58,10 @@ sf-page-view{
 	}
 }
 
+vw-modal sf-page-view{
+	overflow: visible;
+}
+
 img{
 	opacity: 1;
 	transition: opacity 0.3s ease-in;

@@ -7,8 +7,8 @@
 		<div class="item" @click="toWorkspace">
 			<i class="fas fa-torii-gate"></i> Go to sketch page
 		</div>
-		<div class="item" style="cursor: default">
-			<i class='fa fa-map-signs'></i> <span style="text-decoration: line-through">Open examples</span>
+		<div class="item" @click="openExamples">
+			<i class='fa fa-map-signs'></i> <span>Open examples</span>
 		</div>
 		<div class="item" style="cursor: default">
 			<i class='fa fa-book-open'></i> <span style="text-decoration: line-through">Learn from editor</span>
@@ -134,10 +134,15 @@
 ## js-global
 sf.model('welcome-text', function(My){
 	My.toWorkspace = function(){
+		if(SketchList.length === 0){
+			My.openExamples();
+			return;
+		}
+
 		views.goto('/sketch/1');
 	}
 
-	My.toHome = function(){
-
+	My.openExamples = function(){
+		Modal.goto('/example-list');
 	}
 });
