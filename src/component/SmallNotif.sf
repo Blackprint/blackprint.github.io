@@ -8,12 +8,12 @@ SmallNotif.add('message', 'color', /* delay in ms*/);
 ## comment, this will automatically appended to body
 ## html
 <sf-m name="small.notif">
-	<div class="notify-container right-top">
-		<div sf-each="x in list" class="notify-base notify-{{ x.color }}">
-			<span>{{ x.message }}</span>
-			<button @click="close(x)" class="close">×</button>
-		</div>
-	</div>
+  <div class="notify-container right-top">
+    <div sf-each="x in list" class="notify-base notify-{{ x.color }}">
+      <span>{{ x.message }}</span>
+      <button @click="close(x)" class="close">×</button>
+    </div>
+  </div>
 </sf-m>
 
 ## js-global

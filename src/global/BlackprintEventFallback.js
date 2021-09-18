@@ -23,7 +23,7 @@ let BlackprintEventFallback = {
 
 BlackprintEventFallback.error.types = {
 	node_port_not_found({ node, portName }){
-		SmallNotif.add(`Node port not found for ${node} with name: ${portName}`, 'red');
+		SmallNotif.add(`Node port not found for ${node.iface.title} with name: ${portName}`, 'red');
 	},
 	node_not_found({ namespace }){
 		SmallNotif.add(`Node for ${namespace} was not found, maybe .registerNode() haven't being called?`, 'red')
