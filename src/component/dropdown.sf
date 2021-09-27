@@ -327,7 +327,7 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 					My.root.pendingDeepOpen_ = setTimeout(()=> {
 						if(My.root.pendingDeepOpen === ev.target)
 							openDeep(ev);
-					}, 400);
+					}, 200);
 				});
 
 				elem.on('click', openDeep);
@@ -345,7 +345,7 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 					}
 
 					opt.hover && opt.hover.apply(opt.context, opt.args);
-				}, 400);
+				}, 200);
 			});
 
 			if(opt.callback){
