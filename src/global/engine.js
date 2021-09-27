@@ -31,9 +31,9 @@ window.engineTest = async function(){
 	console.warn('If you want to import your JSON, don\'t forget to run engine.clearNodes() first');
 
 	console.log(`For obtain engine node:%c
-var button = engine.getNodes('Example/Button/Simple')[0];
-var input = engine.getNodes('Example/Input/Simple')[0];
-var logger = engine.getNodes('Example/Display/Logger')[0];
+var button = engine.iface.myButton;
+var input = engine.iface.myInput;
+var logger = engine.iface.myLogger;
 `, "color: gray");
 	console.log("To click on invisible button: %cbutton.clicked()", "color: gray");
 	console.log("To set the invisible input: %cinput.data.value = 'hello'", "color: gray");
