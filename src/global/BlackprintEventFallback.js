@@ -8,7 +8,7 @@ let BlackprintEventFallback = {
 		SmallNotif.add(`The cable is not suitable (${cable.source}, ${port.source})`, 'yellow');
 	},
 	cable_wrong_type({ cable, iface, source, target }){
-		SmallNotif.add(iface.title+"> Port from '"+source.iface.title + " - " + source.name+"' was not an "+target.type.name, 'yellow');
+		SmallNotif.add(iface.title+"> Port from '"+source.iface.title + " - " + source.name+"' was not an "+(target.type._name || target.type.name), 'yellow');
 	},
 	cable_wrong_type_pair({ cable, target }){
 		SmallNotif.add(`The cable type is not suitable (${cable.owner.type.name}, ${target.type.name})`, 'yellow');
