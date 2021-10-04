@@ -5,15 +5,16 @@ For adding library or style, please modify /public/index.html
 <img class="background" src="/assets/img/background/blackprint.jpg?1">
 
 <!-- Model on ./blackprint/header.js -->
-<sf-m name="header" class="header">
-	<div class="header-left" @click="mainMenu" style="cursor: {{ showOptions && 'pointer' }};">
+<sf-m name="header" class="header {{ showOptions ? 'sketch-mode' : '' }}">
+	<div class="header-left" @click="mainMenu">
 		<img src="/assets/img/icon/blackprint.png">
 		<div>Blackprint</div>
+		<i class="fa fa-caret-down menu-button-hint"></i>
 	</div>
 	<div class="header-center">
 		<div>A node to node general purpose visual programming</div>
 	</div>
-	<div class="header-menu" style="display: {{ showOptions ? '' : 'none' }};">
+	<div class="header-menu">
 		<div class="item-list">
 			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></div>
 			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
@@ -46,6 +47,18 @@ body > .background{
 	width: 100%;
 	box-shadow: inset 0 0 11rem 0px black;
 	height: 100%;
+}
+
+.sketch-mode{
+	.header-left{
+		cursor: pointer;
+		i.menu-button-hint{
+			display: block;
+		}
+	}
+	.header-menu{
+		display: inherit;
+	}
 }
 
 .large-header{
@@ -90,6 +103,19 @@ vw-ground{
 			vertical-align: middle;
 			display: inline-block;
 		}
+
+		.menu-button-hint{
+			display: none;
+			position: absolute;
+			bottom: -3px;
+			left: 100px;
+		}
+
+		&:hover{
+			.menu-button-hint, div{
+				color: #bdbdbd;
+			}
+		}
 	}
 
 	.header-center {
@@ -101,6 +127,7 @@ vw-ground{
 }
 
 .header-menu{
+	display: none;
 	.item-list{
 		display: flex;
 		position: absolute;
