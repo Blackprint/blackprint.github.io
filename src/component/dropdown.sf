@@ -142,7 +142,7 @@ drop-down{
 // =====================================================================
 // ============== Model <sf-m name="dropdown"></sf-m> ==================
 // =====================================================================
-sf.model('dropdown', function(My){
+var DropDown = sf.model('dropdown', function(My){
 	My.menus = [];
 	My.onCancel = void 0;
 	My.className = '';
