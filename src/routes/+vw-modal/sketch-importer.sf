@@ -1,0 +1,204 @@
+## html
+<sf-m name="sketch-importer">
+	<div class="description" title="To avoid any risks if you have stored sensitive data on this editor, make sure you have verify the author of the nodes and the JSON to be imported.">Please verify the author before importing</div>
+	<div class="info-modules">
+		<div class="title">These modules will be imported:</div>
+		<ul class="list">
+			<li class="item" sf-each="x in modules">
+				{{ x }}
+			</li>
+		</ul>
+	</div>
+	<div class="info-nodes">
+		<div class="title">These nodes will be used:</div>
+		<ul class="list">
+			<li class="item" sf-each="x in nodes">
+				{{ x.name }} ({{ x.count }})
+			</li>
+		</ul>
+	</div>
+	<div class="info-clear">
+		<div class="title">Please be careful if you saved any sensitive data<br>Click to clear the saved data:</div>
+		<div class="button-clear">
+			<div @click="clear.localStorage">
+				Local Storage ({{ savedKeys.localStorage.length }})
+			</div>
+			<div @click="clear.sessionStorage">
+				Session Storage ({{ savedKeys.sessionStorage.length }})
+			</div><br>
+			<div @click="clear.environmentVariables">
+				Environment Variables ({{ savedKeys.environmentVariables.length }})
+			</div>
+			<div @click="clear.sketchPages">
+				Sketch Pages ({{ savedKeys.sketchPages.length }})
+			</div>
+		</div>
+	</div>
+	<div class="button-import" @click="importNow">
+		Import Sketch
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="sketch-importer"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	color: white;
+	.description{
+		padding: 10px;
+		width: 500px;
+		text-align: center;
+		margin-bottom: 10px;
+		text-decoration: underline;
+		letter-spacing: 1px;
+		a{
+			color: skyblue;
+		}
+	}
+	.info-modules, .info-nodes{
+		background: #000000ab;
+		padding: 7px;
+		border-radius: 10px;
+		margin: 5px 2px;
+		.title{
+			color: gray;
+		}
+	}
+	.info-clear{
+		margin-top: 10px;
+		.title{
+			text-align: center;
+		}
+	}
+	.list{
+		list-style-type: decimal;
+		margin: 5px 0;
+		padding: 0 30px;
+		max-height: 15vh;
+		overflow: hidden scroll;
+	}
+	.button-clear{
+		text-align: center;
+		div{
+			display: inline-block;
+			margin: 5px;
+			border: 1px dashed #000;
+			padding: 7px;
+			background: #000000ad;
+			border-radius: 20px;
+			cursor: pointer;
+			&:hover{
+				background: #181818ad;
+				box-shadow: 0 0 9px #c6ebbd;
+			}
+		}
+	}
+	.button-import{
+		position: relative;
+		border-radius: 10px;
+		background: #125c15;
+		border: 1px solid #65a122;
+		margin: 0 auto 5px auto;
+		width: 120px;
+		padding: 7px 10px;
+		text-align: center;
+		cursor: pointer;
+		&:hover{
+			background: #65a122;
+			box-shadow: 0 0 9px #c6ebbd;
+		}
+	}
+}
+
+## js-global
+var SketchImporter = sf.model('sketch-importer', function(My){
+	My.modules = [];
+	My.nodes = [];
+	My.pendingLoad = void 0;
+	My.savedKeys = {
+		localStorage:[],
+		sessionStorage:[],
+		environmentVariables:[],
+		sketchPages:[],
+	};
+
+	My.loadJSON = async function(json){
+		Modal.goto('/sketch-importer');
+		My.pendingLoad = json = JSON.parse(json);
+
+		let metadata = json._;
+		My.modules = metadata.moduleJS || [];
+
+		My.nodes = [];
+		for(let key in json){
+			if(key === '_') continue;
+
+			My.nodes.push({name: key, count: json[key].length});
+		}
+
+		My.checkSavedData();
+	}
+
+	My.importNow = function(){
+		if(My.pendingLoad === void 0){
+			let msg = "Please call 'SketchImport.loadJSON' first";
+			console.error(msg);
+
+			SmallNotif.add(msg, 'yellow');
+			return false;
+		}
+
+		Modal.hide();
+		views.goto('/sketch/1');
+
+		let sketch = SketchList[0] ??= new Blackprint.Sketch();
+		sketch.importJSON(My.pendingLoad);
+
+		My.pendingLoad = void 0;
+	}
+
+	My.checkSavedData = function(){
+		My.savedKeys.localStorage = Object.keys(localStorage);
+		My.savedKeys.sessionStorage = Object.keys(sessionStorage);
+		My.savedKeys.environmentVariables = Object.keys(Blackprint.Environment.map);
+		My.savedKeys.sketchPages = SketchList;
+	}
+
+	My.clear = {
+		localStorage(){
+			let keys = Object.keys(localStorage);
+
+			for(let i=0; i < keys.length; i++)
+				delete localStorage[keys[i]];
+
+			My.savedKeys.localStorage = Object.keys(localStorage);
+		},
+		sessionStorage(){
+			let keys = Object.keys(sessionStorage);
+
+			for(let i=0; i < keys.length; i++)
+				delete sessionStorage[keys[i]];
+
+			My.savedKeys.sessionStorage = Object.keys(sessionStorage);
+		},
+		environmentVariables(){
+			let ref = Blackprint.Environment;
+			let keys = Object.keys(ref.map);
+
+			for(let i=0; i < keys.length; i++)
+				ref.delete(keys[i]);
+
+			My.savedKeys.environmentVariables = Object.keys(Blackprint.Environment.map);
+		},
+		sketchPages(){
+			for (var i = 0; i < SketchList.length; i++)
+				SketchList[i].destroy();
+
+			SketchList.splice(1);
+			views.goto('/sketch/1');
+		}
+	};
+});

@@ -31,66 +31,43 @@ sf.model('header', function(My, include){
 				title: 'Open',
 				icon: 'fa fa-folder-open',
 				deep:[{
-					title: 'Import JSON',
-					info: 'Append data from JSON to current sketch',
-					deep: [{
-						title: "from Clipboard",
-						async callback(){
-							let val = await Swal.fire({
-								title: "Append data from JSON to current sketch",
-								input: "text",
-							});
+					title: "From Clipboard",
+					async callback(){
+						let val = await Swal.fire({
+							title: "Paste the JSON here",
+							input: "text",
+						});
 
-							val = val.value;
-							if(!val) return;
+						val = val.value;
+						if(!val) return;
 
-							importJSON(sketch, val);
-						}
-					}],
+						SketchImporter.loadJSON(val, sketch);
+					}
 				}, {
-					title: 'Load JSON',
-					info: 'Clean sketch and import from JSON',
-					deep: [{
-						title: "from Clipboard",
-						async callback(){
-							let val = await Swal.fire({
-								title: "Clean sketch and import from JSON",
-								input: "text",
-							});
-
-							val = val.value;
-							if(!val) return;
-
-							sketch.clearNodes();
-							importJSON(sketch, val);
-						}
-					}, {
-						title: "from File",
-						callback(){
-							var el = document.createElement("input");
-							el.setAttribute('type', 'file');
-							el.onchange = async function(){
-								if(this.files.length === 0) return;
-								if(this.files.length !== 1){
-									console.log(this.files);
-									console.log("Currently only support 1 file");
-									SmallNotif.add('Currently only support 1 file', 'error');
-									return;
-								}
-
-								let text = JSON.parse(await this.files[0].text());
-								if(text){
-									text = text.trim();
-									if(text.slice(0, 1) !== '{')
-										SmallNotif.add('Data in the file is not a JSON', 'error');
-								}
-
-								sketch.clearNodes();
-								importJSON(sketch, text);
+					title: "From File",
+					callback(){
+						var el = document.createElement("input");
+						el.setAttribute('type', 'file');
+						el.onchange = async function(){
+							if(this.files.length === 0) return;
+							if(this.files.length !== 1){
+								console.log(this.files);
+								console.log("Currently only support 1 file");
+								SmallNotif.add('Currently only support 1 file', 'error');
+								return;
 							}
-							el.click();
+
+							let text = JSON.parse(await this.files[0].text());
+							if(text){
+								text = text.trim();
+								if(text.slice(0, 1) !== '{')
+									SmallNotif.add('Data in the file is not a JSON', 'error');
+							}
+
+							SketchImporter.loadJSON(text, sketch);
 						}
-					}]
+						el.click();
+					}
 				}]
 			}, {
 				title:'Export',
