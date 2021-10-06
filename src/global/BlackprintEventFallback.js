@@ -1,6 +1,6 @@
 // Please use sketch.on('...', callback) instead
 // This is used if no one listened to the event
-let BlackprintEventFallback = {
+var BlackprintEventFallback = {
 	error(error){
 		BlackprintEventFallback.error.types[error.type](error.data || error);
 	},
