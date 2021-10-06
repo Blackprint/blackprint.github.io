@@ -52,9 +52,14 @@ sf-page-view{
 
 .anim-parent{
 	.anim-element{
+		visibility: visible;
 		backface-visibility: hidden;
 		transform-style: preserve-3d;
 		transform: translate3d(0, 0, 0);
+
+		sf-page-view{
+			visibility: visible;
+		}
 	}
 }
 
