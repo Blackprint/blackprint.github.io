@@ -30,8 +30,10 @@ sketch-page{
 			sf.model('header').cloneActive = sketch.page.cloneActive;
 
 			// Empty workspace?
-			if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0)
-				Modal.goto('/example-list');
+			setTimeout(()=> {
+				if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0)
+					Modal.goto('/example-list');
+			}, 500);
 		},
 		leaving(){
 			console.log("Leaving from sketch page data:", arguments);
