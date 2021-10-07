@@ -119,6 +119,23 @@ sf.model('header', function(My, include){
 							URL.revokeObjectURL(btn.href);
 						}, 120e3);
 					}
+				}, {
+					title: 'To URL',
+					callback(){
+						var compress = pako.deflateRaw(sketch.exportJSON());
+						var temp = Base64.fromUint8Array(compress, true);
+
+						sf.URI.data.importSketch = [temp];
+						sf.URI.replace();
+
+						let loc = location.href;
+						navigator.clipboard.writeText(loc);
+
+						Swal.fire({
+							title: "Copied to clipboard!",
+							text: loc
+						});
+					}
 				}]
 			}]
 		}, {
