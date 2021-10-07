@@ -37,3 +37,7 @@ BlackprintEventFallback.error.types = {
 		console.error("It seems '"+tagName+"' HTML haven't been registered as component or can't be loaded", element);
 	},
 };
+
+window.addEventListener('error', function(e){
+	SmallNotif.add("Something went wrong..");
+});
