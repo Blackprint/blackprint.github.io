@@ -39,13 +39,18 @@ sf-m[name="example-list"] {
 	}
 }
 
+## js-global.router
+={
+	on:{
+		coming(){
+			sf.model('example-list').list = Object.keys(sampleList);
+		}
+	}
+}
+
 ## js-global
 sf.model('example-list', function(My){
 	My.list = [];
-
-	My.init = function(){
-		My.list = Object.keys(sampleList);
-	}
 
 	My.open = function(key){
 		let obj = sampleList[key];
