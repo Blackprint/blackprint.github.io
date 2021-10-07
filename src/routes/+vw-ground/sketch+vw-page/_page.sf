@@ -123,4 +123,19 @@ sf.component('sketch-page', function(My){
 			sf.Window.destroy();
 		}
 	}
+
+	sketch.on('node.menu', function(iface, menu){
+		menu.unshift({
+			title: !iface.id ? "Add ID" : "Modify ID",
+			async callback(){
+				let val = await Swal.fire({
+					title: "Write the new ID here",
+					text: (iface.id ? "Current ID: "+iface.id : void 0),
+					input: "text",
+				});
+
+				iface.id = val.value;
+			}
+		});
+	});
 });
