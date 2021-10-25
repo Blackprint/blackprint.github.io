@@ -28,12 +28,13 @@ sketch-page{
 			let sketch = SketchList[data.page - 1];
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;
-
 		},
 		showed(){
 			setTimeout(()=> {
-				if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0)
+				if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0){
+					if(SketchList[0].__importing) return;
 					Modal.goto('/example-list');
+				}
 			}, 100);
 		},
 		leaving(){
@@ -45,7 +46,6 @@ sketch-page{
 ## js-global
 // Blackprint.space = Space (https://github.com/ScarletsFiction/ScarletsFrame/wiki)
 // sketch.scope = shortcut to obtain your model scope/context
-
 var SketchList = [];
 sf.component('sketch-page', function(My){
 	// URL: #page/sketch/{data.page}

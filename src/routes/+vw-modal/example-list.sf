@@ -58,9 +58,24 @@ sf.model('example-list', function(My){
 			SketchList[i].clearNodes();
 
 		Modal.hide();
-		views.goto('/sketch/1');
 
 		let sketch = SketchList[0] ??= new Blackprint.Sketch();
-		sketch.importJSON(obj);
+		sketch.__importing = true;
+
+		async function pageShowed(){
+			await sketch.importJSON(obj);
+			delete sketch.__importing;
+
+			My.pendingLoad = void 0;
+		}
+
+		if(views.currentPath === '/sketch/1'){
+			SmallNotif.add("Loading", 'yellow');
+			return setTimeout(pageShowed, 200);
+		}
+
+		views.goto('/sketch/1');
+		SmallNotif.add("Loading", 'yellow', 1200);
+		setTimeout(pageShowed, 1000); // Wait page animation
 	}
 });
