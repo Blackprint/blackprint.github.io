@@ -159,7 +159,7 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		sketch.__importing = true;
 
 		async function pageShowed(){
-			await sketch.importJSON(obj);
+			await sketch.importJSON(My.pendingLoad);
 			delete sketch.__importing;
 
 			My.pendingLoad = void 0;
