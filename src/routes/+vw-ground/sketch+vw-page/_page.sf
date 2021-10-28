@@ -124,7 +124,7 @@ sf.component('sketch-page', function(My){
 		}
 	}
 
-	sketch.on('node.menu', function(iface, menu){
+	sketch.on('node.menu', function({ iface, menu }){
 		menu.unshift({
 			title: !iface.id ? "Add ID" : "Modify ID",
 			async callback(){
