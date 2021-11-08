@@ -33,8 +33,8 @@ BlackprintEventFallback.error.types = {
 		console.error("Node was not found on the list", iface);
 	},
 	node_template_not_found({ tagName, element }){
-		SmallNotif.add(`It seems '${tagName}' HTML haven't been registered as component or can't be loaded`, 'red');
-		console.error("It seems '"+tagName+"' HTML haven't been registered as component or can't be loaded", element);
+		SmallNotif.add(`It seems '${tagName}' HTML haven't been registered as component or can't be loaded.`, 'red');
+		console.error("It seems '"+tagName+"' HTML haven't been registered as component or can't be loaded. Please double check the interface file path or name, the interface path name and the file name is case sensitive.", element);
 	},
 };
 
