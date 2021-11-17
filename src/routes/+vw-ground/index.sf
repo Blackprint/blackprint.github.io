@@ -25,12 +25,16 @@
 				<div class="name">Deno</div>
 			</a>
 			<a class="item" href="https://github.com/Blackprint/engine-js" target="_blank">
-				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.12.0/icons/nodejs/nodejs-plain.svg">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.14.0/icons/nodejs/nodejs-plain.svg">
 				<div class="name">Node.js</div>
 			</a>
 			<a class="item" href="https://github.com/Blackprint/engine-php" target="_blank">
-				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.12.0/icons/php/php-plain.svg">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.14.0/icons/php/php-plain.svg">
 				<div class="name">PHP</div>
+			</a>
+			<a class="item" href="https://github.com/Blackprint/engine-go" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/go/go-original-wordmark.svg">
+				<div class="name">Golang</div>
 			</a>
 		</div>
 	</div>
