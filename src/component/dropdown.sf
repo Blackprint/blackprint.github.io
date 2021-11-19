@@ -6,7 +6,7 @@
   ">
   <div class="first" style="display: {{ !title && 'none' }}">{{ title || '' }}</div>
   <ul>
-    <li sf-each="x in options" :class="{{ x.divider ? 'divider' : '' }} {{ x.disabled && 'disabled' }}" title="{{ x.info || '' }}">
+    <li sf-each="x in options" :class="{{ x.divider ? 'divider' : '' }} {{ x.disabled ? 'disabled' : '' }}" title="{{ x.info || '' }}">
       {{@if x.title !== undefined:
       	{[ <a> ]} // Begin
 
@@ -20,7 +20,7 @@
 
       	// Always use { [ enclosed template ]} to avoid vulnerability
       	// like the text being parsed as HTML
-      	{[ <span>{{ x.title }}</span> ]} // Content
+      	{[ <div>{{ x.title }}</div> ]} // Content
 
       	// Add icon if the has deep menu
       	if(x.deep !== void 0)
@@ -127,8 +127,17 @@ drop-down{
 		margin: 0;
 		padding: 0;
 
+		li a {
+			display: flex;
+			div{
+				padding-left: 5px;
+			}
+		}
+
 		.dropdown-icon {
 			padding-right: 5px;
+			float: left;
+			align-self: center;
 		}
 
 		li.disabled, li.disabled:hover{
@@ -176,6 +185,11 @@ var DropDown = sf.model('dropdown', function(My){
 			menus.x = event.x;
 			menus.y = event.y;
 			menus.event = event;
+		}
+
+		for (var i = menus.length - 1; i >= 0; i--) {
+			if(menus[i].hide)
+				menus.splice(i, 1);
 		}
 
 		My.className = className || '';
@@ -246,6 +260,11 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 	My.width = 0;
 	My.height = 0;
 	My.disabled = $item.disabled === true;
+
+	for (var i = $item.length - 1; i >= 0; i--) {
+		if($item[i].hide)
+			$item.splice(i, 1);
+	}
 
 	// First dropdown title
 	My.title = $item.title;
