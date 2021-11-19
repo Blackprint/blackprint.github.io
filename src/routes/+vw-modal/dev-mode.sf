@@ -1,10 +1,10 @@
 ## html
 <sf-m name="modal-dev-mode">
-	<div class="description">Please set the Blackprint nodes server URL:</div>
-	<div>
-		<input type="text" sf-bind="url">
+	<div class="description">Please set the Blackprint nodes server URL</div>
+	<div class="text-input">
+		<input placeholder="{{ placeholder }}" type="text" sf-bind="url">
 	</div>
-	<button @click="changeServer"></button>
+	<div class="button-import" @click="changeServer">Connect</div>
 </sf-m>
 
 ## scss-global
@@ -17,23 +17,35 @@ sf-m[name="modal-dev-mode"] {
 	.description{
 		padding: 10px;
 		color: white;
-		a{
-			color: skyblue;
+	}
+	.text-input{
+		padding: 10px;
+		position: relative;
+		display: flex;
+
+		input{
+			width: 100%;
+			border: 1px solid black;
+			background: #161616;
+			padding: 5px;
+			color: white;
+			outline: none;
 		}
 	}
-	.list{
-		padding: 5px;
-		.item{
-			color: #fff;
-			background: #0000009e;
-			cursor: pointer;
-			border-radius: 4px;
-			padding: 5px;
-			margin: 5px;
-			border: 1px solid #000;
-			&:hover{
-				background: #000000de;
-			}
+	.button-import{
+		position: relative;
+		border-radius: 10px;
+		background: #125c15;
+		border: 1px solid #65a122;
+		margin: 0 auto 5px auto;
+		width: 120px;
+		padding: 7px 10px;
+		text-align: center;
+		cursor: pointer;
+		color: white;
+		&:hover{
+			background: #65a122;
+			box-shadow: 0 0 9px #c6ebbd;
 		}
 	}
 }
@@ -41,6 +53,7 @@ sf-m[name="modal-dev-mode"] {
 ## js-global
 sf.model('modal-dev-mode', function(My){
 	My.url = localStorage.BPModuleServer ??= "";
+	My.placeholder = location.origin;
 
 	// Automatically move to development mode
 	if(location.hostname === 'localhost' && location.pathname !== "/dev.html"){
@@ -62,15 +75,19 @@ sf.model('modal-dev-mode', function(My){
 
 		___browserSync___.socketUrl = url;
 
+		let socket = ___browserSync___.socket;
 		socket.disconnect();
+
 		socket.once('connect', function(){
+			console.log("Connected to Blackprint nodes server:", url);
 			SmallNotif.add("Connected to Blackprint node server", "green");
 		});
 
-		let socket = ___browserSync___.socket;
-		socket.nsp = url;
+		socket.nsp = '/browser-sync';
 		socket.io.uri = url;
 		socket.connect();
+
+		Modal.hide();
 	}
 
 	if(My.url !== '' && sf.hotReload !== void 0)

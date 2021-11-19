@@ -144,17 +144,36 @@ sf.model('header', function(My, include){
 			deep:[{
 				title: 'Create Custom',
 				icon: 'fa fa-plus',
+				hide: sf.hotReload === void 0,
 				callback(){
 					Modal.goto('/custom-node-editor');
 				}
 			}, {
-				title: (window.___browserSync___?.socket?.disconnected ? "Connect" : "Disconnect")+' module server',
+				title: (function(){
+					if(sf.hotReload === void 0)
+						return "Development Mode";
+
+					if(window.___browserSync___ === void 0)
+						return "Connect module server";
+
+					let socket = ___browserSync___.socket;
+					let isConnected = socket.connected;
+					let isDefault = socket.io.uri.indexOf(location.origin) === 0;
+
+					return (!isConnected || isDefault ? "Connect" : "Disconnect")+' module server';
+				})(),
 				icon: 'fa fa-plug',
-				hide: sf.hotReload === void 0,
 				callback(){
-					if(___browserSync___.socket.connected){
-						___browserSync___.socket.disconnect();
-						return;
+					if(sf.hotReload === void 0)
+						return location.pathname = '/dev.html';
+
+					if(window.___browserSync___){
+						let socket = ___browserSync___.socket;
+						let isConnected = socket.connected;
+						let isDefault = socket.io.uri.indexOf(location.origin) === 0;
+
+						if(isConnected && !isDefault)
+							return socket.disconnect();
 					}
 
 					Modal.goto('/dev-mode');
