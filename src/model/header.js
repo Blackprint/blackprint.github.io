@@ -148,6 +148,18 @@ sf.model('header', function(My, include){
 					Modal.goto('/custom-node-editor');
 				}
 			}, {
+				title: (window.___browserSync___?.socket?.disconnected ? "Connect" : "Disconnect")+' module server',
+				icon: 'fa fa-plug',
+				hide: sf.hotReload === void 0,
+				callback(){
+					if(___browserSync___.socket.connected){
+						___browserSync___.socket.disconnect();
+						return;
+					}
+
+					Modal.goto('/dev-mode');
+				}
+			}, {
 				title: 'Loaded from URL',
 				icon: 'fa fa-truck-loading',
 				callback(){

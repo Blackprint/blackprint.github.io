@@ -1,0 +1,78 @@
+## html
+<sf-m name="modal-dev-mode">
+	<div class="description">Please set the Blackprint nodes server URL:</div>
+	<div>
+		<input type="text" sf-bind="url">
+	</div>
+	<button @click="changeServer"></button>
+</sf-m>
+
+## scss-global
+sf-m[name="modal-dev-mode"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	.description{
+		padding: 10px;
+		color: white;
+		a{
+			color: skyblue;
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+		}
+	}
+}
+
+## js-global
+sf.model('modal-dev-mode', function(My){
+	My.url = localStorage.BPModuleServer ??= "";
+
+	// Automatically move to development mode
+	if(location.hostname === 'localhost' && location.pathname !== "/dev.html"){
+		location.pathname = "/dev.html";
+		return;
+	}
+
+	My.changeServer = async function(){
+		let url = My.url;
+		if(!url) url = location.origin;
+		// url = 'http://localhost:6791';
+
+		if(url.slice(-1) === '/')
+			url = url.slice(0, -1);
+		url += '/browser-sync';
+
+		if(window.___browserSync___ === void 0)
+			await sf.loader.js([url+'/browser-sync-client.js?v=2']);
+
+		___browserSync___.socketUrl = url;
+
+		socket.disconnect();
+		socket.once('connect', function(){
+			SmallNotif.add("Connected to Blackprint node server", "green");
+		});
+
+		let socket = ___browserSync___.socket;
+		socket.nsp = url;
+		socket.io.uri = url;
+		socket.connect();
+	}
+
+	if(My.url !== '' && sf.hotReload !== void 0)
+		My.changeServer();
+});
