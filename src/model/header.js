@@ -154,13 +154,13 @@ sf.model('header', function(My, include){
 						return "Development Mode";
 
 					if(window.___browserSync___ === void 0)
-						return "Connect module server";
+						return "Connect to module server";
 
 					let socket = ___browserSync___.socket;
 					let isConnected = socket.connected;
 					let isDefault = socket.io.uri.indexOf(location.origin) === 0;
 
-					return (!isConnected || isDefault ? "Connect" : "Disconnect")+' module server';
+					return (!isConnected || isDefault ? "Connect to" : "Disconnect from")+' module server';
 				})(),
 				icon: 'fa fa-plug',
 				callback(){
@@ -173,7 +173,7 @@ sf.model('header', function(My, include){
 						let isDefault = socket.io.uri.indexOf(location.origin) === 0;
 
 						if(isConnected && !isDefault)
-							return socket.disconnect();
+							socket.disconnect();
 					}
 
 					Modal.goto('/dev-mode');

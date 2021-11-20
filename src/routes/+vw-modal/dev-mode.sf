@@ -1,8 +1,9 @@
 ## html
 <sf-m name="modal-dev-mode">
 	<div class="description">Please set the Blackprint nodes server URL</div>
+	<div class="note" style="display: {{ url === '' || url === placeholder ? 'none':'' }}" @click="connectDefault">(Click here to connect to default server)</div>
 	<div class="text-input">
-		<input placeholder="{{ placeholder }}" type="text" sf-bind="url">
+		<input placeholder="{{ placeholder }}" type="text" sf-bind="url" @keyup.Enter="changeServer">
 	</div>
 	<div class="button-import" @click="changeServer">Connect</div>
 </sf-m>
@@ -17,6 +18,14 @@ sf-m[name="modal-dev-mode"] {
 	.description{
 		padding: 10px;
 		color: white;
+	}
+	.note{
+		text-align: center;
+		font-size: 12px;
+		padding: 0;
+		color: gray;
+		margin-top: -10px;
+		cursor: pointer;
 	}
 	.text-input{
 		padding: 10px;
@@ -50,6 +59,22 @@ sf-m[name="modal-dev-mode"] {
 	}
 }
 
+## js-global.router
+={
+	on:{
+		coming(){
+			setTimeout(()=> {
+				sf.model('modal-dev-mode').$el('input').focus();
+			}, 500);
+		},
+		showed(){
+			setTimeout(()=> {
+				sf.model('modal-dev-mode').$el('input').focus();
+			}, 100);
+		},
+	}
+}
+
 ## js-global
 sf.model('modal-dev-mode', function(My){
 	My.url = localStorage.BPModuleServer ??= "";
@@ -61,31 +86,64 @@ sf.model('modal-dev-mode', function(My){
 		return;
 	}
 
+	My.connectDefault = function(){
+		localStorage.BPModuleServer = My.url = "";
+		My.changeServer();
+	}
+
 	My.changeServer = async function(){
 		let url = My.url;
 		if(!url) url = location.origin;
 		// url = 'http://localhost:6791';
 
+		let _url = url;
+
 		if(url.slice(-1) === '/')
 			url = url.slice(0, -1);
 		url += '/browser-sync';
 
-		if(window.___browserSync___ === void 0)
-			await sf.loader.js([url+'/browser-sync-client.js?v=2']);
+		if(window.___browserSync___ === void 0){
+			try{
+				await sf.loader.js([url+'/browser-sync-client.js?v=2']);
+			} catch(e) {
+				SmallNotif.add("Failed to load client", "red");
+				return;
+			}
+		}
 
 		___browserSync___.socketUrl = url;
 
 		let socket = ___browserSync___.socket;
 		socket.disconnect();
 
-		socket.once('connect', function(){
+		setTimeout(()=> {
+			if(socket.connected) return;
+			console.log("Failed to connect to Blackprint nodes server:", url);
+			SmallNotif.add("Failed to connect to Blackprint node server", "red");
+			socket.disconnect();
+			socket.off('connect', onConnected);
+		}, 8000);
+
+		function onConnected(){
 			console.log("Connected to Blackprint nodes server:", url);
 			SmallNotif.add("Connected to Blackprint node server", "green");
-		});
+			localStorage.BPModuleServer = My.url;
+		}
+
+		socket.once('connect', onConnected);
 
 		socket.nsp = '/browser-sync';
 		socket.io.uri = url;
 		socket.connect();
+
+		try{
+			let moduleList = Object.values(await $.getJSON(_url+'/api/module-list'));
+			for (var i = 0; i < moduleList.length; i++)
+				moduleList[i] = _url+moduleList[i];
+
+			SmallNotif.add(`Loading ${moduleList.length} new modules`, "green");
+			await Blackprint.loadModuleFromURL(moduleList);
+		} catch(e) {}
 
 		Modal.hide();
 	}
