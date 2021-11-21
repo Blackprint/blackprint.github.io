@@ -136,18 +136,43 @@ sf.model('modal-dev-mode', function(My){
 		socket.io.uri = url;
 		socket.connect();
 
+		let newModuleLoaded = false;
 		try{
 			let moduleList = Object.values(await $.getJSON(_url+'/api/module-list'));
 			for (var i = 0; i < moduleList.length; i++)
 				moduleList[i] = _url+moduleList[i];
 
-			SmallNotif.add(`Loading ${moduleList.length} new modules`, "green");
-			await Blackprint.loadModuleFromURL(moduleList);
-		} catch(e) {}
+			if(moduleList.length !== 0){
+				SmallNotif.add(`Loading ${moduleList.length} new modules`, "yellow");
 
-		Modal.hide();
+				await Blackprint.loadModuleFromURL(moduleList, {
+					loadBrowserInterface: true
+				});
+
+				SmallNotif.add(`New modules have been loaded`, "green");
+			}
+
+			newModuleLoaded = true;
+		} catch(e) {
+			SmallNotif.add(`Failed to load new modules`, "red");
+			throw e;
+		}
+
+		setTimeout(()=> {
+			if(newModuleLoaded) return;
+			SmallNotif.add(`Loading modules was taking longer than 10s`, "red");
+
+			if(sf.loader.pendingResources.size !== 0)
+				console.log("Pending resources:", sf.loader.pendingResources);
+		}, 10000);
+
+		if(Modal.showed)
+			Modal.hide();
 	}
 
-	if(My.url !== '' && sf.hotReload !== void 0)
-		My.changeServer();
+	if(My.url !== '' && sf.hotReload !== void 0){
+		$(function(){
+			setTimeout(()=> My.changeServer(), 200);
+		});
+	}
 });
