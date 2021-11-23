@@ -62,20 +62,7 @@ sf.model('example-list', function(My){
 		let sketch = SketchList[0] ??= new Blackprint.Sketch();
 		sketch.__importing = true;
 
-		async function pageShowed(){
-			await sketch.importJSON(obj);
-			delete sketch.__importing;
-
-			My.pendingLoad = void 0;
-		}
-
-		if(views.currentPath === '/sketch/1'){
-			SmallNotif.add("Loading", 'yellow');
-			return setTimeout(pageShowed, 200);
-		}
-
-		views.goto('/sketch/1');
-		SmallNotif.add("Loading", 'yellow', 1200);
-		setTimeout(pageShowed, 1000); // Wait page animation
+		SketchImporter.pendingLoad = obj;
+		SketchImporter.importNow();
 	}
 });

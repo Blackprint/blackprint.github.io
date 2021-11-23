@@ -144,6 +144,13 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		My.checkSavedData();
 	}
 
+	let progressToast = false;
+	function clearProgressToast(){
+		if(progressToast === false) return;
+		let list = SmallNotif.list;
+		list.splice(list.indexOf(progressToast), 1);
+	}
+
 	My.importNow = function(){
 		if(My.pendingLoad === void 0){
 			let msg = "Please call 'SketchImport.loadJSON' first";
@@ -159,6 +166,19 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		sketch.__importing = true;
 
 		async function pageShowed(){
+			sf.loader.onFinish(clearProgressToast);
+			sf.loader.onProgress(function(loaded, total){
+				if(progressToast === false){
+					if(loaded === total) return;
+
+					progressToast = SmallNotif.add("Load", "yellow", 1000);
+					clearTimeout(progressToast.timer);
+				}
+
+				progressToast.message = `Loading ${loaded}/${total}`;
+				if(loaded === total) clearProgressToast();
+			});
+
 			await sketch.importJSON(My.pendingLoad);
 			delete sketch.__importing;
 
@@ -167,7 +187,7 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 
 		if(views.currentPath === '/sketch/1'){
 			SmallNotif.add("Loading", 'yellow');
-			return setTimeout(pageShowed, 200);
+			return setTimeout(pageShowed, 400);
 		}
 
 		views.goto('/sketch/1');
