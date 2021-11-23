@@ -1,6 +1,6 @@
 ## html
 <sf-m name="modal-dev-mode">
-	<div class="description">Please set the Blackprint nodes server URL</div>
+	<div class="description">Please set the Blackprint module server URL</div>
 	<div class="note" style="display: {{ url === '' || url === placeholder ? 'none':'' }}" @click="connectDefault">(Click here to connect to default server)</div>
 	<div class="text-input">
 		<input placeholder="{{ placeholder }}" type="text" sf-bind="url" @keyup.Enter="changeServer">
@@ -118,15 +118,15 @@ sf.model('modal-dev-mode', function(My){
 
 		setTimeout(()=> {
 			if(socket.connected) return;
-			console.log("Failed to connect to Blackprint nodes server:", url);
-			SmallNotif.add("Failed to connect to Blackprint node server", "red");
+			console.log("Failed to connect to Blackprint module server:", url);
+			SmallNotif.add("Failed to connect to Blackprint module server", "red");
 			socket.disconnect();
 			socket.off('connect', onConnected);
 		}, 8000);
 
 		function onConnected(){
-			console.log("Connected to Blackprint nodes server:", url);
-			SmallNotif.add("Connected to Blackprint node server", "green");
+			console.log("Connected to Blackprint module server:", url);
+			SmallNotif.add("Connected to Blackprint module server", "green");
 			localStorage.BPModuleServer = My.url;
 		}
 
