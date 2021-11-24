@@ -134,6 +134,7 @@ sf.component('sketch-page', function(My){
 					input: "text",
 				});
 
+				if(val.isConfirmed === false) return;
 				iface.id = val.value;
 			}
 		});
