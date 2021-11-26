@@ -51,7 +51,8 @@ sf-m[name="sketch-importer"] {
 	max-width: 80vw;
 	.description{
 		padding: 10px;
-		width: 500px;
+		min-width: 500px;
+		width: 100%;
 		text-align: center;
 		margin-bottom: 10px;
 		text-decoration: underline;
@@ -127,6 +128,9 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		sketchPages:[],
 	};
 
+	let progressToast = false;
+	let progressTriggered = true;
+
 	My.loadJSON = async function(json){
 		Modal.goto('/sketch-importer');
 		My.pendingLoad = json = JSON.parse(json);
@@ -144,13 +148,6 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		My.checkSavedData();
 	}
 
-	let progressToast = false;
-	function clearProgressToast(){
-		if(progressToast === false) return;
-		let list = SmallNotif.list;
-		list.splice(list.indexOf(progressToast), 1);
-	}
-
 	My.importNow = function(){
 		if(My.pendingLoad === void 0){
 			let msg = "Please call 'SketchImport.loadJSON' first";
@@ -166,32 +163,34 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		sketch.__importing = true;
 
 		async function pageShowed(){
-			sf.loader.onFinish(clearProgressToast);
-			sf.loader.onProgress(function(loaded, total){
-				if(progressToast === false){
-					if(loaded === total) return;
+			sf.loader.DOMWasLoaded = false; // flag because we may load new module
 
-					progressToast = SmallNotif.add("Load", "yellow", 1000);
-					clearTimeout(progressToast.timer);
-				}
+			// Add listener only once until finish
+			if(progressTriggered){
+				sf.loader.onProgress(function(loaded, total){
+					progressToast.message = `Loading ${loaded}/${total}`;
+					progressTriggered = true;
+				});
+			}
 
-				progressToast.message = `Loading ${loaded}/${total}`;
-				if(loaded === total) clearProgressToast();
-			});
-
+			// Import from JSON, and also load required modules if exist
 			await sketch.importJSON(My.pendingLoad);
+			sf.loader.DOMWasLoaded = true;
 			delete sketch.__importing;
-
 			My.pendingLoad = void 0;
+
+			// Clear toast
+			let list = SmallNotif.list;
+			list.splice(list.indexOf(progressToast), 1);
 		}
 
 		if(views.currentPath === '/sketch/1'){
-			SmallNotif.add("Loading", 'yellow');
+			progressToast = SmallNotif.add("Loading", 'yellow', false);
 			return setTimeout(pageShowed, 400);
 		}
 
 		views.goto('/sketch/1');
-		SmallNotif.add("Loading", 'yellow', 1200);
+		progressToast = SmallNotif.add("Loading", 'yellow', false);
 		setTimeout(pageShowed, 1000); // Wait page animation
 	}
 
