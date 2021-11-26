@@ -47,9 +47,11 @@ var SmallNotif = sf.model('small.notif', function(My){
     var item = {message, color:color || 'yellow'};
     My.list.push(item);
 
-    item.timer = setTimeout(()=> {
-      My.list.splice(My.list.indexOf(item), 1);
-    }, delay || (1000 + 100 * message.length));
+    if(delay !== false){
+      item.timer = setTimeout(()=> {
+        My.list.splice(My.list.indexOf(item), 1);
+      }, delay || (1000 + 100 * message.length));
+    }
 
     return item;
   }
