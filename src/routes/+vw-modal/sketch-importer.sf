@@ -42,7 +42,7 @@
 
 ## scss-global
 sf-m[name="sketch-importer"] {
-	background: #292929;
+	background: #1e1e1eab;
 	border-radius: 10px;
 	border: 2px solid black;
 	position: relative;
