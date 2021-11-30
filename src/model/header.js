@@ -137,6 +137,12 @@ sf.model('header', function(My, include){
 						});
 					}
 				}]
+			}, {
+				title: 'Examples',
+				icon: 'fa fa-layer-group',
+				callback(){
+					Modal.goto('/example-list');
+				}
 			}]
 		}, {
 			title: 'Modules',
