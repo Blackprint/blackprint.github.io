@@ -4,19 +4,19 @@ var BlackprintEventFallback = {
 	error(error){
 		BlackprintEventFallback.error.types[error.type](error.data || error);
 	},
-	cable_wrong_pair({ port, cable }){
+	'cable.wrong_pair'({ port, cable }){
 		SmallNotif.add(`The cable is not suitable (${cable.source}, ${port.source})`, 'yellow');
 	},
-	cable_wrong_type({ cable, iface, source, target }){
+	'cable.wrong_type'({ cable, iface, source, target }){
 		SmallNotif.add(iface.title+"> Port from '"+source.iface.title + " - " + source.name+"' was not an "+(target.type._name || target.type.name), 'yellow');
 	},
-	cable_wrong_type_pair({ cable, target }){
+	'cable.wrong_type_pair'({ cable, target }){
 		SmallNotif.add(`The cable type is not suitable (${cable.owner.type.name}, ${target.type.name})`, 'yellow');
 	},
-	cable_duplicate_removed({ cable, target }){
+	'cable.duplicate_removed'({ cable, target }){
 		SmallNotif.add("Duplicated cable removed", 'yellow');
 	},
-	cable_replaced({ cable, target }){
+	'cable.replaced'({ cable, target }){
 		SmallNotif.add("Cable was replaced because input doesn't support array", 'yellow');
 	}
 };
@@ -39,5 +39,9 @@ BlackprintEventFallback.error.types = {
 };
 
 window.addEventListener('error', function(e){
+	SmallNotif.add("Something went wrong..");
+});
+
+window.addEventListener('onunhandledrejection', function(e){
 	SmallNotif.add("Something went wrong..");
 });
