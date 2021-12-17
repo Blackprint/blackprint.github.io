@@ -3,7 +3,7 @@ For adding library or style, please modify /public/index.html
 
 ## html.append-to-body
 <div class="background">
-	<img style="background-image: url('/assets/img/background/Black1.jpg')">
+	<img style="background-image: url('/assets/img/background/Black3.jpg')">
 	<div></div>
 </div>
 
