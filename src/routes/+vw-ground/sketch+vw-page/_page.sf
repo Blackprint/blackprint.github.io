@@ -24,7 +24,7 @@ sketch-page{
 ={
 	on:{
 		coming(data){ // data === views.data
-			console.log("Sketch page data:", arguments);
+			console.log("Sketch page data:", data);
 			let sketch = SketchList[data.page - 1];
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;

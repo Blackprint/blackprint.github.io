@@ -174,10 +174,16 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 			}
 
 			// Import from JSON, and also load required modules if exist
-			await sketch.importJSON(My.pendingLoad);
-			sf.loader.DOMWasLoaded = true;
-			delete sketch.__importing;
-			My.pendingLoad = void 0;
+			try{
+				await sketch.importJSON(My.pendingLoad);
+			} catch(e) {
+				SmallNotif.add("Failed to import data", 'red');
+				throw e;
+			} finally {
+				sf.loader.DOMWasLoaded = true;
+				delete sketch.__importing;
+				My.pendingLoad = void 0;
+			}
 
 			// Clear toast
 			let list = SmallNotif.list;
