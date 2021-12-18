@@ -3,7 +3,7 @@ For adding library or style, please modify /public/index.html
 
 ## html.append-to-body
 <div class="background">
-	<div class="img" style="background-image: url('/assets/img/background/Black3.jpg')"></div>
+	<div class="img" style="background-image: url('/assets/img/background/black3.jpg')"></div>
 	<div class="tile"></div>
 </div>
 
@@ -58,7 +58,7 @@ body > .background {
 	.tile{
 		opacity: 0.8;
 		position: fixed;
-		background: url('/assets/img/background/Tile.png?8');
+		background: url('/assets/img/background/tile.png');
 		background-repeat: repeat;
 		background-size: 100px;
 		width: 100%;
