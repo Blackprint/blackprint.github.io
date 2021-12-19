@@ -39,7 +39,7 @@ To request an feature, you can create an issue in the repository. Please follow 
 ### The Build Script: how it works
 The build tools for this editor is using [ScarletsFrame's compiler](https://github.com/StefansArya/scarletsframe-compiler). You should also clone Blackprint Sketch + Engine from the [main repository](https://github.com/Blackprint/Blackprint) and also follow the guidelines on [there](https://github.com/Blackprint/Blackprint/blob/master/.github/CONTRIBUTING.md#the-build-script-how-it-works).
 
-You may also need to change `<script>` URL on  `/index.html` if you want to test the engine or sketch library from the browser.
+You may also need to change `<script>` URL on  `/index.html` and `/dev.html` if you want to test the engine or sketch library from the browser.
 
 ```xml
 <!-- Comment this -->
