@@ -8,4 +8,11 @@ $(function(){
 			SketchImporter.loadJSON(importSketch);
 		}, 1000);
 	}
+
+	setTimeout(()=> {
+		// Disable VFX for mobile device or non-chrome browser
+		if(/android|ios/i.test(navigator.userAgent) || !/chrome/i.test(navigator.userAgent)){
+			sf.model('header').switchVFX();
+		}
+	}, 100);
 });
