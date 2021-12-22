@@ -10,13 +10,13 @@ var BlackprintEventFallback = {
 	'cable.wrong_type'({ cable, iface, source, target }){
 		SmallNotif.add(iface.title+"> Port from '"+source.iface.title + " - " + source.name+"' was not an "+(target.type._name || target.type.name), 'yellow');
 	},
-	'cable.wrong_type_pair'({ cable, target }){
-		SmallNotif.add(`The cable type is not suitable (${cable.owner.type.name}, ${target.type.name})`, 'yellow');
+	'cable.wrong_type_pair'({ cable, port, target }){
+		SmallNotif.add(`The cable type is not suitable (${target.type.name}, ${port.type.name})`, 'yellow');
 	},
-	'cable.duplicate_removed'({ cable, target }){
+	'cable.duplicate_removed'({ cable, port }){
 		SmallNotif.add("Duplicated cable removed", 'yellow');
 	},
-	'cable.replaced'({ cable, target }){
+	'cable.replaced'({ cable, port }){
 		SmallNotif.add("Cable was replaced because input doesn't support array", 'yellow');
 	}
 };
