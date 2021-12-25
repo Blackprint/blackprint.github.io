@@ -143,6 +143,25 @@ sf.model('header', function(My, include){
 				callback(){
 					Modal.goto('/example-list');
 				}
+			}, {
+				title: 'Reload',
+				icon: 'fa fa-sync',
+				async callback(){
+					let val = await Swal.fire({
+						title: "This action will export and reimport current sketch",
+						showCancelButton: true,
+						showCloseButton: true
+					});
+
+					if(confirm.isDismissed && confirm.dismiss === 'backdrop')
+						return;
+
+					let sketch = SketchList[0];
+					let temp = sketch.exportJSON();
+					sketch.clearNodes();
+
+					await sketch.importJSON(temp);
+				}
 			}]
 		}, {
 			title: 'Modules',
