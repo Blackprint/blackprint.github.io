@@ -18,6 +18,16 @@ sketch-page{
 		padding: 20px;
 		text-align: center;
 	}
+
+	sf-space[blackprint] .bg-tile{
+		background: url('/assets/img/background/tile.png');
+		background-size: 100px;
+		filter: brightness(38%);
+		opacity: 0.5;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+	}
 }
 
 ## js-global.router
@@ -36,9 +46,12 @@ sketch-page{
 					Modal.goto('/example-list');
 				}
 			}, 100);
+
+			$('body > .background .tile').css('display', 'none');
 		},
 		leaving(){
 			console.log("Leaving from sketch page data:", arguments);
+			$('body > .background .tile').css('display', '');
 		}
 	}
 }
@@ -56,7 +69,7 @@ sf.component('sketch-page', function(My){
 	// This is used if no one listened to the event
 	sketch._event.$_fallback = BlackprintEventFallback;
 
-    sketch.settings('visualizeFlow', true);
+	sketch.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();
 
 	let SketchPages = sf.model('sketch-pages');
@@ -68,7 +81,12 @@ sf.component('sketch-page', function(My){
 	}
 
 	// Will run when <sketch-page> inserted on DOM
-	My.init = async function(){}
+	My.init = async function(){
+		let sfm = $(My.space.firstElementChild);
+		if(!sfm.eq(0).hasClass('bg-tile')){
+			sfm.prepend('<div class="bg-tile"></div>');
+		}
+	}
 
 	My.importJSON = json => sketch.importJSON(json);
 	My.clearNodes = ()=> sketch.clearNodes();
