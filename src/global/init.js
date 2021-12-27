@@ -1,4 +1,10 @@
 $(function(){
+
+	// Fix for Telegram who encode the URL after the hashtag
+	if((location.hash.includes('%23'))){
+		location.hash = decodeURIComponent(location.hash)
+	}
+
 	let importSketch = sf.URI.data.importSketch;
 	if(importSketch !== void 0){
 		Modal.hide();
