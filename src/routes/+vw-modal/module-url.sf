@@ -12,7 +12,8 @@
 					<b>{{ shortenLink(x._url, 'host') }}</b>
 					{{ shortenLink(x._url, 'path') }}
 					<b>{{ shortenLink(x._url, 'search') }}</b>
-					<a title="Right click to copy link address, click to open on new tab" target="_blank" href="{{x._url}}"><i class="fa fa-link"></i></a></div></div>
+					<a title="Right click to copy link address, click to open on new tab" target="_blank" href="{{x._url}}"><i class="fa fa-link"></i></a>
+				</div></div>
 				<div class="column nodes">
 					{{ x._nodeLength }}
 				</div>
@@ -40,6 +41,7 @@
 	</div>
 	<div class="menu">
 		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+		<div class="item" @click="npmList" title="Search from NPM"><i class="fa fa-book-open"></i></div>
 	</div>
 </sf-m>
 
@@ -294,6 +296,10 @@ sf.model('module-url', function(My){
 
 			onBubbling(obj, prop, key, bubble);
 		}
+	}
+
+	My.npmList = function(){
+		modal.goto('/npm-packages');
 	}
 
 	My.close = function(){

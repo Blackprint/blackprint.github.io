@@ -56,11 +56,11 @@
 </div>
 
 <div class="welcome-right">
-	<a style="text-decoration: line-through">
+	<a target="_blank" style="cursor: pointer;" onclick="Modal.goto('/npm-packages')">
 		Package List <i class="fas fa-boxes"></i>
 	</a>
 	<a target="_blank" href="https://www.npmjs.com/search?q=keywords:blackprint">
-		NPMjs <i class="fas fa-box"></i>
+		npm.js <i class="fas fa-box"></i>
 	</a>
 </div>
 

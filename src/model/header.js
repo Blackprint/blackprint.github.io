@@ -204,8 +204,8 @@ sf.model('header', function(My, include){
 					Modal.goto('/dev-mode');
 				}
 			}, {
-				title: 'Loaded from URL',
-				icon: 'fa fa-truck-loading',
+				title: 'Loaded module',
+				icon: 'fa fa-boxes',
 				callback(){
 					Modal.goto('/module-url');
 				}

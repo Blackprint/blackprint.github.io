@@ -19,6 +19,7 @@ For adding library or style, please modify /public/index.html
 	</div>
 	<div class="header-menu">
 		<div class="item-list">
+			<div class="item" @click="Modal.goto('/module-url')" title="Loaded module"><i class='fa fa-boxes'></i></div>
 			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></div>
 			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
 			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
