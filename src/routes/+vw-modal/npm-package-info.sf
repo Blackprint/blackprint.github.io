@@ -1,0 +1,180 @@
+## html
+<sf-m name="npm-package-info">
+	<div class="title">{{ title }} (v{{ version }})</div>
+	<div class="info"><span>{{ author }}</span> <a style="display: {{ repository ? '' : 'none' }}" href="{{ repository }}" target="_blank">(Repository)</a></div>
+	<div class="description">{{ description }}</div>
+
+	<div class="list-info">Please select module to import:</div>
+	<div class="list">
+		<div class="item {{ x.active ? 'active' : '' }}" sf-each="x in list" @click="load(x)">
+			{{ x.url }}
+		</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="back" title="Back"><i class="fa fa-reply"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="npm-package-info"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	> .info{
+		padding: 10px;
+		color: white;
+		font-size: 12px;
+		margin-top: -20px;
+		a{
+			color: skyblue;
+		}
+	}
+	> .description {
+		color: white;
+		padding: 0 10px;
+	}
+	> .list-info {
+		margin-top: 10px;
+		border-top: 1px dashed white;
+		padding: 5px 10px 0 10px;
+	}
+	> .title{
+		padding: 10px;
+		color: white;
+		font-weight: bold;
+		text-decoration: underline;
+		a{
+			color: skyblue;
+		}
+	}
+
+	> .list-info{
+		color: white;
+	}
+
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+
+			&.active{
+				color: gray;
+			}
+		}
+	}
+
+	.menu{
+		position: absolute;
+		right: -5px;
+		top: -10px;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global
+sf.model('npm-package-info', function(My){
+	My.list = [];
+	My.title = '';
+	My.description = '';
+	My.version = '';
+	My.author = '';
+	My.date = '';
+	My.repository = '';
+	My.packageURL = '';
+	My.package = 0;
+
+	My.open = function(package, moduleList){
+		My.list = moduleList;
+		My.package = package;
+		My.title = package.name;
+		My.description = package.description || '';
+		My.version = package.version;
+		My.date = package.date.split('T')[0];
+		My.author = package.publisher.username || '';
+		My.repository = package.links.repository || '';
+
+		My.packageURL = `https://cdn.jsdelivr.net/npm/${package.name}@${package.version}`;
+
+		let temp = Blackprint.modulesURL;
+		let list = My.list;
+		for(let key in temp){
+			for (var i = 0; i < list.length; i++) {
+				let item = list[i];
+				if(key.includes(item.url))
+					item.active = true;
+			}
+		}
+
+		Modal.goto('/npm-package-info');
+	}
+
+	let progressToast, loading = false;
+	function theProgress(finished){
+		if(finished){
+			if(!progressToast) return;
+
+			let list = SmallNotif.list;
+			list.splice(list.indexOf(progressToast), 1);
+
+			progressToast = false;
+			return;
+		}
+
+		progressToast = SmallNotif.add("Loading", 'yellow', false);
+		sf.loader.onProgress(function(loaded, total){
+			if(!progressToast) return;
+			progressToast.message = `Loading ${loaded}/${total}`;
+		});
+	}
+
+	My.load = async function(item){
+		sf.loader.DOMWasLoaded = false; // flag because we may load new module
+		loading = true;
+
+		setTimeout(function(){
+			if(loading) theProgress();
+		}, 500);
+
+		try{
+			await Blackprint.loadModuleFromURL([My.packageURL + item.url], {
+				loadBrowserInterface: true // set to "false" for Node.js/Deno
+			});
+		} finally {
+			sf.loader.DOMWasLoaded = true;
+			loading = false;
+		}
+
+		item.active = true;
+		My.package._active = true;
+
+		// Clear toast
+		theProgress(true);
+	}
+
+	My.back = function(){
+		Modal.goto('/npm-packages');
+	}
+});

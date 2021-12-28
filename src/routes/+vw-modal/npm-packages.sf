@@ -1,0 +1,137 @@
+## html
+<sf-m name="npm-packages">
+	<div class="description">Search package on NPM repository</div>
+	<div class="mini-description" title="especially if you're not a developer, always becareful if someone ask you to do something with Blackprint, like inputting password or private key">Always becareful and verify the module's source code before going to production</div>
+	<div class="search">
+		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
+	</div>
+	<div class="list">
+		<div class="item {{ x.package._active && 'active' }}" sf-each="x in list" @click="open(x.package)">
+			<div>
+				<div class="title">{{ x.package.name }} (v{{ x.package.version }})</div>
+				<div class="author">{{ x.package.publisher.username }}</div></div>
+			<div>
+				<div class="description">{{ x.package.description }}</div>
+				<div class="date">{{ x.package.date.split('T')[0] }}</div>
+			</div>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="npm-packages"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	> .mini-description{
+		padding: 10px;
+		color: white;
+		font-size: 12px;
+		margin-top: -20px;
+	}
+	> .description{
+		padding: 10px;
+		color: white;
+		a{
+			color: skyblue;
+		}
+	}
+	.search{
+		padding: 0 5px;
+		input{
+			color: #fff;
+			background: #0000009e;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			width: calc(100% - 22px);
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+
+			&.active{
+				color: gray;
+			}
+
+			.title{
+				font-weight: bold;
+				text-decoration: underline;
+			}
+			.description{
+				font-weight: normal;
+				padding-right: 80px;
+			}
+			.author{
+				float: right;
+				margin-top: -24px;
+			}
+			.date{
+				float: right;
+				vertical-align: middle;
+				margin-top: -20px;
+			}
+		}
+	}
+}
+
+## js-global
+sf.model('npm-packages', function(My){
+	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint%20nodes';
+	My.list = [];
+	My.search = '';
+
+	My.init = function(){
+		My.refreshList();
+	}
+
+	My.refreshList = async function(){
+		let _query = query;
+		if(My.search !== '')
+			_query += '%20'+My.search;
+
+		let list = (await $.getJSON(_query)).objects;
+
+		// ToDo: check if version was different with current loaded module
+		let temp = Blackprint.modulesURL;
+		for(let key in temp){
+			for (var i = 0; i < list.length; i++) {
+				let item = list[i].package.name;
+				if(key.includes(item.url))
+					item.package.active = true;
+			}
+		}
+
+		My.list = list;
+	}
+
+	My.open = async function(package){
+		try{
+			// ToDo: do we need to sanitize URL? '-'
+			var data = await $.get(`https://cdn.jsdelivr.net/npm/${package.name}@${package.version}/README.md`);
+		} catch(e) {}
+
+		if(!data) throw new Error("Can't find package's README.md");
+
+		let list = [];
+		data.replace(/(\/dist\/.*?)['"`\\ %]/g, function(full, match){
+			list.push({url: match});
+		});
+
+		sf.model('npm-package-info').open(package, list);
+	}
+});
