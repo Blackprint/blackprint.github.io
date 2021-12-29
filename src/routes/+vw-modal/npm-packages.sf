@@ -119,10 +119,10 @@ sf.model('npm-packages', function(My){
 		My.list = list;
 	}
 
-	My.open = async function(package){
+	My.open = async function(pkg){
 		try{
 			// ToDo: do we need to sanitize URL? '-'
-			var data = await $.get(`https://cdn.jsdelivr.net/npm/${package.name}@${package.version}/README.md`);
+			var data = await $.get(`https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}/README.md`);
 		} catch(e) {}
 
 		if(!data) throw new Error("Can't find package's README.md");
@@ -132,6 +132,6 @@ sf.model('npm-packages', function(My){
 			list.push({url: match});
 		});
 
-		sf.model('npm-package-info').open(package, list);
+		sf.model('npm-package-info').open(pkg, list);
 	}
 });

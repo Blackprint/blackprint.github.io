@@ -106,17 +106,17 @@ sf.model('npm-package-info', function(My){
 	My.packageURL = '';
 	My.package = 0;
 
-	My.open = function(package, moduleList){
+	My.open = function(pkg, moduleList){
 		My.list = moduleList;
-		My.package = package;
-		My.title = package.name;
-		My.description = package.description || '';
-		My.version = package.version;
-		My.date = package.date.split('T')[0];
-		My.author = package.publisher.username || '';
-		My.repository = package.links.repository || '';
+		My.package = pkg;
+		My.title = pkg.name;
+		My.description = pkg.description || '';
+		My.version = pkg.version;
+		My.date = pkg.date.split('T')[0];
+		My.author = pkg.publisher.username || '';
+		My.repository = pkg.links.repository || '';
 
-		My.packageURL = `https://cdn.jsdelivr.net/npm/${package.name}@${package.version}`;
+		My.packageURL = `https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}`;
 
 		let temp = Blackprint.modulesURL;
 		let list = My.list;
