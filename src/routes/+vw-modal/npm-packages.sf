@@ -120,6 +120,8 @@ sf.model('npm-packages', function(My){
 	}
 
 	My.open = async function(pkg){
+		SmallNotif.add("Retrieving information");
+
 		try{
 			// ToDo: do we need to sanitize URL? '-'
 			var data = await $.get(`https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}/README.md`);
