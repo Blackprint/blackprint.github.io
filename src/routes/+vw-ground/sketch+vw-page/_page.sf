@@ -146,14 +146,28 @@ sf.component('sketch-page', function(My){
 		menu.unshift({
 			title: !iface.id ? "Add ID" : "Modify ID",
 			async callback(){
-				let val = await Swal.fire({
+				let ref = await Swal.fire({
 					title: "Write the new ID here",
 					text: (iface.id ? "Current ID: "+iface.id : void 0),
 					input: "text",
 				});
 
-				if(val.isConfirmed === false) return;
-				iface.id = val.value;
+				if(ref.isConfirmed === false) return;
+
+				let sketch = SketchList[0];
+				let val = ref.value;
+
+				if(val === ''){
+					delete sketch.iface[iface.id];
+					iface.id = val;
+					return;
+				}
+
+				if(sketch.iface[val] !== void 0)
+					throw new Error("ID already exist");
+
+				iface.id = val;
+				sketch.iface[val] = iface;
 			}
 		});
 	});
