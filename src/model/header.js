@@ -217,6 +217,12 @@ sf.model('header', function(My, include){
 				Modal.goto('/environment-variables');
 			}
 		}, {
+			title: 'Settings',
+			icon: 'fa fa-tools',
+			callback(){
+				Modal.goto('/sketch-settings');
+			}
+		}, {
 			title: 'Home',
 			icon: 'fa fa-home',
 			callback(){
