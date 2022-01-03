@@ -43,3 +43,25 @@ sf-space[blackprint]{
 		}
 	}
 }
+
+.node-ui-darker sf-space[blackprint]{
+	.nodes{
+		.node{
+			.header {
+		        border-bottom: 1px dashed rgba(41,184,229,.7);
+		        background: rgba(41,184,229,.25);
+		        box-shadow: none;
+			}
+
+			@mixin headerColor($type, $bgA, $bgB, $bgC) {
+			  &.#{$type} .header{
+		        border-bottom: 1px dashed rgba($bgA, $bgB, $bgC, .7);
+		        background: rgba($bgA, $bgB, $bgC, .25);
+			  }
+			}
+
+			@include headerColor('trigger', 226, 18, 18);
+			@include headerColor('input', 108, 232, 93);
+		}
+	}
+}
