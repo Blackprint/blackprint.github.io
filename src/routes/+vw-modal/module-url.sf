@@ -170,6 +170,28 @@ sf.model('module-url', function(My){
 		return url.pathname.replace(/(cjs|mjs|dist)\/|\.(min|mjs|js)/g, '').split('/').slice(-2).join('/');
 	}
 
+	async function loadModuleURL(url, options){
+		sf.loader.DOMWasLoaded = false; // flag because we may load new module
+
+		let temp = My.newURL;
+		My.newURL = '';
+
+		let progressToast = SmallNotif.add("Loading", 'yellow', false);
+		sf.loader.onProgress(function(loaded, total){
+			progressToast.message = `Loading ${loaded}/${total}`;
+		});
+
+		try {
+			await Blackprint.loadModuleFromURL(url, options);
+			SmallNotif.add("Module sucessfully loaded", 'green');
+		} catch(e) {
+			SmallNotif.add("Failed to load module", 'red');
+			My.newURL = temp;
+		} finally {
+			sf.loader.DOMWasLoaded = true; // reset flag
+		}
+	}
+
 	My.addURL = function(){
 		let list = My.list;
 
@@ -180,16 +202,13 @@ sf.model('module-url', function(My){
 
 			if(My.newURL.replace(/\?.*?$/m, '') === temp._url.replace(/\?.*?$/m, '')){
 				temp._url = My.newURL.replace(/\?.*?$/m, '');
-				Blackprint.loadModuleFromURL(temp._url);
-				My.newURL = '';
+				loadModuleURL(temp._url);
 				return;
 			}
 		}
 
 		let url = My.newURL.replace(/\?.*?$/m, '') + '?'+ (Date.now()/1000|0);
-		My.newURL = '';
-
-		Blackprint.loadModuleFromURL(url, {
+		loadModuleURL(url, {
 			loadBrowserInterface: true // Also load the related .sf.js and .sf.css if exist
 		});
 	}
