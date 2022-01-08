@@ -43,6 +43,8 @@ sketch-page{
 			setTimeout(()=> {
 				if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0){
 					if(SketchList[0].__importing) return;
+					if(modal.currentPath === '/sketch-importer') return;
+
 					Modal.goto('/example-list');
 				}
 			}, 100);
