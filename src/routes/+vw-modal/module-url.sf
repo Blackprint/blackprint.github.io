@@ -51,7 +51,7 @@ sf-m[name="module-url"] {
 	border-radius: 10px;
 	border: 2px solid black;
 	position: relative;
-	min-width: 600px;
+	min-width: 700px;
 
 	.head{
 		letter-spacing: 1px;
@@ -167,22 +167,28 @@ sf.model('module-url', function(My){
 		if(which === 'host')
 			return url.host || location.host;
 
-		return url.pathname.replace(/(cjs|mjs|dist)\/|\.(min|mjs|js)/g, '').split('/').slice(-2).join('/');
+		// which === 'path'
+		let path = url.pathname;
+		if(path.includes('@dist'))
+			return path.replace(/(cjs|mjs)\/|\.(min|mjs|js)/g, '').split('/').slice(-2).join('/');
+
+		return path.replace(/(cjs|mjs|dist)\/|\.(min|mjs|js)/g, '').split('/').slice(-2).join('/');
 	}
 
 	async function loadModuleURL(url, options){
-		sf.loader.DOMWasLoaded = false; // flag because we may load new module
-
 		let temp = My.newURL;
 		My.newURL = '';
 
 		let progressToast = SmallNotif.add("Loading", 'yellow', false);
+
+		sf.loader.DOMWasLoaded = false; // flag because we may load new module
 		sf.loader.onProgress(function(loaded, total){
 			progressToast.message = `Loading ${loaded}/${total}`;
 		});
 
 		try {
 			await Blackprint.loadModuleFromURL(url, options);
+			await sf.loader.task;
 			SmallNotif.add("Module sucessfully loaded", 'green');
 		} catch(e) {
 			SmallNotif.add("Failed to load module", 'red');
@@ -190,6 +196,10 @@ sf.model('module-url', function(My){
 		} finally {
 			sf.loader.DOMWasLoaded = true; // reset flag
 		}
+
+		// Clear toast
+		let list = SmallNotif.list;
+		list.splice(list.indexOf(progressToast), 1);
 	}
 
 	My.addURL = function(){
