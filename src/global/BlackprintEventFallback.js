@@ -39,9 +39,15 @@ BlackprintEventFallback.error.types = {
 };
 
 window.addEventListener('error', function(e){
-	SmallNotif.add(e.message || "Something went wrong..", 'red');
+	let message = e.message || "Something went wrong..";
+	message = message.replace('Uncaught ', '');
+
+	SmallNotif.add(message, 'red');
 });
 
 window.addEventListener('onunhandledrejection', function(e){
-	SmallNotif.add(e.message || "Something went wrong..", 'red');
+	let message = e.message || "Something went wrong..";
+	message = message.replace('Uncaught ', '');
+
+	SmallNotif.add(message, 'red');
 });
