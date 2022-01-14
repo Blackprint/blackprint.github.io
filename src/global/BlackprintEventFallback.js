@@ -39,9 +39,9 @@ BlackprintEventFallback.error.types = {
 };
 
 window.addEventListener('error', function(e){
-	SmallNotif.add("Something went wrong..");
+	SmallNotif.add(e.message || "Something went wrong..", 'red');
 });
 
 window.addEventListener('onunhandledrejection', function(e){
-	SmallNotif.add("Something went wrong..");
+	SmallNotif.add(e.message || "Something went wrong..", 'red');
 });
