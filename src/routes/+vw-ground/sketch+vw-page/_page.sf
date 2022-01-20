@@ -23,6 +23,7 @@ sketch-page{
 		background: url('/assets/img/background/tile.png');
 		background-size: 100px;
 		filter: brightness(38%);
+		backface-visibility: hidden;
 		opacity: 0.5;
 		width: 100%;
 		height: 100%;
