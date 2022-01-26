@@ -11,7 +11,7 @@ sf-space[blackprint]{
 				padding-left: 22px;
 			}
 
-			&.trigger .header{
+			&.event .header{
 				.icon{
 					font-family: "Font Awesome 5 Free";
 					font-weight: 900;
@@ -21,6 +21,8 @@ sf-space[blackprint]{
 					}
 
 					height: 16px;
+					font-size: 12px;
+					line-height: 18px;
 					padding-right: 4px;
 					display: inline-block;
 				}
@@ -48,19 +50,19 @@ sf-space[blackprint]{
 	.nodes{
 		.node{
 			.header {
-		        border-bottom: 1px dashed rgba(41,184,229,.7);
-		        background: rgba(41,184,229,.25);
-		        box-shadow: none;
+				border-bottom: 1px dashed rgba(41,184,229,.7);
+				background: rgba(41,184,229,.25);
+				box-shadow: none;
 			}
 
 			@mixin headerColor($type, $bgA, $bgB, $bgC) {
 			  &.#{$type} .header{
-		        border-bottom: 1px dashed rgba($bgA, $bgB, $bgC, .7);
-		        background: rgba($bgA, $bgB, $bgC, .25);
+				border-bottom: 1px dashed rgba($bgA, $bgB, $bgC, .7);
+				background: rgba($bgA, $bgB, $bgC, .25);
 			  }
 			}
 
-			@include headerColor('trigger', 226, 18, 18);
+			@include headerColor('event', 226, 18, 18);
 			@include headerColor('input', 108, 232, 93);
 		}
 	}
