@@ -1,5 +1,5 @@
-# Blackprint Editor Example
-This repository may have rapid changes on the future.
+# Blackprint Editor
+This repository may have rapid changes on the future, if you want to create your own editor you can use the [sketch library](https://github.com/Blackprint/Blackprint) instead.
 
 If you want to contribute on this Editor, please see [CONTRIBUTING.md](https://github.com/Blackprint/blackprint.github.io/blob/master/.github/CONTRIBUTING.md).
 
