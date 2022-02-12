@@ -6,7 +6,7 @@
 
 	<div class="list-info">Please select module to import:</div>
 	<div class="list">
-		<div class="item {{ x.active ? 'active' : '' }}" sf-each="x in list" @click="load(x)">
+		<div class="item {{ x.active || '' }}" sf-each="x in list" @click="load(x)">
 			{{ x.url }}
 		</div>
 	</div>
@@ -42,6 +42,7 @@ sf-m[name="npm-package-info"] {
 	}
 	> .title{
 		padding: 10px;
+		margin-right: 40px;
 		color: white;
 		font-weight: bold;
 		text-decoration: underline;
@@ -70,6 +71,9 @@ sf-m[name="npm-package-info"] {
 
 			&.active{
 				color: gray;
+			}
+			&.loading{
+				color: burlywood;
 			}
 		}
 	}
@@ -124,24 +128,33 @@ sf.model('npm-package-info', function(My){
 			for (var i = 0; i < list.length; i++) {
 				let item = list[i];
 				if(key.includes(item.url))
-					item.active = true;
+					item.active = 'active';
 			}
 		}
 
 		Modal.goto('/npm-package-info');
 	}
 
-	let progressToast, loading = false;
+	let progressToast, loading = false, loadCount = 0;
 	function theProgress(finished){
 		if(finished){
+			if(loadCount !== 0){
+				if(loadCount > 0) loadCount--;
+				return;
+			}
+
 			if(!progressToast) return;
 
 			let list = SmallNotif.list;
 			list.splice(list.indexOf(progressToast), 1);
 
 			progressToast = false;
+			loading = false;
 			return;
 		}
+
+		if(loading) return;
+		loading = true;
 
 		progressToast = SmallNotif.add("Loading", 'yellow', false);
 		sf.loader.onProgress(function(loaded, total){
@@ -152,11 +165,13 @@ sf.model('npm-package-info', function(My){
 
 	My.load = async function(item){
 		sf.loader.DOMWasLoaded = false; // flag because we may load new module
-		loading = true;
 
-		setTimeout(function(){
-			if(loading) theProgress();
+		setTimeout(()=> {
+			if(loadCount > 0) theProgress();
 		}, 500);
+
+		loadCount++;
+		item.active = 'loading';
 
 		try{
 			await Blackprint.loadModuleFromURL([My.packageURL + item.url], {
@@ -167,7 +182,7 @@ sf.model('npm-package-info', function(My){
 			loading = false;
 		}
 
-		item.active = true;
+		item.active = 'active';
 		My.package._active = true;
 
 		// Clear toast
