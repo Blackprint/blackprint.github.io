@@ -192,6 +192,7 @@ sf.model('module-url', function(My){
 			SmallNotif.add("Module sucessfully loaded", 'green');
 		} catch(e) {
 			SmallNotif.add("Failed to load module", 'red');
+			console.error(e);
 			My.newURL = temp;
 		} finally {
 			sf.loader.DOMWasLoaded = true; // reset flag
@@ -271,13 +272,13 @@ sf.model('module-url', function(My){
 
 	Blackprint.on('moduleDelete', { slot: 'bp-editor' }, function({ url }) {
 		let styles = document.styleSheets;
-		let simplifiedURL = url.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)/g, '');
+		let simplifiedURL = url.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)\b/g, '');
 
 		for (var i = 0; i < styles.length; i++) {
 			let style = styles[i];
 			if(style.href == null) continue;
 
-			let temp = style.href.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)/g, '');
+			let temp = style.href.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)\b/g, '');
 			if(temp === simplifiedURL){
 				style.ownerNode.remove();
 				break;

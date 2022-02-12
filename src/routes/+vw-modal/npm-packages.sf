@@ -141,7 +141,7 @@ sf.model('npm-packages', function(My){
 		let package = await $.getJSON(url+'/package.json');
 		let list;
 
-		if(package.blackprint == null){
+		if(package.blackprint?.bundle == null){
 			try{
 				var data = await $.get(url+`/README.md`);
 			} catch(e) {}
