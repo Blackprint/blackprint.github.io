@@ -6,16 +6,18 @@
 		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
 	</div>
 	<div class="list">
-		<div class="item {{ x.package._active && 'active' }}" sf-each="x in list" @click="open(x.package)">
+		<div class="item {{ x.package._active && 'active' }} {{ x.package._update && 'update' }}" sf-each="x in list" @click="open(x.package)">
 			<div>
-				<div class="title">{{ x.package.name }} (v{{ x.package.version }})</div>
-				<div class="author">{{ x.package.publisher.username }}</div></div>
+				<div class="title">{{ x.package.name }} <span>(v{{ x.package.version }})</span></div>
+				<div class="author">{{ x.package.publisher.username }}</div>
+			</div>
 			<div>
 				<div class="description">{{ x.package.description }}</div>
 				<div class="date">{{ x.package.date.split('T')[0] }}</div>
 			</div>
 		</div>
 	</div>
+	<div class="search-info" style="display: {{ searchInfo !== '' ? '' : 'none' }}">{{ searchInfo }}</div>
 </sf-m>
 
 ## scss-global
@@ -25,6 +27,12 @@ sf-m[name="npm-packages"] {
 	border: 2px solid black;
 	position: relative;
 	box-shadow: 0 0 20px 0px white;
+	.search-info{
+		color: white;
+		text-align: center;
+		width: 100%;
+		margin-bottom: 10px;
+	}
 	> .mini-description{
 		padding: 10px;
 		color: white;
@@ -94,6 +102,7 @@ sf.model('npm-packages', function(My){
 	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint%20nodes';
 	My.list = [];
 	My.search = '';
+	My.searchInfo = '';
 
 	My.init = function(){
 		My.refreshList();
@@ -104,15 +113,20 @@ sf.model('npm-packages', function(My){
 		if(My.search !== '')
 			_query += '%20'+My.search;
 
+		My.searchInfo = "Searching packages...";
 		let list = (await $.getJSON(_query)).objects;
+		My.searchInfo = "";
 
 		// ToDo: check if version was different with current loaded module
 		let temp = Blackprint.modulesURL;
 		for(let key in temp){
 			for (var i = 0; i < list.length; i++) {
-				let item = list[i].package.name;
-				if(key.includes(item.url))
-					item.package.active = true;
+				let item = list[i].package;
+
+				if(key.includes(item.name)){
+					item._active = true;
+					item._update = Blackprint.utils.packageIsNewer(key, item.name+'@'+item.version);
+				}
 			}
 		}
 
@@ -120,19 +134,39 @@ sf.model('npm-packages', function(My){
 	}
 
 	My.open = async function(pkg){
-		SmallNotif.add("Retrieving information");
+		My.searchInfo = "Retrieving information...";
 
-		try{
-			// ToDo: do we need to sanitize URL? '-'
-			var data = await $.get(`https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}/README.md`);
-		} catch(e) {}
+		// ToDo: do we need to sanitize URL? '-'
+		let url = `https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}`;
+		let package = await $.getJSON(url+'/package.json');
+		let list;
 
-		if(!data) throw new Error("Can't find package's README.md");
+		if(package.blackprint == null){
+			try{
+				var data = await $.get(url+`/README.md`);
+			} catch(e) {}
 
-		let list = [];
-		data.replace(/(\/dist\/.*?)['"`\\ %]/g, function(full, match){
-			list.push({url: match});
-		});
+			My.searchInfo = "";
+			if(!data) throw new Error("Can't find package's README.md");
+
+			list = [];
+			data.replace(/(\/dist\/.*?)['"`\\ %]/g, function(full, match){
+				list.push({url: match});
+			});
+		}
+		else {
+			list = package.blackprint.bundle;
+			for (var i = 0; i < list.length; i++) {
+				let temp = list[i];
+
+				if(temp.slice(0, 1) !== '/')
+					temp = `/${temp}`;
+
+				list[i] = {url: temp};
+			}
+
+			My.searchInfo = "";
+		}
 
 		sf.model('npm-package-info').open(pkg, list);
 	}
