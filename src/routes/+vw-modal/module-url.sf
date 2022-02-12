@@ -233,13 +233,12 @@ sf.model('module-url', function(My){
 		Blackprint.loadModuleFromURL(item._url);
 	}
 
+	let { diveModuleURL } = Blackprint.utils;
 	My.hideFromURL = function(item){
 		let url = item._url.replace(/\?.*?$/m, '');
-		let temp = Blackprint.modulesURL[url];
-
 		let hidden = item._hidden = !item._hidden;
 
-		diveModuleURL(temp, function(deepObject, deepProp, keys, bubble){
+		diveModuleURL(Blackprint.modulesURL[url], function(deepObject, deepProp, keys, bubble){
 			deepObject[deepProp].hidden = hidden;
 
 			// Bubbling check if the parent has no child anymore
@@ -267,28 +266,12 @@ sf.model('module-url', function(My){
 		if(index === -1) return;
 		let url = item._url.replace(/[?#].*?$/m, '');
 
-		diveModuleURL(Blackprint.modulesURL[url], function(deepObject, deepProp, keys, bubble){
-			delete deepObject[deepProp];
+		Blackprint.deleteModuleFromURL(url);
+	}
 
-			// Bubbling check if the parent has no child anymore
-			for (var i = bubble.length-1; i >= 0; i--) {
-				let ref = bubble[i];
-
-				if(--ref.val._length <= 0){
-					if(i === 0){
-						delete Blackprint.nodes[keys[0]];
-						break;
-					}
-
-					let parent = bubble[i-1];
-					delete parent.val[ref.key];
-				}
-				else break;
-			}
-		});
-
+	Blackprint.on('moduleDelete', { slot: 'bp-editor' }, function({ url }) {
 		let styles = document.styleSheets;
-		let simplifiedURL = url.replace(/\.(sf|js|css|min|mjs)/g, '');
+		let simplifiedURL = url.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)/g, '');
 
 		for (var i = 0; i < styles.length; i++) {
 			let style = styles[i];
@@ -301,31 +284,14 @@ sf.model('module-url', function(My){
 			}
 		}
 
-		delete Blackprint.modulesURL[url];
-		list.splice(index, 1);
-	}
-
-	function diveModuleURL(moduleInfo, onBubbling){
-		that:for(let key in moduleInfo){
-			if(key.slice(0, 1) === '_')
-				continue;
-
-			key = key.split('/');
-			let prop = key.pop();
-
-			// Dive
-			let obj = Blackprint.nodes;
-			let bubble = new Array(key.length);
-			for (var i = 0; i < key.length; i++){
-				let k = key[i];
-				obj = obj[k];
-				bubble[i] = {key:k, val:obj};
-				if(obj == null) continue that;
+		let list = My.list;
+		for (var i = 0; i < list.length; i++) {
+			if(list[i]._url.includes(simplifiedURL)){
+				list.splice(i, 1);
+				break;
 			}
-
-			onBubbling(obj, prop, key, bubble);
 		}
-	}
+	});
 
 	My.npmList = function(){
 		modal.goto('/npm-packages');
