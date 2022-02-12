@@ -3,6 +3,7 @@ sf.model('header', function(My, include){
 	My.message = "Hello";
 	My.showOptions = false;
 	My.info = {scale:100};
+	My._loadedModuleURL = Blackprint._modulesURL;
 
 	My.init = function(){
 		sf.URI.parse(); // Trigger to reparse current URL

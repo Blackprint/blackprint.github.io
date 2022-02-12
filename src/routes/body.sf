@@ -19,7 +19,10 @@ For adding library or style, please modify /public/index.html
 	</div>
 	<div class="header-menu">
 		<div class="item-list">
-			<div class="item" @click="Modal.goto('/module-url')" title="Loaded module"><i class='fa fa-boxes'></i></div>
+			<div class="item" @click="Modal.goto('/module-url')" title="Loaded module">
+				<i class='fa fa-boxes'></i>
+				<div class="module-counter">{{ _loadedModuleURL.length }}</div>
+			</div>
 			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Clone the container for the small version"><i class='fa fa-window-restore'></i></div>
 			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX?"><i class="fas fa-rocket"></i></div>
 			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize flow"><i class="fas fa-bezier-curve"></i></div>
@@ -155,12 +158,29 @@ vw-ground{
 		top: 12px;
 		font-size: 22px;
 		.item{
-		    padding: 0 10px;
-		    cursor: pointer;
+			padding: 0 10px;
+			cursor: pointer;
+			position: relative;
 
-		    &.active{
-		    	color: white;
-		    }
+			&.active{
+				color: white;
+			}
+
+			.module-counter {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				font-size: 10px;
+				color: black;
+				background: #ffffffde;
+				box-shadow: 0 0 6px white;
+				border-radius: 100%;
+				padding: 2px 3px 2px 4px;
+				text-align: center;
+				font-weight: bold;
+				height: 12px;
+				min-width: 10px;
+			}
 		}
 	}
 	.header-zoom{
@@ -180,12 +200,12 @@ vw-ground{
 		top: 12px;
 		font-size: 22px;
 		.item{
-		    padding: 0 10px;
-		    cursor: pointer;
+			padding: 0 10px;
+			cursor: pointer;
 
-		    &.active{
-		    	color: white;
-		    }
+			&.active{
+				color: white;
+			}
 		}
 	}
 }
