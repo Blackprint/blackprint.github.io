@@ -2,7 +2,7 @@
 ## html
 <drop-down class="dropdown-menu {{hidden}}" style="
     display: {{visible ? 'block' : 'none'}};
-    transform: translate({{ x }}px, {{ y }}px);
+    transform: translate({{ x | 0 }}px, {{ y | 0 }}px);
   ">
   <div class="first" style="display: {{ !title && 'none' }}">{{ title || '' }}</div>
   <ul>
