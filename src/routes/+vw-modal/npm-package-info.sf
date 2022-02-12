@@ -7,7 +7,7 @@
 	<div class="list-info">Please select module to import:</div>
 	<div class="list">
 		<div class="item {{ x.active || '' }}" sf-each="x in list" @click="load(x)">
-			{{ x.url }}
+			{{ x.url }} <i class="{{ x.active === 'loading' ? 'fa fa-spinner fa-spin' : '' }}"></i>
 		</div>
 	</div>
 	<div class="menu">
