@@ -42,6 +42,7 @@
 	<div class="menu">
 		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
 		<div class="item" @click="npmList" title="Search from NPM"><i class="fa fa-book-open"></i></div>
+		<div class="item" @click="loadCachedList" style="{{ firstInit ? '' : 'display: none' }}" title="Load cached list"><i class="fa fa-boxes"></i></div>
 	</div>
 </sf-m>
 
@@ -149,13 +150,28 @@ sf-m[name="module-url"] {
 	}
 }
 
+## js-global.router
+={
+	on: {
+		coming(){ _editorModuleURL.sortURL() }
+	}
+}
+
 ## js-global
-sf.model('module-url', function(My){
+let _editorModuleURL = sf.model('module-url', function(My){
 	My.list = Blackprint._modulesURL;
+	My.firstInit = !!localStorage.bpModuleURLList;
 	My.newURL = '';
 
 	My.init = async function(){
 		// First initialization cycle
+	}
+
+	My.sortURL = function() {
+		My.list.sort((a, b) => a._url.localeCompare(b._url));
+		My.list.refresh();
+
+		localStorage.bpModuleURLList = JSON.stringify(My.list.map(v => v._url));
 	}
 
 	My.shortenLink = function(url, which){
@@ -201,6 +217,8 @@ sf.model('module-url', function(My){
 		// Clear toast
 		let list = SmallNotif.list;
 		list.splice(list.indexOf(progressToast), 1);
+
+		My.sortURL();
 	}
 
 	My.addURL = function(){
@@ -213,7 +231,9 @@ sf.model('module-url', function(My){
 
 			if(My.newURL.replace(/\?.*?$/m, '') === temp._url.replace(/\?.*?$/m, '')){
 				temp._url = My.newURL.replace(/\?.*?$/m, '');
-				loadModuleURL(temp._url);
+				loadModuleURL(temp._url, {
+					loadBrowserInterface: true
+				});
 				return;
 			}
 		}
@@ -296,6 +316,18 @@ sf.model('module-url', function(My){
 
 	My.npmList = function(){
 		modal.goto('/npm-packages');
+	}
+
+	My.loadCachedList = function(){
+		let list = localStorage.bpModuleURLList;
+		if(!list) return;
+
+		list = JSON.parse(list);
+		if(list.length === 0) return;
+
+		loadModuleURL(list, {
+			loadBrowserInterface: true // Also load the related .sf.js and .sf.css if exist
+		});
 	}
 
 	My.close = function(){
