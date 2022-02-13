@@ -5,7 +5,7 @@
 		<div class="item">
 			<div class="title">Theme:</div>
 			<select sf-bind="theme">
-				<option value="ue4">UE4 Blueprint</option>
+				<option value="default">Default</option>
 				<option value="darker">Darker</option>
 			</select>
 		</div>
@@ -50,7 +50,7 @@ sf-m[name="sketch-settings"] {
 
 ## js-global
 sf.model('sketch-settings', function(My){
-	My.theme = 'ue4';
+	My.theme = 'default';
 	My.on$theme = function(now){
 		$('body')
 			.removeClass('node-ui-'+My.theme)
