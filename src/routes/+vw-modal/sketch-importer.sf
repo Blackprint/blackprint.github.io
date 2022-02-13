@@ -133,7 +133,11 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 
 	My.loadJSON = async function(json){
 		Modal.goto('/sketch-importer');
-		My.pendingLoad = json = JSON.parse(json);
+
+		if(json.constructor === String)
+			json = JSON.parse(json);
+
+		My.pendingLoad = json;
 
 		let metadata = json._;
 		My.modules = (metadata && metadata.moduleJS) || [];
