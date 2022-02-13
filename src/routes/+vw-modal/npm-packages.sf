@@ -1,6 +1,9 @@
 ## html
 <sf-m name="npm-packages">
-	<div class="description">Search package on NPM repository</div>
+	<div class="description">
+		Search package on NPM repository
+		<i class="{{ loading ? 'fa fa-spinner fa-spin' : '' }}"></i>
+	</div>
 	<div class="mini-description" title="especially if you're not a developer, always becareful if someone ask you to do something with Blackprint, like inputting password or private key">Always becareful and verify the module's source code before going to production</div>
 	<div class="search">
 		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
@@ -17,7 +20,6 @@
 			</div>
 		</div>
 	</div>
-	<div class="search-info" style="display: {{ searchInfo !== '' ? '' : 'none' }}">{{ searchInfo }}</div>
 </sf-m>
 
 ## scss-global
@@ -99,10 +101,10 @@ sf-m[name="npm-packages"] {
 
 ## js-global
 sf.model('npm-packages', function(My){
-	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint%20nodes';
+	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint';
 	My.list = [];
 	My.search = '';
-	My.searchInfo = '';
+	My.loading = false;
 
 	My.init = function(){
 		My.refreshList();
@@ -113,9 +115,9 @@ sf.model('npm-packages', function(My){
 		if(My.search !== '')
 			_query += '%20'+My.search;
 
-		My.searchInfo = "Searching packages...";
+		My.loading = true;
 		let list = (await $.getJSON(_query)).objects;
-		My.searchInfo = "";
+		My.loading = false;
 
 		// ToDo: check if version was different with current loaded module
 		let temp = Blackprint.modulesURL;
@@ -134,40 +136,44 @@ sf.model('npm-packages', function(My){
 	}
 
 	My.open = async function(pkg){
-		My.searchInfo = "Retrieving information...";
+		My.loading = true;
 
 		// ToDo: do we need to sanitize URL? '-'
-		let url = `https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}`;
-		let package = await $.getJSON(url+'/package.json');
-		let list;
+		let dirs = await $.getJSON(`https://data.jsdelivr.com/v1/package/npm/${pkg.name}@${pkg.version}`);
+		dirs = dirs.files;
 
-		if(package.blackprint?.bundle == null){
-			try{
-				var data = await $.get(url+`/README.md`);
-			} catch(e) {}
+		let dist = [];
+		let example = [];
 
-			My.searchInfo = "";
-			if(!data) throw new Error("Can't find package's README.md");
+		for (var i = 0; i < dirs.length; i++) {
+			let dir = dirs[i];
+			if(dir.type !== 'directory') continue;
 
-			list = [];
-			data.replace(/(\/dist\/.*?)['"`\\ %]/g, function(full, match){
-				list.push({url: match});
-			});
-		}
-		else {
-			list = package.blackprint.bundle;
-			for (var i = 0; i < list.length; i++) {
-				let temp = list[i];
+			if(dir.name === 'dist'){
+				let temp = dir.files;
+				for (var a = 0; a < temp.length; a++) {
+					let file = temp[a];
+					if(file.type !== 'file') continue;
 
-				if(temp.slice(0, 1) !== '/')
-					temp = `/${temp}`;
+					let name = file.name;
+					if(/\.(map|sf\.mjs|sf\.js|css)$/.test(name))
+						continue;
 
-				list[i] = {url: temp};
+					dist.push({url: `/dist/${name}`});
+				}
 			}
+			else if(dir.name === 'example'){
+				let temp = dir.files;
+				for (var a = 0; a < temp.length; a++) {
+					let file = temp[a];
+					if(file.type !== 'file') continue;
 
-			My.searchInfo = "";
+					example.push({url: `/example/${file.name}`});
+				}
+			}
 		}
 
-		sf.model('npm-package-info').open(pkg, list);
+		My.loading = false;
+		sf.model('npm-package-info').open(pkg, dist, example);
 	}
 });
