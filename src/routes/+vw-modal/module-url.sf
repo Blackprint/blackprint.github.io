@@ -163,6 +163,8 @@ let _editorModuleURL = sf.model('module-url', function(My){
 	My.firstInit = !!localStorage.bpModuleURLList;
 	My.newURL = '';
 
+	let lastModuleList = localStorage.bpModuleURLList;
+
 	My.init = async function(){
 		// First initialization cycle
 	}
@@ -170,6 +172,8 @@ let _editorModuleURL = sf.model('module-url', function(My){
 	My.sortURL = function() {
 		My.list.sort((a, b) => a._url.localeCompare(b._url));
 		My.list.refresh();
+
+		if(My.list.length === 0) return;
 
 		localStorage.bpModuleURLList = JSON.stringify(My.list.map(v => v._url));
 	}
@@ -319,11 +323,13 @@ let _editorModuleURL = sf.model('module-url', function(My){
 	}
 
 	My.loadCachedList = function(){
-		let list = localStorage.bpModuleURLList;
+		let list = lastModuleList;
 		if(!list) return;
 
 		list = JSON.parse(list);
 		if(list.length === 0) return;
+
+		My.firstInit = false;
 
 		loadModuleURL(list, {
 			loadBrowserInterface: true // Also load the related .sf.js and .sf.css if exist

@@ -110,8 +110,9 @@ sf.model('npm-package-info', function(My){
 	My.packageURL = '';
 	My.package = 0;
 
-	My.open = function(pkg, moduleList){
+	My.open = function(pkg, moduleList, exampleList){
 		My.list = moduleList;
+		My.exampleList = exampleList;
 		My.package = pkg;
 		My.title = pkg.name;
 		My.description = pkg.description || '';
@@ -167,7 +168,7 @@ sf.model('npm-package-info', function(My){
 		sf.loader.DOMWasLoaded = false; // flag because we may load new module
 
 		setTimeout(()=> {
-			if(loadCount > 0) theProgress();
+			if(loadCount !== 0) theProgress();
 		}, 500);
 
 		loadCount++;
@@ -181,6 +182,9 @@ sf.model('npm-package-info', function(My){
 			sf.loader.DOMWasLoaded = true;
 			loading = false;
 		}
+
+		if(My.exampleList.length !== 0)
+			ModuleExampleList.add(My.title, My.exampleList, My.packageURL);
 
 		item.active = 'active';
 		My.package._active = true;
