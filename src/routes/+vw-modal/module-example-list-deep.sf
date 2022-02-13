@@ -68,10 +68,10 @@ sf.model('module-example-list-deep', function(My){
 	My.baseUrl = '';
 	My.list = [];
 
-	My.openModal = function(package){
-		My.packageName = package.packageName;
+	My.openModal = function(pkg){
+		My.packageName = pkg.packageName;
 
-		let list = package.examples;
+		let list = pkg.examples;
 		for (var i = 0; i < list.length; i++) {
 			let temp = list[i];
 
@@ -84,7 +84,7 @@ sf.model('module-example-list-deep', function(My){
 		}
 
 		My.list = list;
-		My.baseUrl = package.packageURL;
+		My.baseUrl = pkg.packageURL;
 	}
 
 	My.openExample = async function(item){
