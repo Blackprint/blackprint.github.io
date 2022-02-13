@@ -32,18 +32,12 @@ var SmallNotif = sf.model('small.notif', function(My){
     }
   };
 
-  My.initialized = false;
-  My.lazyInit = function(){
-    if(My.initialized) return;
-    My.initialized = true;
-
+  $(function(){
     if($('sf-m[name="small.notif"]').length !== 0) return;
     $('body').append($(window.templates[#this.path]));
-  }
+  });
 
   My.add = function(message, color, delay){
-    My.lazyInit();
-
     var item = {message, color:color || 'yellow'};
     My.list.push(item);
 
