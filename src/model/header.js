@@ -1,9 +1,10 @@
 // https://www.npmjs.com/package/scarletsframe#initializedefine-model
-sf.model('header', function(My, include){
+var EditorHeader = sf.model('header', function(My, include){
 	My.message = "Hello";
 	My.showOptions = false;
 	My.info = {scale:100};
 	My._loadedModuleURL = Blackprint._modulesURL;
+	My._moduleExampleList = []; // will be referenced by: /src/routes/+vw-modal/module-example-list.sf
 
 	My.init = function(){
 		sf.URI.parse(); // Trigger to reparse current URL
