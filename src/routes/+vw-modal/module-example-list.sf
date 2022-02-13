@@ -1,0 +1,93 @@
+## html
+<sf-m name="module-example-list">
+	<div class="description">Please select one of the module to load the example list</div>
+	<div class="list">
+		<div class="item" sf-each="x in list" @click="open(x)">
+			{{ x.packageName }}
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="module-example-list"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	.description{
+		padding: 10px;
+		color: white;
+		a{
+			color: skyblue;
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+		}
+	}
+}
+
+## js-global.router
+={
+	on:{
+		coming(){ }
+	}
+}
+
+## js-global
+var ModuleExampleList = sf.model('module-example-list', function(My){
+	My.list = EditorHeader._moduleExampleList;
+
+	init();
+	function init() {
+		let cache = localStorage.bpModuleExampleList;
+		if(!cache) return;
+
+		My.list.push(...JSON.parse(cache));
+	}
+
+	My.open = function(x) {
+		sf.model('module-example-list-deep').openModal(x);
+		Modal.goto('/module-example-list-deep');
+	}
+
+	My.add = function(packageName, list, packageURL){
+		let ref = My.list;
+		for (var i = 0; i < ref.length; i++) {
+			if(ref[i].packageName === packageName) break;
+		}
+
+		// new example
+		if(i === ref.length){
+			ref.push({
+				packageName,
+				packageURL,
+				examples: list,
+			});
+
+			My.list = ref = ref.sort((a, b) => a.packageName.localeCompare(b.packageName));
+
+			try{
+				// This may give error if this modal was never been opened since startup
+				ref.refresh();
+			} catch(e){}
+
+			SmallNotif.add(`"${packageName}" example has been added`, 'green');
+		}
+		else ref[i].examples = list;
+
+		localStorage.bpModuleExampleList = JSON.stringify(My.list);
+	}
+});

@@ -1,0 +1,104 @@
+## html
+<sf-m name="module-example-list-deep">
+	<div class="description">Examples for: <b>{{ packageName }}</b></div>
+	<div class="list">
+		<div class="item" sf-each="x in list" @click="openExample(x)">
+			{{ x.name }}
+		</div>
+	</div>
+	<div class="menu">
+		<div class="item" @click="back" title="Back"><i class="fa fa-reply"></i></div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="module-example-list-deep"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	.description{
+		padding: 10px;
+		color: white;
+		margin-right: 40px;
+		a{
+			color: skyblue;
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+		}
+	}
+
+	.menu{
+		position: absolute;
+		right: -5px;
+		top: -10px;
+		text-align: center;
+		.item{
+			cursor: pointer;
+			padding: 5px;
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+			border: 1px solid #000;
+			border-radius: 20px;
+			background: #000000a8;
+			color: #fff;
+			box-shadow: 0 0 5px black;
+		}
+	}
+}
+
+## js-global
+sf.model('module-example-list-deep', function(My){
+	My.packageName = '';
+	My.baseUrl = '';
+	My.list = [];
+
+	My.openModal = function(package){
+		My.packageName = package.packageName;
+
+		let list = package.examples;
+		for (var i = 0; i < list.length; i++) {
+			let temp = list[i];
+
+			if(!temp.name){
+				temp.name = temp.url
+					.replace('example/', '')
+					.replace('.json', '')
+					.replace(/\-/g, ' ');
+			}
+		}
+
+		My.list = list;
+		My.baseUrl = package.packageURL;
+	}
+
+	My.openExample = async function(item){
+		SmallNotif.add("Loading information..");
+
+		let url = item.url;
+		if(url.slice(0, 1) !== '/')
+			url = `/${url}`;
+
+		let obj = await $.getJSON(My.baseUrl+url);
+		SketchImporter.loadJSON(obj);
+	}
+
+	My.back = function(){
+		Modal.goto('/module-example-list');
+	}
+});
