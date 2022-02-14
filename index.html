@@ -58,6 +58,9 @@
 		// Register sf.$ to global
 		$ = sf.$;
 
+		// Temporary ducktape before v0.6.3
+		window.sf$hotReload = {replaceClass(){}};
+
 		// Load modules
 		;(async function(){
 			var url = 'https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.6.2';
