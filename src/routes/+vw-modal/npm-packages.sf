@@ -101,7 +101,7 @@ sf-m[name="npm-packages"] {
 
 ## js-global
 sf.model('npm-packages', function(My){
-	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint';
+	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint%20nodes';
 	My.list = [];
 	My.search = '';
 	My.loading = false;
