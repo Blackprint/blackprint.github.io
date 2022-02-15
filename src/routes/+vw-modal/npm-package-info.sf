@@ -139,11 +139,10 @@ sf.model('npm-package-info', function(My){
 	let progressToast, loading = false, loadCount = 0;
 	function theProgress(finished){
 		if(finished){
-			if(loadCount !== 0){
-				if(loadCount > 0) loadCount--;
+			if(--loadCount > 0)
 				return;
-			}
 
+			loadCount = 0;
 			if(!progressToast) return;
 
 			let list = SmallNotif.list;

@@ -78,6 +78,7 @@ sf.model('module-example-list-deep', function(My){
 			if(!temp.name){
 				temp.name = temp.url
 					.replace('example/', '')
+					.replace(/^\//, '')
 					.replace('.json', '')
 					.replace(/\-/g, ' ');
 			}
