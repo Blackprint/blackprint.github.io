@@ -172,6 +172,17 @@ sf.component('sketch-page', function(My){
 				iface.id = val;
 				sketch.iface[val] = iface;
 			}
+		}, {
+			title: "View source code",
+			async callback(){
+				let code = await utils.openNodeSource(iface);
+				if(!code) return;
+
+				let editor = sf.model('custom-node-editor');
+				editor.setValue(code);
+
+				Modal.goto('/custom-node-editor');
+			}
 		});
 	});
 });

@@ -59,7 +59,7 @@ sf.model('custom-node-editor', function(My){
 
 	My.init = async function(){
 		if(window.monaco === void 0){
-			await sf.loader.js(['https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.1.1/lib/umd/monaco-loader.min.js']);
+			await sf.loader.js(['https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.2.0/lib/umd/monaco-loader.min.js']);
 			await monaco_loader.init();
 		}
 
@@ -91,12 +91,19 @@ sf.model('custom-node-editor', function(My){
 		eval(My.editor.getValue());
 	}
 
+	My.setValue = function(code){
+		if(My.editor != null)
+			My.editor.setValue(code);
+
+		My.content = code;
+	}
+
 	My.close = function(){
 		Modal.hide();
 
-		My.editor.dispose();
-		My.editor = null;
-		modal.goto('/');
+		// My.editor.dispose();
+		// My.editor = null;
+		// modal.goto('/');
 
 		My.container.find('.bp-loading-status').css('display', '');
 	}
