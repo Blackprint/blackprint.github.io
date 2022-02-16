@@ -160,7 +160,7 @@ sf-m[name="module-url"] {
 ## js-global
 let _editorModuleURL = sf.model('module-url', function(My){
 	My.list = Blackprint._modulesURL;
-	My.firstInit = !!localStorage.bpModuleURLList;
+	My.firstInit = false && !!localStorage.bpModuleURLList; // disable it for now
 	My.newURL = '';
 
 	let lastModuleList = localStorage.bpModuleURLList;
