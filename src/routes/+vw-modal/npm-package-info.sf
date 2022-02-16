@@ -136,41 +136,51 @@ sf.model('npm-package-info', function(My){
 		Modal.goto('/npm-package-info');
 	}
 
-	let progressToast, loading = false, loadCount = 0;
-	function theProgress(finished){
-		if(finished){
-			if(--loadCount > 0)
-				return;
-
-			loadCount = 0;
-			if(!progressToast) return;
-
-			let list = SmallNotif.list;
-			list.splice(list.indexOf(progressToast), 1);
-
-			progressToast = false;
-			loading = false;
-			return;
-		}
-
-		if(loading) return;
-		loading = true;
+	let progressToast;
+	async function theProgress(){
+		if(progressToast) return;
 
 		progressToast = SmallNotif.add("Loading", 'yellow', false);
-		sf.loader.onProgress(function(loaded, total){
+
+		// todo: fix: sf.loader.onProgress
+		let temp = (function(loaded, total){
+			if(loaded === total){
+				sf.loader.DOMWasLoaded = true;
+				progressToast.message = `Loading ${loaded}/${total}`;
+
+				progressToast = false;
+				return;
+			}
+
 			if(!progressToast) return;
 			progressToast.message = `Loading ${loaded}/${total}`;
 		});
+
+		let intv = setInterval(()=> {
+			temp(sf.loader.loadedContent, sf.loader.totalContent);
+		}, 500);
+
+		try{
+			await sf.loader.task;
+		} catch(e){
+			SmallNotif.add(e.message, 'red');
+			console.error(e);
+		}
+
+		clearInterval(intv);
+
+		let list = SmallNotif.list;
+		list.splice(list.indexOf(progressToast), 1);
 	}
 
 	My.load = async function(item){
 		sf.loader.DOMWasLoaded = false; // flag because we may load new module
 
 		setTimeout(()=> {
-			if(loadCount !== 0) theProgress();
+			if(sf.loader.totalContent !== sf.loader.loadedContent)
+				theProgress();
 		}, 500);
 
-		loadCount++;
 		item.active = 'loading';
 
 		try{
@@ -178,8 +188,8 @@ sf.model('npm-package-info', function(My){
 				loadBrowserInterface: true // set to "false" for Node.js/Deno
 			});
 		} finally {
-			sf.loader.DOMWasLoaded = true;
-			loading = false;
+			if(sf.loader.totalContent === sf.loader.loadedContent)
+				sf.loader.DOMWasLoaded = true;
 		}
 
 		if(My.exampleList.length !== 0)
@@ -187,9 +197,6 @@ sf.model('npm-package-info', function(My){
 
 		item.active = 'active';
 		My.package._active = true;
-
-		// Clear toast
-		theProgress(true);
 	}
 
 	My.back = function(){
