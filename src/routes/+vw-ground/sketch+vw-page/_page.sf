@@ -19,6 +19,12 @@ sketch-page{
 		text-align: center;
 	}
 
+	@media(max-width: 900px){
+		.bottom-message {
+			display: none;
+		}
+	}
+
 	sf-space[blackprint] .bg-tile{
 		background: url('/assets/img/background/tile.png');
 		background-size: 100px;

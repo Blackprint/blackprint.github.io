@@ -215,6 +215,16 @@ vw-ground{
 	}
 }
 
+@media(max-width: 900px){
+	.header-center div {
+		display: none;
+	}
+
+	sf-m[name="modal"]{
+		overflow: scroll;
+	}
+}
+
 .header-left-menu{
 	.dropdown-menu li{
 		min-width: 175px;
