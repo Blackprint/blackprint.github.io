@@ -18,7 +18,7 @@
 		</ul>
 	</div>
 	<div class="info-clear">
-		<div class="title">Please be careful if you saved any sensitive data<br>Click to clear the saved data:</div>
+		<div class="title">Please be careful if you saved sensitive data on this editor<br>You can click below to clear the saved data:</div>
 		<!-- Hi! can you contribute for clearing browser data like WebSQL or IndexedDB? -->
 		<div class="button-clear">
 			<div @click="clear.localStorage">
