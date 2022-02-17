@@ -5,7 +5,7 @@
 	</div>
 	<div class="menu">
 		<div class="item" @click="run" title="Execute (Ctrl + Enter)"><i class="fa fa-play"></i></div>
-		<div class="item" @click="Modal.hide()" title="Minimize"><i class="fa fa-window-minimize"></i></div>
+		<!-- <div class="item" @click="Modal.hide()" title="Minimize"><i class="fa fa-window-minimize"></i></div> -->
 		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
 	</div>
 </sf-m>
@@ -105,6 +105,6 @@ sf.model('custom-node-editor', function(My){
 		// My.editor = null;
 		// modal.goto('/');
 
-		My.container.find('.bp-loading-status').css('display', '');
+		// My.container.find('.bp-loading-status').css('display', '');
 	}
 });
