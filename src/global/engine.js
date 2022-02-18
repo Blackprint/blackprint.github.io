@@ -1,5 +1,6 @@
 // New engine instance (separated from the editor) that can be accessed from the console
 let engine = new Blackprint.Engine();
+window.engine = engine;
 
 console.log("-- Do you want to run a sample for engine-js?");
 console.log("-- Call engineTest() from this console");
