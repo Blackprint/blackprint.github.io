@@ -105,8 +105,8 @@ sf.component('sketch-page', function(My){
 		My.cloneActive = !My.cloneActive;
 
 		if(My.cloneActive){
-			if(My.switchVFXActive === false)
-				My.switchVFX();
+			if(My.disableVFXActive === false)
+				My.disableVFX();
 
 			// Reset current container view
 			var container = sketch.scope('container');

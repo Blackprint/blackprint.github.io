@@ -146,6 +146,24 @@ var EditorHeader = sf.model('header', function(My, include){
 					Modal.goto('/example-list');
 				}
 			}, {
+				title: 'Remote Engine',
+				icon: 'fa fa-plug',
+				disabled: true,
+				async callback(){
+					if(location.hostname !== 'localhost')
+						return SmallNotif.add("Still work in progress");
+
+					await engineTest();
+
+					setTimeout(()=> {
+						let server = new Blackprint.RemoteEngineServer(window.engine);
+						let client = new Blackprint.RemoteEngineClient(window.SketchList[0]);
+
+						client.onSyncOut = v => server.onSyncIn(v);
+						server.onSyncOut = v => client.onSyncIn(v);
+					}, 1000);
+				}
+			},{
 				title: 'Reload',
 				icon: 'fa fa-sync',
 				async callback(){
@@ -243,17 +261,19 @@ var EditorHeader = sf.model('header', function(My, include){
 		My.cloneActive = sketch.page.cloneActive;
 	}
 
-	My.switchVFXActive = false;
-	My.switchVFX = function(){
-		My.switchVFXActive = !My.switchVFXActive;
+	My.disableVFXActive = false;
+	My.disableVFX = function(){
+		My.disableVFXActive = !My.disableVFXActive;
 
-		if(My.switchVFXActive){
+		if(My.disableVFXActive)
 			$('body').addClass('blackprint-no-vfx');
-			My.visualizeActive = false;
-			Blackprint.settings('visualizeFlow', false);
-		}
 		else $('body').removeClass('blackprint-no-vfx');
+
+		localStorage.disableVFXActive = My.disableVFXActive ? '1' : '0';
 	}
+
+	if(localStorage.disableVFXActive === '1' && My.disableVFXActive === false)
+		My.disableVFX();
 
 	My.visualizeActive = true;
 	My.visualizeFlow = function(){

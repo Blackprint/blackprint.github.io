@@ -29,7 +29,7 @@ For adding library or style, please modify /public/index.html
 				<div class="module-counter">{{ _loadedModuleURL.length }}</div>
 			</div>
 			<div class="item {{ cloneActive ? 'active' : '' }}" @click="cloneContainer" title="Show the minimap and open new window"><i class='fa fa-window-restore'></i></div>
-			<div class="item {{ switchVFXActive ? 'active' : '' }}" @click="switchVFX" title="Improve performance by disable VFX"><i class="fas fa-rocket"></i></div>
+			<div class="item {{ disableVFXActive ? 'active' : '' }}" @click="disableVFX" title="Improve performance by disable VFX"><i class="fas fa-rocket"></i></div>
 			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize data flow"><i class="fas fa-bezier-curve"></i></div>
 		</div>
 		<div class="header-zoom">
