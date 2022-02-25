@@ -146,24 +146,6 @@ var EditorHeader = sf.model('header', function(My, include){
 					Modal.goto('/example-list');
 				}
 			}, {
-				title: 'Remote Engine',
-				icon: 'fa fa-plug',
-				disabled: true,
-				async callback(){
-					if(location.hostname !== 'localhost')
-						return SmallNotif.add("Still work in progress");
-
-					await engineTest();
-
-					setTimeout(()=> {
-						let server = new Blackprint.RemoteEngineServer(window.engine);
-						let client = new Blackprint.RemoteEngineClient(window.SketchList[0]);
-
-						client.onSyncOut = v => server.onSyncIn(v);
-						server.onSyncOut = v => client.onSyncIn(v);
-					}, 1000);
-				}
-			},{
 				title: 'Reload',
 				icon: 'fa fa-sync',
 				async callback(){
@@ -194,24 +176,71 @@ var EditorHeader = sf.model('header', function(My, include){
 					Modal.goto('/custom-node-editor');
 				}
 			}, {
-				title: (function(){
-					if(sf.hotReload === void 0)
-						return "Development Mode";
+				title: 'Loaded module',
+				icon: 'fa fa-boxes',
+				callback(){
+					Modal.goto('/module-url');
+				}
+			}]
+		}, {
+			title: 'Remote',
+			icon: 'fa fa-plug',
+			deep:[{
+				title: 'Sketch',
+				icon: 'fa fa-plug',
+				disabled: true,
+				async callback(){
+					if(location.hostname !== 'localhost')
+						return SmallNotif.add("Still work in progress");
 
+						window.win = window.open('http://localhost:6789/dev.html#page/sketch/1', 'ay', 'popup');
+
+						win.onclick = function(){
+							win.onclick = null;
+							win.ins = new win.Blackprint.RemoteSketch(win.SketchList[0]);
+							win.onmessage = function(msg){ win.ins.onSyncIn(msg.data) };
+							win.console.log = console.log;
+							win.console.error = console.error;
+							win.ins.onSyncOut = v => win.opener.postMessage(v);
+
+							let ins = new Blackprint.RemoteSketch(SketchList[0]);
+							window.onmessage = function(msg){ ins.onSyncIn(msg.data) };
+							window.onbeforeunload = ()=> win.close();
+							ins.onSyncOut = v => win.postMessage(v);
+						}
+				}
+			}, {
+				title: 'Engine',
+				icon: 'fa fa-plug',
+				disabled: true,
+				async callback(){
+					if(location.hostname !== 'localhost')
+						return SmallNotif.add("Still work in progress");
+
+					await engineTest();
+
+					setTimeout(()=> {
+						let server = new Blackprint.RemoteEngineServer(window.engine);
+						let client = new Blackprint.RemoteEngineClient(window.SketchList[0]);
+
+						client.onSyncOut = v => server.onSyncIn(v);
+						server.onSyncOut = v => client.onSyncIn(v);
+					}, 1000);
+				}
+			}, {
+				title: (function(){
 					if(window.___browserSync___ === void 0)
-						return "Connect to module server";
+						return "Module server";
 
 					let socket = ___browserSync___.socket;
 					let isConnected = socket.connected;
 					let isDefault = socket.io.uri.indexOf(location.origin) === 0;
 
-					return (!isConnected || isDefault ? "Connect to" : "Disconnect from")+' module server';
+					return 'Module server '+(!isConnected || isDefault ? "" : "✔️");
 				})(),
 				icon: 'fa fa-plug',
+				hide: sf.hotReload === void 0,
 				callback(){
-					if(sf.hotReload === void 0)
-						return location.pathname = '/dev.html';
-
 					if(window.___browserSync___){
 						let socket = ___browserSync___.socket;
 						let isConnected = socket.connected;
@@ -223,18 +252,19 @@ var EditorHeader = sf.model('header', function(My, include){
 
 					Modal.goto('/dev-mode');
 				}
-			}, {
-				title: 'Loaded module',
-				icon: 'fa fa-boxes',
-				callback(){
-					Modal.goto('/module-url');
-				}
 			}]
 		}, {
 			title: 'Environment',
 			icon: 'fa fa-key',
 			callback(){
 				Modal.goto('/environment-variables');
+			}
+		}, {
+			title: 'Development Mode',
+			icon: 'fa fa-tools',
+			hide: sf.hotReload !== void 0,
+			callback(){
+				location.pathname = '/dev.html';
 			}
 		}, {
 			title: 'Settings',
