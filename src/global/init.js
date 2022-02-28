@@ -1,5 +1,4 @@
 $(function(){
-
 	// Fix for Telegram who encode the URL after the hashtag
 	if((location.hash.includes('%23'))){
 		location.hash = decodeURIComponent(location.hash)
@@ -21,4 +20,18 @@ $(function(){
 			sf.model('header').disableVFX();
 		}
 	}, 100);
+
+	$(sf.Window).on('resize', ev => {
+		let height = ev.target.innerHeight;
+		let width = ev.target.innerWidth;
+
+		for (var i = 0; i < SketchList.length; i++) {
+			let container = SketchList[i].scope('container');
+			if(container.origSize.h < height)
+				container.origSize.h = container.size.h = height;
+
+			if(container.origSize.w < width)
+				container.origSize.w = container.size.w = width;
+		}
+	});
 });
