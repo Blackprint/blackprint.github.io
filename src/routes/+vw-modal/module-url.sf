@@ -1,50 +1,52 @@
 ## html
-<sf-m name="module-url">
-	<div class="head">
-		<div class="row url">Shortened Module URL</div>
-		<div class="row nodes">Nodes</div>
-		<div class="row actions">Actions</div>
-	</div>
-	<div class="content">
-		<div>
-			<div class="row" sf-each="x in list">
-				<div class="column url"><div>
-					<b>{{ shortenLink(x._url, 'host') }}</b>
-					{{ shortenLink(x._url, 'path') }}
-					<b>{{ shortenLink(x._url, 'search') }}</b>
-					<a title="Right click to copy link address, click to open on new tab" target="_blank" href="{{x._url}}"><i class="fa fa-link"></i></a>
-				</div></div>
-				<div class="column nodes">
-					{{ x._nodeLength }}
-				</div>
-				<div class="column actions">
-					<button title="Show this module on dropdown/module list" @click="hideFromURL(x)">
-						 <i class="fa fa-list"></i>
-						 <i class="fa fa-slash" style="
-						    position: absolute;
-						    margin-left: -15px;
-						    display: {{ x._hidden ? 'inline-block' : 'none' }}
-						"></i>
-					</button>
-					<button title="Reload this module again from URL" @click="reloadURL(x)">
-						<i class="fa fa-sync"></i>
-					</button>
-					<button title="Remove any related nodes and also remove this module" @click="deleteFromURL(x)">
-						<i class="fa fa-trash"></i>
-					</button>
+<div style="height:70vh">
+	<sf-m name="module-url">
+		<div class="head">
+			<div class="row url">Shortened Module URL</div>
+			<div class="row nodes">Nodes</div>
+			<div class="row actions">Actions</div>
+		</div>
+		<div class="content">
+			<div>
+				<div class="row" sf-each="x in list">
+					<div class="column url"><div>
+						<b>{{ shortenLink(x._url, 'host') }}</b>
+						{{ shortenLink(x._url, 'path') }}
+						<b>{{ shortenLink(x._url, 'search') }}</b>
+						<a title="Right click to copy link address, click to open on new tab" target="_blank" href="{{x._url}}"><i class="fa fa-link"></i></a>
+					</div></div>
+					<div class="column nodes">
+						{{ x._nodeLength }}
+					</div>
+					<div class="column actions">
+						<button title="Show this module on dropdown/module list" @click="hideFromURL(x)">
+							 <i class="fa fa-list"></i>
+							 <i class="fa fa-slash" style="
+							    position: absolute;
+							    margin-left: -15px;
+							    display: {{ x._hidden ? 'inline-block' : 'none' }}
+							"></i>
+						</button>
+						<button title="Reload this module again from URL" @click="reloadURL(x)">
+							<i class="fa fa-sync"></i>
+						</button>
+						<button title="Remove any related nodes and also remove this module" @click="deleteFromURL(x)">
+							<i class="fa fa-trash"></i>
+						</button>
+					</div>
 				</div>
 			</div>
+			<div class="row">
+				<input class="column url-input" type="text" @keyup.Enter="addURL()" sf-bind="newURL" placeholder="Add module from URL here... (Then press enter)">
+			</div>
 		</div>
-		<div class="row">
-			<input class="column url-input" type="text" @keyup.Enter="addURL()" sf-bind="newURL" placeholder="Add module from URL here... (Then press enter)">
+		<div class="menu">
+			<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
+			<div class="item" @click="npmList" title="Search from NPM"><i class="fa fa-book-open"></i></div>
+			<div class="item" @click="loadCachedList" style="{{ firstInit ? '' : 'display: none' }}" title="Load cached list"><i class="fa fa-boxes"></i></div>
 		</div>
-	</div>
-	<div class="menu">
-		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
-		<div class="item" @click="npmList" title="Search from NPM"><i class="fa fa-book-open"></i></div>
-		<div class="item" @click="loadCachedList" style="{{ firstInit ? '' : 'display: none' }}" title="Load cached list"><i class="fa fa-boxes"></i></div>
-	</div>
-</sf-m>
+	</sf-m>
+</div>
 
 ## scss-global
 sf-m[name="module-url"] {
@@ -254,6 +256,9 @@ let _editorModuleURL = sf.model('module-url', function(My){
 		else if(item._url.includes('?'))
 			item._url = item._url.replace(/\?.*?$/m, '')+'?1';
 		else item._url += '?1';
+
+		for (var i = 0; i < SketchList.length; i++)
+			SketchList[i]._remote?.syncModuleList();
 
 		Blackprint.loadModuleFromURL(item._url);
 	}
