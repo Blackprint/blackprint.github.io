@@ -43,6 +43,7 @@ window.addEventListener('error', function(e){
 	message = message.replace('Uncaught ', '');
 
 	SmallNotif.add(message, 'red');
+	console.error(e);
 });
 
 window.addEventListener('onunhandledrejection', function(e){
@@ -50,4 +51,5 @@ window.addEventListener('onunhandledrejection', function(e){
 	message = message.replace('Uncaught ', '');
 
 	SmallNotif.add(message, 'red');
+	console.error(e);
 });
