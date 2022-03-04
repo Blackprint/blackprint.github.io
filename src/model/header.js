@@ -190,12 +190,18 @@ var EditorHeader = sf.model('header', function(My, include){
 				title: 'Sketch' + (sf.model('modal-remote-sketch-connect').socket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
 				async callback(){
+					let socket = sf.model('modal-remote-sketch-connect').socket;
+					if(socket?.connected) socket.disconnect();
+
 					Modal.goto('/remote-sketch-connect');
 				}
 			}, {
 				title: 'Engine' + (sf.model('modal-remote-engine-connect').socket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
 				async callback(){
+					let socket = sf.model('modal-remote-engine-connect').socket;
+					if(socket?.connected) socket.disconnect();
+
 					Modal.goto('/remote-engine-connect');
 				}
 			}, {
