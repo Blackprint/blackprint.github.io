@@ -1,0 +1,135 @@
+## html
+<sf-m name="modal-remote-sketch-connect">
+	<div class="description">Please set the remote sketch's relay URL</div>
+	<div class="note" style="display: {{ url === '' || url === placeholder ? 'none':'' }}" @click="connectDefault">(Click here to connect to default localhost server)</div>
+	<div class="text-input">
+		<input placeholder="{{ placeholder }}" type="text" sf-bind="url" @keyup.Enter="changeServer">
+	</div>
+	<div class="button-import" @click="changeServer">Connect</div>
+</sf-m>
+
+## scss-global
+sf-m[name="modal-remote-sketch-connect"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	.description{
+		padding: 10px;
+		color: white;
+	}
+	.note{
+		text-align: center;
+		font-size: 12px;
+		padding: 0;
+		color: gray;
+		margin-top: -10px;
+		cursor: pointer;
+	}
+	.text-input{
+		padding: 10px;
+		position: relative;
+		display: flex;
+
+		input{
+			width: 100%;
+			border: 1px solid black;
+			background: #161616;
+			padding: 5px;
+			color: white;
+			outline: none;
+		}
+	}
+	.button-import{
+		position: relative;
+		border-radius: 10px;
+		background: #125c15;
+		border: 1px solid #65a122;
+		margin: 0 auto 5px auto;
+		width: 120px;
+		padding: 7px 10px;
+		text-align: center;
+		cursor: pointer;
+		color: white;
+		&:hover{
+			background: #65a122;
+			box-shadow: 0 0 9px #c6ebbd;
+		}
+	}
+}
+
+## js-global.router
+={
+	on:{
+		coming(){
+			setTimeout(()=> {
+				sf.model('modal-remote-sketch-connect').$el('input').focus();
+			}, 500);
+		},
+		showed(){
+			setTimeout(()=> {
+				sf.model('modal-remote-sketch-connect').$el('input').focus();
+			}, 100);
+		},
+	}
+}
+
+## js-global
+sf.model('modal-remote-sketch-connect', function(My){
+	My.url = localStorage.BPSketchRelayServer ??= "";
+	My.placeholder = 'http://localhost:2345';
+	My.allowModuleSync = true;
+	My.allowRemoteImport = true;
+	My.allowDataOutSync = true;
+	My.client = true;
+	My.socket = true;
+
+	My.connectDefault = function(){
+		localStorage.BPSketchRelayServer = My.url = "";
+		My.changeServer();
+	}
+
+	My.changeServer = async function(){
+		let url = My.url;
+
+		if(window.io == null)
+			await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
+
+		let instance = window.SketchList[0];
+		let client = My.client ??= new Blackprint.RemoteSketch(instance);
+		My.client.enable?.();
+
+		// Allow import/module sync
+		client.onImport = v=> My.allowRemoteImport;
+		client.onModule = v=> My.allowModuleSync;
+		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
+
+		My.socket?.destroy();
+		let socket = My.socket = io(url);
+
+		socket.on('relay', client.onSyncIn);
+		client.onSyncOut = v => socket.volatile.emit('relay', v);
+
+		setTimeout(()=> {
+			if(socket.connected) return;
+			console.log("Failed to connect to sketch's relay server:", url);
+			SmallNotif.add("Failed to connect to sketch's relay server", "red");
+			socket.disconnect();
+			socket.off('connect', onConnected);
+		}, 8000);
+
+		socket.on('disconnect', ()=> SmallNotif.add("Disconnected from relay server"));
+		socket.on('connect', function(){
+			console.log("Connected to sketch's relay server:", url);
+			SmallNotif.add("Connected to sketch's relay server", "green");
+			localStorage.BPSketchRelayServer = url;
+		});
+
+		if(Modal.showed) Modal.hide();
+	}
+
+	if(My.url !== ''){
+		$(() => setTimeout(()=> My.changeServer(), 200));
+	}
+});

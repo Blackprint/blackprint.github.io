@@ -187,92 +187,16 @@ var EditorHeader = sf.model('header', function(My, include){
 			icon: 'fa fa-plug',
 			hide: sf.hotReload === void 0,
 			deep:[{
-				title: 'Sketch',
+				title: 'Sketch' + (sf.model('modal-remote-sketch-connect').socket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
-				disabled: true,
 				async callback(){
-					if(location.hostname !== 'localhost')
-						return SmallNotif.add("Still work in progress");
-
-					if(0){
-						window.win = window.open('http://localhost:6789/dev.html#page/sketch/1', 'ay', 'popup');
-
-						win.onclick = function(){
-							win.onclick = null;
-							win.ins = new win.Blackprint.RemoteSketch(win.SketchList[0]);
-							win.onmessage = function(msg){ win.ins.onSyncIn(msg.data) };
-							win.console.log = console.log;
-							win.console.error = console.error;
-							win.onunhandledrejection = (v)=>console.error(v.reason);
-							win.onerror = console.error;
-							win.ins.onSyncOut = v => win.opener.postMessage(v);
-							win.ins.on('disabled', ()=> win.SmallNotif.add("Remote sync was disabled", 'red'));
-
-							// Allow import/module sync
-							win.ins.onImport = v=> true;
-							win.ins.onModule = v=> true;
-
-
-							let ins = new Blackprint.RemoteSketch(SketchList[0]);
-							window.onmessage = function(msg){ ins.onSyncIn(msg.data) };
-							window.onbeforeunload = ()=> win.close();
-							ins.onSyncOut = v => win.postMessage(v);
-							ins.on('disabled', ()=> window.SmallNotif.add("Remote sync was disabled", 'red'));
-
-							// Allow import/module sync
-							ins.onImport = v=> true;
-							ins.onModule = v=> true;
-						}
-					}
-					else {
-						if(window.io == null)
-							await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
-
-						let client = new Blackprint.RemoteSketch(SketchList[0]);
-
-						let socket = io("ws://localhost:2345");
-						socket.on('connect', ()=> SmallNotif.add("Connected to relay server"));
-						socket.on('disconnect', ()=> SmallNotif.add("Disconnected from relay server"));
-
-						socket.on('relay', client.onSyncIn);
-						client.onSyncOut = v => socket.emit('relay', v);
-					}
+					Modal.goto('/remote-sketch-connect');
 				}
 			}, {
-				title: 'Engine',
+				title: 'Engine' + (sf.model('modal-remote-engine-connect').socket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
-				disabled: true,
 				async callback(){
-					if(location.hostname !== 'localhost')
-						return SmallNotif.add("Still work in progress");
-
-					let instance = window.SketchList[0];
-					let client = new Blackprint.RemoteControl(instance);
-
-					if(0){
-						let server = new Blackprint.RemoteEngine(window.engine);
-
-						// Allow import/module sync
-						server.onImport = v=> true;
-						server.onModule = v=> true;
-
-						client.onSyncOut = v => server.onSyncIn(v);
-						server.onSyncOut = v => client.onSyncIn(v);
-					}
-					else {
-						if(window.io == null)
-							await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
-
-						let socket = io("ws://localhost:2345");
-						socket.on('connect', ()=> SmallNotif.add("Connected to remote engine"));
-						socket.on('disconnect', ()=> SmallNotif.add("Disconnected from remote engine"));
-
-						// instance.syncDataOut = false;
-						instance.disablePorts = true;
-
-						socket.on('relay', v => client.onSyncIn(v));
-						client.onSyncOut = v => socket.emit('relay', v);
-					}
+					Modal.goto('/remote-engine-connect');
 				}
 			}, {
 				title: (function(){

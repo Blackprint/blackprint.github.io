@@ -80,12 +80,6 @@ sf.model('modal-dev-mode', function(My){
 	My.url = localStorage.BPModuleServer ??= "";
 	My.placeholder = location.origin;
 
-	// Automatically move to development mode
-	if(location.hostname === 'localhost' && location.pathname !== "/dev.html"){
-		location.pathname = "/dev.html";
-		return;
-	}
-
 	My.connectDefault = function(){
 		localStorage.BPModuleServer = My.url = "";
 		My.changeServer();
