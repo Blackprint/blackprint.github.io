@@ -77,21 +77,22 @@ sf-m[name="modal-remote-engine-connect"] {
 
 ## js-global
 sf.model('modal-remote-engine-connect', function(My){
-	My.url = localStorage.BPSketchRelayServer ??= "";
+	My.url = localStorage.BPRemoteEngine ??= "";
 	My.placeholder = 'http://localhost:2345';
 	My.allowModuleSync = true;
 	My.allowRemoteImport = true;
 	My.allowDataOutSync = true;
-	My.client = true;
-	My.socket = true;
+	My.client = null;
+	My.socket = null;
 
 	My.connectDefault = function(){
-		localStorage.BPSketchRelayServer = My.url = "";
+		localStorage.BPRemoteEngine = My.url = "";
 		My.changeServer();
 	}
 
 	My.changeServer = async function(){
 		let url = My.url;
+		if(!url) url = My.placeholder;
 
 		if(window.io == null)
 			await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
@@ -104,7 +105,7 @@ sf.model('modal-remote-engine-connect', function(My){
 		let socket = My.socket = io(url);
 
 		socket.on('startup-time', time => {
-			if(Date.now() - time < 10e3) // lower than 10 sec
+			if((Date.now() - time) < 10e3) // younger than 10 sec
 				client.sendSketchToRemote();
 			else {
 				client.importRemoteJSON();
@@ -135,15 +136,14 @@ sf.model('modal-remote-engine-connect', function(My){
 			if(socket.connected) return;
 			console.log("Failed to connect to remote engine:", url);
 			SmallNotif.add("Failed to connect to remote engine", "red");
-			socket.disconnect();
-			socket.off('connect', onConnected);
+			socket.destroy();
 		}, 8000);
 
 		socket.on('disconnect', ()=> SmallNotif.add("Disconnected from remote engine"));
 		socket.on('connect', function(){
 			console.log("Connected to remote engine:", url);
 			SmallNotif.add("Connected to remote engine", "green");
-			localStorage.BPSketchRelayServer = url;
+			localStorage.BPRemoteEngine = url;
 		});
 	}
 

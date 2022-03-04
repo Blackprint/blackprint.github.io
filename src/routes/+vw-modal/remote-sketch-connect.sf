@@ -82,8 +82,8 @@ sf.model('modal-remote-sketch-connect', function(My){
 	My.allowModuleSync = true;
 	My.allowRemoteImport = true;
 	My.allowDataOutSync = true;
-	My.client = true;
-	My.socket = true;
+	My.client = null;
+	My.socket = null;
 
 	My.connectDefault = function(){
 		localStorage.BPSketchRelayServer = My.url = "";
@@ -115,8 +115,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 			if(socket.connected) return;
 			console.log("Failed to connect to sketch's relay server:", url);
 			SmallNotif.add("Failed to connect to sketch's relay server", "red");
-			socket.disconnect();
-			socket.off('connect', onConnected);
+			socket.destroy();
 		}, 8000);
 
 		socket.on('disconnect', ()=> SmallNotif.add("Disconnected from relay server"));

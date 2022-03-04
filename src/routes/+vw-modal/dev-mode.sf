@@ -87,7 +87,7 @@ sf.model('modal-dev-mode', function(My){
 
 	My.changeServer = async function(){
 		let url = My.url;
-		if(!url) url = location.origin;
+		if(!url) url = My.placeholder;
 		// url = 'http://localhost:6791';
 
 		let _url = url;
