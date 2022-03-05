@@ -34,4 +34,10 @@ $(function(){
 				container.origSize.w = container.size.w = width;
 		}
 	});
+
+	// Auto switch to dev mode when being used on localhost
+	$(function(){
+		if(location.hostname === 'localhost' && !location.pathname.includes('/dev.html'))
+			location.pathname = '/dev.html';
+	});
 });
