@@ -128,7 +128,7 @@ sf.model('modal-remote-engine-connect', function(My){
 		client.onModule = v=> My.allowModuleSync;
 
 		socket.on('relay', v => client.onSyncIn(v));
-		client.onSyncOut = v => socket.volatile.emit('relay', v);
+		client.onSyncOut = v => socket.emit('relay', v);
 
 		if(Modal.showed) Modal.hide();
 
