@@ -147,7 +147,7 @@ sf.model('modal-remote-engine-connect', function(My){
 		});
 	}
 
-	if(My.url !== ''){
+	if(My.url !== '' && Blackprint.RemoteControl != null){
 		$(() => setTimeout(()=> My.changeServer(), 200));
 	}
 });

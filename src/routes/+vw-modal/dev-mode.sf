@@ -165,8 +165,6 @@ sf.model('modal-dev-mode', function(My){
 	}
 
 	if(My.url !== '' && sf.hotReload !== void 0){
-		$(function(){
-			setTimeout(()=> My.changeServer(), 200);
-		});
+		$(()=> setTimeout(()=> My.changeServer(), 200));
 	}
 });

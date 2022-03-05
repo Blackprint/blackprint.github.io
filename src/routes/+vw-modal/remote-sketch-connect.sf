@@ -128,7 +128,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		if(Modal.showed) Modal.hide();
 	}
 
-	if(My.url !== ''){
+	if(My.url !== '' && Blackprint.RemoteSketch != null){
 		$(() => setTimeout(()=> My.changeServer(), 200));
 	}
 });
