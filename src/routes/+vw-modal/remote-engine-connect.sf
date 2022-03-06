@@ -90,7 +90,8 @@ sf.model('modal-remote-engine-connect', function(My){
 		My.changeServer();
 	}
 
-	My.changeServer = async function(){
+	let isConnectOnStartup = false;
+	My.changeServer = async function(clearOnFail){
 		let url = My.url;
 		if(!url) url = My.placeholder;
 
@@ -137,6 +138,10 @@ sf.model('modal-remote-engine-connect', function(My){
 			console.log("Failed to connect to remote engine:", url);
 			SmallNotif.add("Failed to connect to remote engine", "red");
 			socket.destroy();
+
+			// Unset the value if this was failing on startup time
+			if(clearOnFail)
+				localStorage.BPRemoteEngine = "";
 		}, 8000);
 
 		socket.on('disconnect', ()=> SmallNotif.add("Disconnected from remote engine"));
@@ -148,6 +153,6 @@ sf.model('modal-remote-engine-connect', function(My){
 	}
 
 	if(My.url !== '' && Blackprint.RemoteControl != null){
-		$(() => setTimeout(()=> My.changeServer(), 200));
+		$(() => setTimeout(()=> My.changeServer(true), 200));
 	}
 });

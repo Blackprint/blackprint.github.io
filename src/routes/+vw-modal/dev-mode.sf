@@ -85,7 +85,7 @@ sf.model('modal-dev-mode', function(My){
 		My.changeServer();
 	}
 
-	My.changeServer = async function(){
+	My.changeServer = async function(clearOnFail){
 		let url = My.url;
 		if(!url) url = My.placeholder;
 		// url = 'http://localhost:6791';
@@ -116,6 +116,10 @@ sf.model('modal-dev-mode', function(My){
 			SmallNotif.add("Failed to connect to Blackprint module server", "red");
 			socket.disconnect();
 			socket.off('connect', onConnected);
+
+			// Unset the value if this was failing on startup time
+			if(clearOnFail)
+				localStorage.BPModuleServer = "";
 		}, 8000);
 
 		function onConnected(){
@@ -165,6 +169,6 @@ sf.model('modal-dev-mode', function(My){
 	}
 
 	if(My.url !== '' && sf.hotReload !== void 0){
-		$(()=> setTimeout(()=> My.changeServer(), 200));
+		$(() => setTimeout(()=> My.changeServer(true), 200));
 	}
 });

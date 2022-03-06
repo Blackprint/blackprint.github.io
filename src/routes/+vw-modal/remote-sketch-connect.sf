@@ -90,7 +90,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		My.changeServer();
 	}
 
-	My.changeServer = async function(){
+	My.changeServer = async function(clearOnFail){
 		let url = My.url;
 
 		if(window.io == null)
@@ -116,6 +116,10 @@ sf.model('modal-remote-sketch-connect', function(My){
 			console.log("Failed to connect to sketch's relay server:", url);
 			SmallNotif.add("Failed to connect to sketch's relay server", "red");
 			socket.destroy();
+
+			// Unset the value if this was failing on startup time
+			if(clearOnFail)
+				localStorage.BPSketchRelayServer = '';
 		}, 8000);
 
 		socket.on('disconnect', ()=> SmallNotif.add("Disconnected from relay server"));
@@ -129,6 +133,6 @@ sf.model('modal-remote-sketch-connect', function(My){
 	}
 
 	if(My.url !== '' && Blackprint.RemoteSketch != null){
-		$(() => setTimeout(()=> My.changeServer(), 200));
+		$(() => setTimeout(()=> My.changeServer(true), 200))
 	}
 });
