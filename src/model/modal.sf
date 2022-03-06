@@ -60,7 +60,7 @@ var Modal = sf.model('modal', function(My){
 
 	My.hide = function(){
 		My.showed = false;
-		My.$el('.modal-dialog').off('pointerup', My.hide, {outside: true});
+		My.$el('.modal-dialog').off('pointerdown', My.hide, {outside: true});
 	}
 
 	My.goto = function(path){
@@ -68,7 +68,7 @@ var Modal = sf.model('modal', function(My){
 		My.showed = true;
 
 		setTimeout(()=> {
-			My.$el('.modal-dialog').on('pointerup', My.hide, {outside: true});
+			My.$el('.modal-dialog').on('pointerdown', My.hide, {outside: true});
 		}, 400);
 	}
 });
