@@ -38,6 +38,10 @@ BlackprintEventFallback.error.types = {
 	},
 };
 
+Blackprint.on('error', {slot: 'bp-editor'}, function(ev){
+	SmallNotif.add(ev.message, 'red');
+});
+
 window.addEventListener('error', function(e){
 	let message = e.message || "Something went wrong..";
 	message = message.replace('Uncaught ', '');
