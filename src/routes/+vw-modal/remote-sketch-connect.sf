@@ -108,7 +108,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		My.socket?.destroy();
 		let socket = My.socket = io(url);
 
-		socket.on('relay', client.onSyncIn);
+		socket.on('relay', v => client.onSyncIn(v));
 		client.onSyncOut = v => socket.emit('relay', v);
 
 		setTimeout(()=> {

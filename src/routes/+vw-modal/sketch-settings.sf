@@ -9,6 +9,10 @@
 				<option value="darker">Darker</option>
 			</select>
 		</div>
+		<div class="item">
+			<div class="title">Background:</div>
+			<input type="text" sf-bind="background" placeholder="https://...">
+		</div>
 	</div>
 </sf-m>
 
@@ -37,7 +41,7 @@ sf-m[name="sketch-settings"] {
 				display: inline;
 				margin-right: 10px;
 			}
-			select{
+			select, input{
 				background: black;
 				border: none;
 				color: white;
@@ -56,4 +60,15 @@ sf.model('sketch-settings', function(My){
 			.removeClass('node-ui-'+My.theme)
 			.addClass('node-ui-'+now);
 	}
+
+	My.background = localStorage.bpBackgroundURL || '';
+	My.on$background = function(now){
+		$('body > .background > .img')
+			.css('background-image', "url('"+now+"')")
+			.css('background-size', "100%");
+
+		localStorage.bpBackgroundURL = now;
+	}
+
+	if(My.background) My.on$background(My.background);
 });
