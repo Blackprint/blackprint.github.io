@@ -64,7 +64,7 @@ sf.model('sketch-settings', function(My){
 	My.background = localStorage.bpBackgroundURL || '';
 	My.on$background = function(now){
 		$('body > .background > .img')
-			.css('background-image', "url('"+now+"')")
+			.css('background-image', "url('"+(now || '/assets/img/background/black3.jpg')+"')")
 			.css('background-size', "100%");
 
 		localStorage.bpBackgroundURL = now;
