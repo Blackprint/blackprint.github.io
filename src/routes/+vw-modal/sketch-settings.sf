@@ -13,6 +13,10 @@
 			<div class="title">Background:</div>
 			<input type="text" sf-bind="background" placeholder="https://...">
 		</div>
+		<div class="item">
+			<div class="title">Hide unused port</div>
+			<input type="checkbox" sf-bind="hideUnusedPort">
+		</div>
 	</div>
 </sf-m>
 
@@ -68,6 +72,20 @@ sf.model('sketch-settings', function(My){
 			.css('background-size', "100%");
 
 		localStorage.bpBackgroundURL = now;
+	}
+
+	My.hideUnusedPort = localStorage.bpHideUnusedPort == 'true' || false;
+	My.on$hideUnusedPort = function(now){
+		for (var i = 0; i < SketchList.length; i++) {
+			let container = SketchList[i].scope('container');
+			container.hideUnusedPort = now;
+
+			let nodes = container.nodeScope.list;
+			for (var a = 0; a < nodes.length; a++)
+				nodes[a].hideUnusedPort = now;
+		}
+
+		localStorage.bpHideUnusedPort = now;
 	}
 
 	if(My.background) My.on$background(My.background);

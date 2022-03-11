@@ -85,6 +85,8 @@ sf.component('sketch-page', function(My){
 	let container = sketch.scope('container');
 	let header = sf.model('header');
 
+	container.hideUnusedPort = sf.model('sketch-settings').hideUnusedPort;
+
 	container.onScale = function(scale){
 		header.info.scale = Math.round(scale * 100);
 	}
