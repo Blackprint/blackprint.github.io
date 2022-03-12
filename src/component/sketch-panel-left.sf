@@ -9,11 +9,15 @@
 sketch-page > .panels sketch-panel-left {
 	position: absolute;
 	display: none; // ToDO: remove me
+	// display: flex;
 	left: 0;
 	width: 200px;
 	height: 100%;
 	transform: translate(-190px, 0);
 	transition: 0.3s ease-out transform;
+	// position: relative;
+	background: #00000085;
+	align-items: center;
 	.content {
 		visibility: hidden;
 	}

@@ -78,27 +78,6 @@ body > .background {
 	}
 }
 
-.sketch-mode{
-	.header-left{
-		cursor: pointer;
-		i.menu-button-hint{
-			display: block;
-		}
-	}
-	.header-menu{
-		display: inherit;
-	}
-}
-
-.large-header{
-	vw-ground{
-		height: calc(100vh - 86px);
-	}
-	.header .header-left div{
-		display: block;
-	}
-}
-
 vw-ground{
 	position: absolute;
 	overflow: hidden;
@@ -108,7 +87,7 @@ vw-ground{
 	width: 100vw;
 }
 
-body > .header{
+body > .header {
 	z-index: 1;
 	backdrop-filter: blur(5px);
 	position: relative;
@@ -154,81 +133,102 @@ body > .header{
 		padding: 10px;
 		height: 24px;
 	}
-}
 
-.header-menu{
-	display: none;
-	.item-list{
-		display: flex;
-		position: absolute;
-		right: 0px;
-		top: 12px;
-		font-size: 22px;
-		.item{
-			padding: 0 10px;
+	&.sketch-mode{
+		.header-left{
 			cursor: pointer;
-			position: relative;
-
-			&.active{
-				color: white;
-			}
-
-			.module-counter {
-				position: absolute;
-				bottom: 0;
-				right: 0;
-				font-size: 10px;
-				color: black;
-				background: #ffffffde;
-				box-shadow: 0 0 6px white;
-				border-radius: 100%;
-				padding: 2px 3px 2px 4px;
-				text-align: center;
-				font-weight: bold;
-				height: 12px;
-				min-width: 10px;
+			i.menu-button-hint{
+				display: block;
 			}
 		}
-	}
-	.header-zoom{
-		position: absolute;
-		right: 10px;
-		color: white;
-		opacity: 0.8;
-		top: 50px;
-		font-size: 22px;
-	}
-}
-
-.header-center{
-	.item-list{
-		display: flex;
-		position: absolute;
-		top: 12px;
-		font-size: 22px;
-		.item{
-			padding: 0 10px;
-			cursor: pointer;
-
-			&.active{
-				color: white;
-			}
+		.header-menu{
+			display: inherit;
 		}
 	}
-}
 
-@media(max-width: 900px){
-	.header-center div {
+	.header-menu{
 		display: none;
+		.item-list{
+			display: flex;
+			position: absolute;
+			right: 0px;
+			top: 12px;
+			font-size: 22px;
+			.item{
+				padding: 0 10px;
+				cursor: pointer;
+				position: relative;
+
+				&.active{
+					color: white;
+				}
+
+				.module-counter {
+					position: absolute;
+					bottom: 0;
+					right: 0;
+					font-size: 10px;
+					color: black;
+					background: #ffffffde;
+					box-shadow: 0 0 6px white;
+					border-radius: 100%;
+					padding: 2px 3px 2px 4px;
+					text-align: center;
+					font-weight: bold;
+					height: 12px;
+					min-width: 10px;
+				}
+			}
+		}
+		.header-zoom{
+			position: absolute;
+			right: 10px;
+			color: white;
+			opacity: 0.8;
+			top: 50px;
+			font-size: 22px;
+		}
 	}
 
-	sf-m[name="modal"]{
-		overflow: scroll;
+	.header-center{
+		.item-list{
+			display: flex;
+			position: absolute;
+			top: 12px;
+			font-size: 22px;
+			.item{
+				padding: 0 10px;
+				cursor: pointer;
+
+				&.active{
+					color: white;
+				}
+			}
+		}
+	}
+
+	@media(max-width: 900px){
+		.header-center div {
+			display: none;
+		}
+
+		sf-m[name="modal"]{
+			overflow: scroll;
+		}
+	}
+
+	.large-header{
+		vw-ground{
+			height: calc(100vh - 86px);
+		}
+		.header .header-left div{
+			display: block;
+		}
 	}
 }
 
 .header-left-menu{
 	.dropdown-menu li{
-		min-width: 175px;
+		min-width: 170px;
 	}
 }

@@ -41,10 +41,6 @@ sketch-page{
 		sketch-panel-left, .middle sketch-panel-bottom, sketch-panel-right {
 			z-index: 1;
 			backdrop-filter: blur(1px);
-			position: relative;
-			background: #00000085;
-			align-items: center;
-			display: flex;
 			box-shadow: 0 0 8px 0 black;
 		}
 	}

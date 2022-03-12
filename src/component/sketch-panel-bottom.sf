@@ -17,6 +17,10 @@ sketch-page > .panels sketch-panel-bottom {
 	left: 0;
 	transform: translate(0, 90px);
 	transition: 0.3s ease-out transform;
+	position: relative;
+	display: flex;
+	background: #00000085;
+	align-items: center;
 	.content {
 		visibility: hidden;
 		justify-content: center;

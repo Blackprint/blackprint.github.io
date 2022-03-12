@@ -15,6 +15,10 @@ sketch-page > .panels sketch-panel-right {
 	height: calc(100% - 200px);
 	transform: translate(230px, 0);
 	transition: 0.3s ease-out transform;
+	display: flex;
+	// position: relative;
+	background: #00000085;
+	align-items: center;
 	.content {
 		visibility: hidden;
 		justify-content: center;
