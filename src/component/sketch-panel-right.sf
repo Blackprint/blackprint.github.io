@@ -1,6 +1,8 @@
 ## html
-<sketch-panel-right class="panel">
-	<div class="opener"><i class="fas fa-chevron-left"></i></div>
+<sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ nodeSelected ? '' : 'hide' }}">
+	<div class="opener" @click="opened ? closePanel(event) : openPanel()">
+		<i class="fas fa-chevron-{{ opened ? 'right' : 'left' }}"></i>
+	</div>
 </sketch-panel-right>
 
 ## scss-global
@@ -21,29 +23,56 @@ sketch-page > .panels sketch-panel-right {
 		padding: 10px;
 		color: #ffffff8a;
 	}
-	.opener i {
-		color: white;
+	.opener{
+		cursor: pointer;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		padding: 10px 10px 10px 0;
 		position: absolute;
 		left: 0;
-		text-align: center;
-		font-size: 12px;
-		display: block;
+		i {
+			color: #ffffff70;
+			position: absolute;
+			left: 0;
+			font-size: 12px;
+			display: block;
+		}
+	}
+	&.hide{
+		display: none;
 	}
 	&.opened {
 		transform: translate(0px, 0);
 		.content {
 			visibility: visible;
 		}
-		.opener {
-			display: none;
-		}
 	}
 }
 
 ## js-global
 sf.component('sketch-panel-right', {template: #this.path}, function(My){
+	My.opened = false;
+	My.nodeSelected = false;
+
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
 		sketchPage.panels.right = My;
+	}
+
+	function removeBlur(){
+		My.$el.css('backdrop-filter', 'none');
+		setTimeout(()=> My.$el.css('backdrop-filter', 'blur(1px)'), 300);
+	}
+
+	My.openPanel = function(){
+		removeBlur();
+		My.opened = true;
+	}
+
+	My.closePanel = function(ev){
+		removeBlur();
+		ev.stopPropagation();
+		My.opened = false;
 	}
 });
