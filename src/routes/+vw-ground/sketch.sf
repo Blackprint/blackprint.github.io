@@ -4,6 +4,7 @@
 	<vw-page></vw-page>
 
 	<div class="mini-blackprint disable-effect {{ miniViewer.topRightHidden && 'hidden' }}">
+		<!-- Will be replaced with element returned by Blackprint.cloneContainer(true) -->
 		<sf-slot for="miniViewer.topRight"></sf-slot>
 	</div>
 </sf-m>

@@ -1,4 +1,5 @@
 ## html.append-to-body
+<!-- /src/model/modal.sf -->
 <sf-m name="modal" class="modal {{ showed && 'show' }}">
   <div class="modal-dialog">
     <vw-modal></vw-modal>
