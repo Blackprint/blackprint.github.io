@@ -108,7 +108,7 @@ vw-ground{
 	width: 100vw;
 }
 
-.header{
+body > .header{
 	z-index: 1;
 	backdrop-filter: blur(5px);
 	position: relative;
