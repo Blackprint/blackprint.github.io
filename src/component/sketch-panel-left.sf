@@ -1,0 +1,41 @@
+## html
+<sketch-panel-left class="panel">
+	<div class="opener"><i class="fas fa-chevron-right"></i></div>
+</sketch-panel-left>
+
+## scss-global
+sketch-page > .panels sketch-panel-left {
+	position: absolute;
+	left: 0;
+	width: 200px;
+	height: 100%;
+	transform: translate(-190px, 0);
+	transition: 0.3s ease-out transform;
+	.content {
+		visibility: hidden;
+	}
+	.opener i {
+		color: white;
+		position: absolute;
+		right: 0;
+		font-size: 12px;
+		display: block;
+	}
+	&.opened {
+		transform: translate(0px, 0);
+		.content {
+			visibility: visible;
+		}
+		.opener {
+			display: none;
+		}
+	}
+}
+
+## js-global
+sf.component('sketch-panel-left', {template: #this.path}, function(My){
+	My.init = function(){
+		let sketchPage = My.$el.parent('sketch-page')[0].model;
+		sketchPage.panels.left = My;
+	}
+});

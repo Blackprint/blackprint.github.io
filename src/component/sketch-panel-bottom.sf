@@ -1,0 +1,52 @@
+## html
+<sketch-panel-bottom class="panel">
+	<div class="opener"><i class="fas fa-chevron-up"></i></div>
+	<div class="content">
+		This editor still in development (≧▽≦)／<br>
+		I want to make it better and easier to use.<br>
+		Please use right click to open drop down menu for the cable, node, container, or port.
+	</div>
+</sketch-panel-bottom>
+
+## scss-global
+sketch-page > .panels sketch-panel-bottom {
+	width: calc(100% - 200px - 240px - 30px);
+	bottom: 0;
+	left: 0;
+	transform: translate(0, 90px);
+	transition: 0.3s ease-out transform;
+	.content {
+		visibility: hidden;
+		justify-content: center;
+		text-align: center;
+		height: 80px;
+		padding: 10px;
+		color: #ffffff8a;
+	}
+	.opener i {
+		color: white;
+		position: absolute;
+		top: 0;
+		text-align: center;
+		width: 100%;
+		font-size: 12px;
+		display: block;
+	}
+	&.opened {
+		transform: translate(0px, 0);
+		.content {
+			visibility: visible;
+		}
+		.opener {
+			display: none;
+		}
+	}
+}
+
+## js-global
+sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
+	My.init = function(){
+		let sketchPage = My.$el.parent('sketch-page')[0].model;
+		sketchPage.panels.bottom = My;
+	}
+});

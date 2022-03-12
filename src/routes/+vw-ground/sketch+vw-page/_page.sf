@@ -1,16 +1,26 @@
 ## html
 <sketch-page>
-	<div class="bottom-message">This editor still in development (≧▽≦)／<br>
-I want to make it better and easier to use.<br>
-Please use right click to open drop down menu for the cable, node, container, or port.</div>
-
 	<!-- This element will be replaced with 'My.space' -->
 	<sf-slot for="space"></sf-slot>
+
+	<!-- Panels -->
+	<div class="panels">
+		<!-- /src/component/sketch-panel-left.sf -->
+		<sketch-panel-left></sketch-panel-left>
+
+		<div class="middle">
+			<!-- /src/component/sketch-panel-bottom.sf -->
+			<sketch-panel-bottom></sketch-panel-bottom>
+		</div>
+
+		<!-- /src/component/sketch-panel-right.sf -->
+		<sketch-panel-right></sketch-panel-right>
+	</div>
 </sketch-page>
 
 ## scss-global
 sketch-page{
-	.bottom-message{
+	&> .bottom-message {
 		position: absolute;
 		bottom: 0;
 		color: #ababab;
@@ -19,13 +29,33 @@ sketch-page{
 		text-align: center;
 	}
 
+	&> .panels {
+		&> .middle {
+			display: flex;
+			position: absolute;
+			margin-left: -20px;
+			bottom: 0;
+			width: 100%;
+			justify-content: center;
+		}
+		sketch-panel-left, .middle sketch-panel-bottom, sketch-panel-right {
+			z-index: 1;
+			backdrop-filter: blur(1px);
+			position: relative;
+			background: #00000085;
+			align-items: center;
+			display: flex;
+			box-shadow: 0 0 8px 0 black;
+		}
+	}
+
 	@media(max-width: 900px){
-		.bottom-message {
+		&> .bottom-message {
 			display: none;
 		}
 	}
 
-	sf-space[blackprint] .bg-tile{
+	&> sf-space[blackprint] .bg-tile{
 		background: url('/assets/img/background/tile.png');
 		background-size: 100px;
 		filter: brightness(38%);
@@ -73,6 +103,9 @@ sf.component('sketch-page', function(My){
 	// URL: #page/sketch/{data.page}
 	let sketch = My.sketch = SketchList[views.data.page - 1] ??= new Blackprint.Sketch();
 	sketch.page = My;
+
+	// Will be filled by each panel component after initialized
+	My.panels = {left: null, bottom: null, right: null};
 
 	// Please use sketch.on('...', callback) instead
 	// This is used if no one listened to the event
