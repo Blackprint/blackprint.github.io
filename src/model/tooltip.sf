@@ -1,0 +1,67 @@
+## html.append-to-body
+<!-- /src/model/tooltip.sf -->
+<sf-m name="tooltip" class="{{ showed && 'show' }}" style="transform: translate({{ x }}px, {{ y }}px);">
+	<div class="desc">{{ desc }}</div>
+</sf-m>
+
+## scss-global
+sf-m[name="tooltip"]{
+	visibility: hidden;
+	background: #000000da;
+	pointer-events: none;
+	padding: 2px 8px;
+	border-radius: 5px;
+	box-shadow: 0 0 2px white;
+	position: fixed;
+	top: 15px;
+	left: 10px;
+	color: white;
+	opacity: 0;
+	z-index: 1;
+	transition: 0.3s ease-in opacity;
+
+	.desc{
+	    white-space: pre-wrap;
+	    // font-size: 14px;
+	}
+
+	&.show{
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.icon{
+		padding-right: 5px;
+	}
+}
+
+## js-global
+var ToolTip = sf.model('tooltip', function(My){
+	My.showed = false;
+	My.desc = '';
+	My.x = 0;
+	My.y = 0;
+
+	My._listener = function(ev){
+		My.x = ev.clientX;
+		My.y = ev.clientY;
+	}
+
+	My.set = function(text, ev){
+		if(ev != null){
+			My.x = ev.x;
+			My.y = ev.y;
+		}
+
+		if(text && My.showed === false){
+			My.showed = true;
+			$(window).on('pointermove', My._listener);
+		}
+		else{
+			My.showed = false;
+			$(window).off('pointermove', My._listener);
+		}
+
+		My.desc = text;
+	}
+});
