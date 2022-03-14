@@ -26,6 +26,7 @@ sketch-page > .panels sketch-panel-bottom {
 		justify-content: center;
 		text-align: center;
 		height: 80px;
+		width: 100%;
 		padding: 10px;
 		color: #ffffff8a;
 	}
