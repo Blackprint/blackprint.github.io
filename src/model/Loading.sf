@@ -1,4 +1,5 @@
 ## html.append-to-body
+<!-- /src/model/loading.sf -->
 <sf-m name="loading" class="{{ showed && 'show' }}">
 	<span class="icon"><i class="fa fa-fan fa-spin"></i></span>
 	<span class="desc">{{ desc }}</span>
@@ -16,6 +17,7 @@ sf-m[name="loading"]{
 	top: 60px;
 	color: white;
 	right: 10px;
+	z-index: 100;
 
 	&.show{
 		display: block;
