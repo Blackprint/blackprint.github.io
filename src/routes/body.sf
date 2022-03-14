@@ -102,11 +102,13 @@ body > .header {
 		font-size: 24px;
 		padding: 0 15px 0 18px;
 		text-align: center;
+		display: table;
 		img{
 			height: 50px;
 			filter: drop-shadow(0 0 2px white);
 			display: inline-block;
 			vertical-align: middle;
+			margin-right: 8px;
 		}
 		div{
 			vertical-align: middle;

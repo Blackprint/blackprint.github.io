@@ -7,6 +7,9 @@ function NodeHoverInfo(ev, hovered){
 		return;
 	}
 
+	let target = $(ev.event.target);
+	if(!!target.attr('title')) target.attr('title', '');
+
 	let event = ev.event;
 	$(window).on('pointermove', PortHoverInfo._move = ev => event = ev);
 

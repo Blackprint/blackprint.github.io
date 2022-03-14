@@ -8,7 +8,9 @@ $(()=>{
 		SmallNotif.add("Loading required nodes", 'yellow', 500);
 
 		// Load nodes for data manipulation
-		Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.4/dist/nodes-data.mjs');
+		Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.4/dist/nodes-data.mjs', {
+			loadBrowserInterface: true
+		});
 	}, 3000);
 });
 
@@ -39,6 +41,20 @@ function SuggestNodeTypeCaster(ev){
 			else {
 				iface.input.In.connectPort(output);
 				iface.output.Out.connectCable(cable);
+			}
+		});
+	}
+	else if(output.type !== Function && input.type === Function){
+		handler(() => {
+			let iface = SuggestNodeTypeCaster.createNode('Data/Any/To/Trigger', ev, input);
+
+			if(cable.owner === output){
+				iface.input.Value.connectCable(cable);
+				iface.output.Call.connectPort(input);
+			}
+			else {
+				iface.input.Value.connectPort(output);
+				iface.output.Call.connectCable(cable);
 			}
 		});
 	}
