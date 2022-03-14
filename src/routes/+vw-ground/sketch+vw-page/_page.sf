@@ -122,6 +122,11 @@ sf.component('sketch-page', function(My){
 		if(ev.iface != null) NodeHoverInfo(ev, false);
 	});
 
+	// This may cause one memory leak because this will never being cleared
+	sketch.on('node.click', {slot: 'bp-editor'}, ev => {
+		My.panels.right.selectNode(ev.iface);
+	});
+
 	Blackprint.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();
 

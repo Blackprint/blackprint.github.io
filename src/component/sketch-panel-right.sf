@@ -1,11 +1,32 @@
 ## html
-<sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ nodeSelected ? '' : 'hide' }}">
+<sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ nodeSelected == null ? 'hide' : '' }}">
+	<div class="content">
+		<div class="panel-title">Properties</div>
+		<div class="default-field">
+			<div class="field">
+				<span class="name">Title:</span> <span> {{ data.title }}</span>
+			</div>
+			<div class="field">
+				<span class="name" title="Registered node path">Namespace:</span> <span style="font-size:12px"> {{ data.namespace }}</span>
+			</div>
+			<div class="field">
+				<span class="name" title="Add an ID so you can easily reference to this node from scripts">Node ID:</span> <input sf-bind="data.id">
+			</div>
+			<div class="field">
+				<span class="name">Comment:</span> <textarea sf-bind="data.comment"></textarea>
+			</div>
+		</div>
+	</div>
 	<div class="opener" @click="opened ? closePanel(event) : openPanel()">
 		<i class="fas fa-chevron-{{ opened ? 'right' : 'left' }}"></i>
 	</div>
 </sketch-panel-right>
 
 ## scss-global
+body sketch-page > .panels sketch-panel-right {
+	backdrop-filter: blur(8px); // Separate rule
+}
+
 sketch-page > .panels sketch-panel-right {
 	position: absolute;
 	// visibility: hidden;
@@ -21,11 +42,39 @@ sketch-page > .panels sketch-panel-right {
 	align-items: center;
 	.content {
 		visibility: hidden;
-		justify-content: center;
-		text-align: center;
-		height: 80px;
-		padding: 10px;
+		width: 100%;
+		top: 0;
+		position: absolute;
+		padding: 6px 0;
 		color: #ffffff8a;
+		.panel-title{
+			color: white;
+			font-size: 18px;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.default-field{
+			border-bottom: 1px dashed #ffffff2e;
+		}
+		.field {
+			border-top: 1px dashed #ffffff2e;
+			margin-top: 4px;
+			padding-top: 2px;
+			padding-left: 5px;
+		}
+		.field > .name {
+			color: white;
+		}
+		input, textarea {
+			background: rgba(0, 0, 0, 0.63);
+			color: white;
+			border: none;
+			outline: none;
+			padding: 4px;
+			width: calc(100% - 12px);
+			border-radius: 10px;
+		}
 	}
 	.opener{
 		cursor: pointer;
@@ -57,7 +106,13 @@ sketch-page > .panels sketch-panel-right {
 ## js-global
 sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	My.opened = false;
-	My.nodeSelected = false;
+	My.nodeSelected = null;
+	My.data = {title:'', namespace:'',
+		id:'',
+		v2m$id(val){ My.nodeSelected.id = val },
+		comment:'',
+		v2m$comment(val){ My.nodeSelected.comment = val },
+	};
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
@@ -67,6 +122,26 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	function removeBlur(){
 		My.$el.css('backdrop-filter', 'none');
 		setTimeout(()=> My.$el.css('backdrop-filter', 'blur(1px)'), 300);
+	}
+
+	My.hide = function(){
+		My.nodeSelected = null;
+	}
+
+	let _firstTimeOpen = true;
+	My.selectNode = function(iface){
+		My.nodeSelected = iface;
+		My.data.title = iface.title;
+		My.data.namespace = iface.namespace;
+		My.data.id = iface.id || '';
+		My.data.comment = iface.comment || '';
+
+		if(_firstTimeOpen){
+			setTimeout(()=>{
+				_firstTimeOpen = false;
+				My.opened = true;
+			}, 500);
+		}
 	}
 
 	My.openPanel = function(){
