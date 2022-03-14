@@ -107,6 +107,21 @@ sf.component('sketch-page', function(My){
 	// This is used if no one listened to the event
 	sketch._event.$_fallback = BlackprintEventFallback;
 
+	// path: /src/global/SuggestNodeTypeCaster.js
+	sketch.on('port.cable.test', {slot: 'bp-editor'}, SuggestNodeTypeCaster);
+	sketch.on('port.hover node.hover', {slot: 'bp-editor'}, ev => {
+		ev.instance = sketch;
+
+		if(ev.port != null) PortHoverInfo(ev, true);
+		if(ev.iface != null) NodeHoverInfo(ev, true);
+	});
+	sketch.on('port.unhover node.unhover', {slot: 'bp-editor'}, ev => {
+		ev.instance = sketch;
+
+		if(ev.port != null) PortHoverInfo(ev, false);
+		if(ev.iface != null) NodeHoverInfo(ev, false);
+	});
+
 	Blackprint.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();
 
