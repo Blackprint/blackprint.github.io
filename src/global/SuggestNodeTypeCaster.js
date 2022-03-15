@@ -30,6 +30,9 @@ function SuggestNodeTypeCaster(ev){
 		output = port;
 	}
 
+	// Skip untyped port
+	if(input.type.any || output.type.any) return;
+
 	if(output.type === Number && input.type === String){
 		handler(() => {
 			let iface = SuggestNodeTypeCaster.createNode('Data/Number/To/String', ev, input);
