@@ -7,6 +7,12 @@ function NodeHoverInfo(ev, hovered){
 		return;
 	}
 
+	// Skip node decoration
+	if(ev.event.target.closest('.extra') != null){
+		NodeHoverInfo(ev, false);
+		return;
+	}
+
 	let target = $(ev.event.target);
 	if(!!target.attr('title')) target.attr('title', '');
 

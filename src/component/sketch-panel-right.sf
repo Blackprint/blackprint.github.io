@@ -10,10 +10,12 @@
 				<span class="name" title="Registered node path">Namespace:</span> <span style="font-size:12px"> {{ data.namespace }}</span>
 			</div>
 			<div class="field">
-				<span class="name" title="Add an ID so you can easily reference to this node from scripts">Node ID:</span> <input sf-bind="data.id">
+				<span class="name" title="Add an ID so you can easily reference to this node from scripts">Node ID:</span>
+				<input sf-bind="data.id" placeholder="...">
 			</div>
 			<div class="field">
-				<span class="name">Comment:</span> <textarea sf-bind="data.comment"></textarea>
+				<span class="name">Comment:</span>
+				<textarea sf-bind="data.comment" placeholder="Add node comment here..."></textarea>
 			</div>
 		</div>
 	</div>
