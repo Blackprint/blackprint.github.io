@@ -1,14 +1,15 @@
 function NodeHoverInfo(ev, hovered){
-	$(window).off('pointermove', PortHoverInfo._move);
+	$(window).off('pointermove', NodeHoverInfo._move);
 
 	if(!hovered){
 		clearTimeout(NodeHoverInfo._timer);
 		if(NodeHoverInfo._show) ToolTip.set();
+		NodeHoverInfo._show = false;
 		return;
 	}
 
-	// Skip node decoration
-	if(ev.event.target.closest('.extra') != null){
+	// Skip node decoration and skip if any button was pressed
+	if(ev.event.target.closest('.extra') != null || ev.event.pressure !== 0){
 		NodeHoverInfo(ev, false);
 		return;
 	}
@@ -17,7 +18,12 @@ function NodeHoverInfo(ev, hovered){
 	if(!!target.attr('title')) target.attr('title', '');
 
 	let event = ev.event;
-	$(window).on('pointermove', PortHoverInfo._move = ev => event = ev);
+	$(window).on('pointermove', NodeHoverInfo._move = ev => {
+		if(ev.pressure !== 0)
+			NodeHoverInfo(ev, false);
+
+		event = ev;
+	});
 
 	clearTimeout(NodeHoverInfo._timer);
 	NodeHoverInfo._timer = setTimeout(()=> {
@@ -27,4 +33,5 @@ function NodeHoverInfo(ev, hovered){
 }
 
 NodeHoverInfo._timer = null;
-NodeHoverInfo._show = true;
+NodeHoverInfo._show = false;
+NodeHoverInfo._move = ()=>{};

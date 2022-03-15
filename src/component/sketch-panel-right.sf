@@ -44,6 +44,7 @@ sketch-page > .panels sketch-panel-right {
 	align-items: center;
 	.content {
 		visibility: hidden;
+		word-break: break-word;
 		width: 100%;
 		top: 0;
 		position: absolute;

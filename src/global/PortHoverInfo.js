@@ -4,6 +4,13 @@ function PortHoverInfo(ev, hovered){
 	if(!hovered){
 		clearTimeout(PortHoverInfo._timer);
 		if(PortHoverInfo._show) ToolTip.set();
+		PortHoverInfo._show = false;
+		return;
+	}
+
+	// Skip if any button was pressed
+	if(ev.event.pressure !== 0){
+		PortHoverInfo(ev, false);
 		return;
 	}
 
@@ -11,7 +18,12 @@ function PortHoverInfo(ev, hovered){
 	if(!!target.attr('title')) target.attr('title', '');
 
 	let event = ev.event;
-	$(window).on('pointermove', PortHoverInfo._move = ev => event = ev);
+	$(window).on('pointermove', PortHoverInfo._move = ev => {
+		if(ev.pressure !== 0)
+			PortHoverInfo(ev, false);
+			
+		event = ev;
+	});
 
 	clearTimeout(NodeHoverInfo._timer);
 	clearTimeout(PortHoverInfo._timer);
