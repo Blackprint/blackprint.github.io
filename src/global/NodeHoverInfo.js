@@ -17,6 +17,9 @@ function NodeHoverInfo(ev, hovered){
 	let target = $(ev.event.target);
 	if(!!target.attr('title')) target.attr('title', '');
 
+	target = target.parent();
+	if(!!target.attr('title')) target.attr('title', '');
+
 	let event = ev.event;
 	$(window).on('pointermove', NodeHoverInfo._move = ev => {
 		if(ev.pressure !== 0)
