@@ -12,12 +12,14 @@
 
 ## scss-global
 sketch-page > .panels sketch-panel-bottom {
-	width: calc(100% - 200px - 240px - 30px);
+	backdrop-filter: blur(1px);
+    position: absolute;
+    left: 50%;
+	width: calc(100% - 200px - 240px - 80px);
+	margin-left: -20px;
 	bottom: 0;
-	left: 0;
-	transform: translate(0, 90px);
+	transform: translate(-50%, 90px);
 	transition: 0.3s ease-out transform;
-	position: relative;
 	display: flex;
 	background: #00000085;
 	align-items: center;
@@ -47,7 +49,7 @@ sketch-page > .panels sketch-panel-bottom {
 		}
 	}
 	&.opened {
-		transform: translate(0px, 0);
+		transform: translate(-50%, 0);
 		.content {
 			visibility: visible;
 		}

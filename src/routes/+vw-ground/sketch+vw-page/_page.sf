@@ -8,10 +8,8 @@
 		<!-- /src/component/sketch-panel-left.sf -->
 		<sketch-panel-left></sketch-panel-left>
 
-		<div class="middle">
-			<!-- /src/component/sketch-panel-bottom.sf -->
-			<sketch-panel-bottom></sketch-panel-bottom>
-		</div>
+		<!-- /src/component/sketch-panel-bottom.sf -->
+		<sketch-panel-bottom></sketch-panel-bottom>
 
 		<!-- /src/component/sketch-panel-right.sf -->
 		<sketch-panel-right></sketch-panel-right>
@@ -30,15 +28,7 @@ sketch-page{
 	}
 
 	&> .panels {
-		&> .middle {
-			display: flex;
-			position: absolute;
-			margin-left: -20px;
-			bottom: 0;
-			width: 100%;
-			justify-content: center;
-		}
-		sketch-panel-left, .middle sketch-panel-bottom, sketch-panel-right {
+		sketch-panel-left, sketch-panel-bottom, sketch-panel-right {
 			z-index: 1;
 			backdrop-filter: blur(1px);
 			box-shadow: 0 0 8px 0 black;
