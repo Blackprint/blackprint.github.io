@@ -11,8 +11,11 @@
 </sketch-panel-bottom>
 
 ## scss-global
+body sketch-page > .panels sketch-panel-bottom {
+	backdrop-filter: blur(1px); // Long CSS rule = more priority
+}
+
 sketch-page > .panels sketch-panel-bottom {
-	backdrop-filter: blur(1px);
     position: absolute;
     left: 50%;
 	width: calc(100% - 200px - 240px - 80px);
@@ -67,7 +70,7 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 
 	function removeBlur(){
 		My.$el.css('backdrop-filter', 'none');
-		setTimeout(()=> My.$el.css('backdrop-filter', 'blur(1px)'), 300);
+		setTimeout(()=> My.$el.css('backdrop-filter', ''), 300);
 	}
 
 	My.openPanel = function(){

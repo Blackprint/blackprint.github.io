@@ -26,7 +26,7 @@
 
 ## scss-global
 body sketch-page > .panels sketch-panel-right {
-	backdrop-filter: blur(8px); // Separate rule
+	backdrop-filter: blur(8px); // Long CSS rule = more priority
 }
 
 sketch-page > .panels sketch-panel-right {
@@ -124,7 +124,7 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 
 	function removeBlur(){
 		My.$el.css('backdrop-filter', 'none');
-		setTimeout(()=> My.$el.css('backdrop-filter', 'blur(1px)'), 300);
+		setTimeout(()=> My.$el.css('backdrop-filter', ''), 300);
 	}
 
 	My.hide = function(){

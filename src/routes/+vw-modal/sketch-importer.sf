@@ -81,7 +81,7 @@ sf-m[name="sketch-importer"] {
 		margin: 5px 0;
 		padding: 0 30px;
 		max-height: 15vh;
-		overflow: hidden scroll;
+		overflow: hidden auto;
 	}
 	.button-clear{
 		text-align: center;

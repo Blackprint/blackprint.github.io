@@ -6,6 +6,10 @@
 </sketch-panel-left>
 
 ## scss-global
+body sketch-page > .panels sketch-panel-left {
+	backdrop-filter: blur(1px); // Long CSS rule = more priority
+}
+
 sketch-page > .panels sketch-panel-left {
 	position: absolute;
 	display: none; // ToDO: remove me
@@ -56,7 +60,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 	function removeBlur(){
 		My.$el.css('backdrop-filter', 'none');
-		setTimeout(()=> My.$el.css('backdrop-filter', 'blur(1px)'), 300);
+		setTimeout(()=> My.$el.css('backdrop-filter', ''), 300);
 	}
 
 	My.openPanel = function(){

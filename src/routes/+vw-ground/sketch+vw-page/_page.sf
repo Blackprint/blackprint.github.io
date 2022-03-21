@@ -61,18 +61,10 @@ sketch-page{
 			let sketch = SketchList[data.page - 1];
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;
-		},
-		showed(){
-			setTimeout(()=> {
-				if(SketchList.length === 1 && SketchList[0].ifaceList.length === 0){
-					if(SketchList[0].__importing) return;
-					if(modal.currentPath === '/sketch-importer') return;
-
-					Modal.goto('/example-list');
-				}
-			}, 100);
-
 			$('body > .background .tile').css('display', 'none');
+
+			if(sketch.ifaceList.length === 0 && !sketch.__importing)
+				sketch.page.panels.bottom.openPanel();
 		},
 		leaving(){
 			console.log("Leaving from sketch page data:", arguments);
