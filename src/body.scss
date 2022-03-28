@@ -8,6 +8,22 @@ html, body {
 	margin: 0;
 }
 
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(192,192,192,.6);
+    border-radius: 7px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(240,240,240,.6);
+    border-radius: 7px;
+}
+
 .disable-effect{
 	*{
 		filter: inherit !important;
