@@ -2,7 +2,7 @@
 <sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ nodeSelected == null ? 'hide' : '' }}">
 	<div class="content">
 		<div class="panel-title">Properties</div>
-		<div class="default-field">
+		<div class="bpsprf-default">
 			<div class="field">
 				<span class="name">Title:</span> <span> {{ data.title }}</span>
 			</div>
@@ -17,6 +17,9 @@
 				<span class="name">Comment:</span>
 				<textarea sf-bind="data.comment" placeholder="Add node comment here..."></textarea>
 			</div>
+		</div>
+		<div class="bpsprf-iface">
+			<sf-slot for="ifaceField"></sf-slot>
 		</div>
 	</div>
 	<div class="opener" @click="opened ? closePanel(event) : openPanel()">
@@ -50,33 +53,12 @@ sketch-page > .panels sketch-panel-right {
 		position: absolute;
 		padding: 6px 0;
 		color: #ffffff8a;
+
 		.panel-title{
 			color: white;
 			font-size: 18px;
 			font-weight: bold;
 			text-align: center;
-		}
-
-		.default-field{
-			border-bottom: 1px dashed #ffffff2e;
-		}
-		.field {
-			border-top: 1px dashed #ffffff2e;
-			margin-top: 4px;
-			padding-top: 2px;
-			padding-left: 5px;
-		}
-		.field > .name {
-			color: white;
-		}
-		input, textarea {
-			background: rgba(0, 0, 0, 0.63);
-			color: white;
-			border: none;
-			outline: none;
-			padding: 4px;
-			width: calc(100% - 12px);
-			border-radius: 10px;
 		}
 	}
 	.opener{
@@ -106,10 +88,36 @@ sketch-page > .panels sketch-panel-right {
 	}
 }
 
+// bpsprf = Blackprint Sketch Panel Right Field
+.bpsprf-default, .bpsprf-iface {
+	// border-bottom: 1px dashed #ffffff2e;
+
+	.field {
+		border-top: 1px dashed #ffffff2e;
+		margin-top: 4px;
+		padding-top: 2px;
+		padding-left: 5px;
+	}
+	.field > .name {
+		color: white;
+	}
+	input, textarea {
+		background: rgba(0, 0, 0, 0.63);
+		color: white;
+		border: none;
+		outline: none;
+		padding: 4px;
+		width: calc(100% - 12px);
+		border-radius: 10px;
+	}
+}
+
 ## js-global
 sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	My.opened = false;
 	My.nodeSelected = null;
+	My.ifaceField = null;
+
 	My.data = {title:'', namespace:'',
 		id:'',
 		v2m$id(val){ My.nodeSelected.id = val },
@@ -138,6 +146,19 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 		My.data.namespace = iface.namespace;
 		My.data.id = iface.id || '';
 		My.data.comment = iface.comment || '';
+
+		if(iface._bpeditorpanel == null){
+			// Blackprint Panel Component
+			let bppc = 'bppc-' + iface.namespace.toLowerCase().split('/').join('-');
+			let bppcList = Blackprint.space.component(bppc);
+			
+			if(bppcList.new != null){
+				let element = bppcList.new.stem(iface);
+				iface._bpeditorpanel = element;
+			}
+		}
+
+		My.ifaceField = iface._bpeditorpanel || null;
 
 		if(_firstTimeOpen){
 			setTimeout(()=>{
