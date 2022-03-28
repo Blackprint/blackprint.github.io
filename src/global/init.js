@@ -11,7 +11,7 @@ $(function(){
 		setTimeout(()=> {
 			importSketch = pako.inflateRaw(Base64.toUint8Array(importSketch[0]), {to: 'string'});
 			SketchImporter.loadJSON(importSketch);
-		}, 1000);
+		}, 500);
 	}
 
 	setTimeout(()=> {
