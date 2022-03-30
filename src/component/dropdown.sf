@@ -80,6 +80,12 @@
 		cursor: pointer;
     	color: black;
 	}
+
+	ul li .has-deep{
+		top: 11px;
+		position: absolute;
+		right: 5px;
+	}
 }
 
 drop-down.dropdown-menu drop-down{
@@ -102,12 +108,6 @@ drop-down.dropdown-menu drop-down{
 		opacity: 1;
 		visibility: visible;
 	}
-}
-
-ul li .has-deep{
-	top: 11px;
-	position: absolute;
-	right: 5px;
 }
 
 drop-down{
