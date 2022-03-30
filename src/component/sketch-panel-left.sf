@@ -1,5 +1,37 @@
 ## html
 <sketch-panel-left class="panel {{ opened ? 'opened' : ''}}">
+	<div class="content">
+		<div class="preview" style="height: {{ scaledPreviewHeight }}px">
+			<div class="zoom" style="transform: scale({{ 200 / previewWidth }})">
+				<sf-slot for="preview"></sf-slot>
+			</div>
+		</div>
+
+		<div class="variable-list">
+			<div class="title">Variables ({{ variableCount }})</div>
+			<div class="button"><i class="fa fa-plus-square"></i></div>
+		</div>
+		<div class="function-list">
+			<div class="title">Functions ({{ functionCount }})</div>
+		</div>
+		<div class="node-list">
+			<div class="title">Nodes ({{ nodeCount }})</div>
+			<div class="button"><i class="fa fa-plus-square"></i></div>
+
+			<!-- /src/component/tree-list.sf -->
+			<div class="tree-view">
+				<div class="tree-item collapsed" sf-each="key, val in nodes"
+					style="display: {{ val.hidden ? 'none' : '' }}">
+					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+					{{@if val.constructor === Object:
+						@return new $TreeList(val);
+					}}
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="opener" @click="opened ? closePanel(event) : openPanel()">
 		<i class="fas fa-chevron-{{ opened ? 'left' : 'right' }}"></i>
 	</div>
@@ -12,8 +44,7 @@ body sketch-page > .panels sketch-panel-left {
 
 sketch-page > .panels sketch-panel-left {
 	position: absolute;
-	display: none; // ToDO: remove me
-	// display: flex;
+	display: flex;
 	left: 0;
 	width: 200px;
 	height: 100%;
@@ -23,7 +54,39 @@ sketch-page > .panels sketch-panel-left {
 	background: #00000085;
 	align-items: center;
 	.content {
+		align-self: baseline;
 		visibility: hidden;
+		.preview{
+			// border-bottom: 1px dashed white;
+			max-width: 200px;
+			max-height: 200px;
+			overflow: hidden;
+			.zoom{
+	    		transform-origin: left top;
+			}
+		}
+	}
+	.variable-list, .function-list, .node-list {
+		color: white;
+		position: relative;
+		width: 190px;
+		border-top: 1px solid white;
+		padding: 5px 5px;
+		// border-bottom: 1px dashed white;
+		.title, .button{
+			display: inline-block;
+			cursor: pointer;
+		}
+		.button{
+			margin-right: 10px;
+			float: right;
+		}
+		.tree-view{
+			position: relative;
+			height: 500px;
+			width: 185px;
+			overflow: auto;
+		}
 	}
 	.opener{
 		cursor: pointer;
@@ -52,10 +115,48 @@ sketch-page > .panels sketch-panel-left {
 ## js-global
 sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.opened = false;
+	My.preview = null;
+	My.previewWidth = 200;
+	My.scaledPreviewHeight = 1;
+
+	My.variables = []; // ToDo
+	My.functions = []; // ToDo
+	My.nodes = Blackprint.nodes; // ToDo
+
+	My.variableCount = 0;
+	My.functionCount = 0;
+	My.nodeCount = 0;
+
+	function deepCount(obj){
+		let len = 0;
+		for(let key in obj){
+			let temp = obj[key];
+			if(temp == null) return;
+			if(temp.constructor !== Object)
+				len++;
+			else len += deepCount(temp);
+		}
+
+		return len;
+	}
+
+	const refreshCounter = () => My.nodeCount = deepCount(Blackprint.availableNode);
+	Blackprint.on('moduleAdded', refreshCounter);
+	$(refreshCounter);
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
 		sketchPage.panels.left = My;
+	}
+
+	My.setPreview = async function(el){
+		My.preview = el;
+		if(el == null) return;
+
+		await $.afterRepaint();
+		let rect = el.getBoundingClientRect();
+		My.previewWidth = rect.width;
+		My.scaledPreviewHeight = rect.height * (200 / rect.width);
 	}
 
 	function removeBlur(){
@@ -72,5 +173,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		removeBlur();
 		ev.stopPropagation();
 		My.opened = false;
+	}
+
+	My.collapseTree = function(el){
+		el = el.nextElementSibling;
+		if(el == null) return;
+
+		let hidden = el.model.hidden = !el.model.hidden;
+		
+		if(hidden)
+			$(el.parentNode).addClass("collapsed");
+		else $(el.parentNode).removeClass("collapsed");
 	}
 });
