@@ -10,9 +10,33 @@
 		<div class="variable-list">
 			<div class="title">Variables ({{ variableCount }})</div>
 			<div class="button"><i class="fa fa-plus-square"></i></div>
+
+			<!-- /src/component/tree-list.sf -->
+			<div class="tree-view">
+				<div class="tree-item collapsed" sf-each="key, val in variables"
+					style="display: {{ val.hidden ? 'none' : '' }}">
+					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+					{{@if val.constructor === Object:
+						@return new $TreeList(val);
+					}}
+				</div>
+			</div>
 		</div>
 		<div class="function-list">
 			<div class="title">Functions ({{ functionCount }})</div>
+
+			<!-- /src/component/tree-list.sf -->
+			<div class="tree-view">
+				<div class="tree-item collapsed" sf-each="key, val in functions"
+					style="display: {{ val.hidden ? 'none' : '' }}">
+					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+					{{@if val.constructor === Object:
+						@return new $TreeList(val);
+					}}
+				</div>
+			</div>
 		</div>
 		<div class="node-list">
 			<div class="title">Nodes ({{ nodeCount }})</div>
@@ -83,7 +107,7 @@ sketch-page > .panels sketch-panel-left {
 		}
 		.tree-view{
 			position: relative;
-			height: 500px;
+			max-height: 500px;
 			width: 185px;
 			overflow: auto;
 		}
@@ -114,14 +138,16 @@ sketch-page > .panels sketch-panel-left {
 
 ## js-global
 sf.component('sketch-panel-left', {template: #this.path}, function(My){
+	let sketch = My.sketch = SketchList[views.data.page - 1];
+
 	My.opened = false;
 	My.preview = null;
 	My.previewWidth = 200;
 	My.scaledPreviewHeight = 1;
 
-	My.variables = []; // ToDo
-	My.functions = []; // ToDo
-	My.nodes = Blackprint.nodes; // ToDo
+	My.variables = sketch.variables;
+	My.functions = sketch.functions;
+	My.nodes = Blackprint.nodes;
 
 	My.variableCount = 0;
 	My.functionCount = 0;
