@@ -1,9 +1,10 @@
 ## html
 <tree-list class="tree-list-menu {{ hidden ? 'hidden' : '' }}">
-	<div class="tree-item" sf-each="key, val in deep">
+	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if val.constructor === Object:
-			@return new $TreeList(val);
+			let kkey = arguments[3]; // ToDo: Fix direct variable on ScarletsFrame
+			@return new $TreeList({parent: parentKey, key: kkey, val});
 		}}
 	</div>
 </tree-list>
@@ -35,9 +36,12 @@
 }
 
 ## js-global
-sf.component('tree-list', {template: #this.path}, function(My, include, $item){
+sf.component('tree-list', {template: #this.path}, function(My, include, $item={}){
+	My.parentKey = $item.parent ?? '';
+	My.parentKey += $item.key && My.parentKey !== '' ? `/${$item.key}` : ($item.key ?? '');
+
+	My.deep = $item.val ?? {};
 	My.hidden = true;
-	My.deep = $item ?? {};
 
 	My.init = function(){
 		My.$el.parent().addClass("has-child").addClass("collapsed");
