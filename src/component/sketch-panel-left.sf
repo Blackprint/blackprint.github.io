@@ -9,7 +9,7 @@
 
 		<div class="variable-list collapsed">
 			<div class="title" @click="collapseSubPanel(this)">Variables ({{ variableCount }})</div>
-			<div class="button"><i class="fa fa-plus-square"></i></div>
+			<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" @pointerdown="checkDragNode">
@@ -18,14 +18,14 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						@return new $TreeList({parent: '', key, val});
+						@return new $TreeList({parentKey: '', key, val});
 					}}
 				</div>
 			</div>
 		</div>
 		<div class="function-list collapsed">
 			<div class="title" @click="collapseSubPanel(this)">Functions ({{ functionCount }})</div>
-			<div class="button"><i class="fa fa-plus-square"></i></div>
+			<div class="button" @click="createFunction"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" @pointerdown="checkDragNode">
@@ -34,14 +34,14 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						@return new $TreeList({parent: '', key, val});
+						@return new $TreeList({parentKey: '', key, val});
 					}}
 				</div>
 			</div>
 		</div>
 		<div class="node-list">
 			<div class="title" @click="collapseSubPanel(this)">Nodes ({{ nodeCount }})</div>
-			<div class="button"><i class="fa fa-plus-square"></i></div>
+			<div class="button" @click="createCustomNode"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" @pointerdown="checkDragNode">
@@ -50,7 +50,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						@return new $TreeList({parent: '', key, val});
+						@return new $TreeList({parentKey: '', key, val});
 					}}
 				</div>
 			</div>
@@ -161,19 +161,34 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 	function deepCount(obj){
 		let len = 0;
+		if(obj.hidden) return len;
+
 		for(let key in obj){
 			let temp = obj[key];
-			if(temp == null) return;
-			if(temp.constructor !== Object)
+			if(temp == null) continue;
+
+			if(temp instanceof Function)
 				len++;
 			else len += deepCount(temp);
 		}
 
+		obj.refresh?.();
 		return len;
 	}
+	
+	let pendingRefresh;
+	const refreshCounter = () => {
+		clearTimeout(pendingRefresh);
 
-	const refreshCounter = () => My.nodeCount = deepCount(Blackprint.availableNode);
+		pendingRefresh = setTimeout(() => {
+			My.nodeCount = deepCount(Blackprint.availableNode);
+		}, 500);
+	}
+	
 	Blackprint.on('moduleAdded', refreshCounter);
+	Blackprint.on('moduleDelete', refreshCounter);
+	Blackprint.on('moduleUpdate', refreshCounter);
+	Blackprint.on('bp_editorNodeAvailability', refreshCounter);
 	$(refreshCounter);
 
 	My.init = function(){
@@ -212,7 +227,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		if(el == null) return;
 
 		let hidden = el.model.hidden = !el.model.hidden;
-		
+
 		if(hidden)
 			$(el.parentNode).addClass("collapsed");
 		else $(el.parentNode).removeClass("collapsed");
@@ -249,5 +264,17 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 				});
 			};
 		});
+	}
+
+	My.createVariable = ev => {
+		SmallNotif.add("Still under development");
+	}
+
+	My.createFunction = ev => {
+		SmallNotif.add("Still under development");
+	}
+
+	My.createCustomNode = ev => {
+		Modal.goto('/custom-node-editor');
 	}
 });
