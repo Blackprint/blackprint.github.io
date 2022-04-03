@@ -3,8 +3,7 @@
 	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if val.constructor === Object:
-			let kkey = arguments[3]; // ToDo: Fix direct variable on ScarletsFrame
-			@return new $TreeList({parent: parentKey, key: kkey, val});
+			@return new $TreeList({parentKey: parentKey, key, val});
 		}}
 	</div>
 </tree-list>
@@ -37,7 +36,7 @@
 
 ## js-global
 sf.component('tree-list', {template: #this.path}, function(My, include, $item={}){
-	My.parentKey = $item.parent ?? '';
+	My.parentKey = $item.parentKey ?? '';
 	My.parentKey += $item.key && My.parentKey !== '' ? `/${$item.key}` : ($item.key ?? '');
 
 	My.deep = $item.val ?? {};
