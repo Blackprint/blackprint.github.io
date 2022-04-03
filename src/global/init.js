@@ -40,4 +40,10 @@ $(function(){
 		if(location.hostname === 'localhost' && !location.pathname.includes('/dev.html'))
 			location.pathname = '/dev.html';
 	});
+
+	// Always use the newest module
+	Blackprint.onModuleConflict = async map =>{
+		// ToDo: show popup to select if user is prefer old version or the newest version
+		return Object.entries(map).forEach(v => v.useOld = false);
+	};
 });
