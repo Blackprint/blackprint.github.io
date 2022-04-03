@@ -103,6 +103,13 @@ sf.component('sketch-page', function(My){
 		if(ev.port != null) PortHoverInfo(ev, false);
 		if(ev.iface != null) NodeHoverInfo(ev, false);
 	});
+	sketch.on('cable.dropped', {slot: 'bp-editor'}, ev => {
+		if(ev.event.ctrlKey || !ev.afterCreated) return;
+		if(ev.event.target.parentNode.model !== sketch.scope('cables')) return;
+
+		let suggestedNode = Blackprint.Sketch.suggestNodeForPort(ev.port);
+		container.nodeScope.menu(ev.event, suggestedNode);
+	});
 
 	// This may cause one memory leak because this will never being cleared
 	sketch.on('node.click', {slot: 'bp-editor'}, ev => {
