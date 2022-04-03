@@ -89,6 +89,8 @@ sf.model('custom-node-editor', function(My){
 
 	My.run = function(){
 		eval(My.editor.getValue());
+
+		Blackprint.emit('bp_editorNodeAvailability');
 	}
 
 	My.setValue = function(code){

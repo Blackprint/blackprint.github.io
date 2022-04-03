@@ -287,6 +287,8 @@ let _editorModuleURL = sf.model('module-url', function(My){
 				else break;
 			}
 		});
+
+		Blackprint.emit('bp_editorNodeAvailability');
 	}
 
 	My.deleteFromURL = function(item){
