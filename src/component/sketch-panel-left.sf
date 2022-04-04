@@ -2,7 +2,7 @@
 <sketch-panel-left class="panel {{ opened ? 'opened' : ''}}">
 	<div class="content">
 		<div class="preview" style="height: {{ scaledPreviewHeight }}px">
-			<div class="zoom" style="transform: scale({{ 200 / previewWidth }})">
+			<div class="zoom" style="transform: scale({{ previewScale }})">
 				<sf-slot for="preview"></sf-slot>
 			</div>
 		</div>
@@ -149,6 +149,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.opened = false;
 	My.preview = null;
 	My.previewWidth = 200;
+	My.previewScale = 1;
 	My.scaledPreviewHeight = 1;
 
 	My.variables = sketch.variables;
@@ -196,14 +197,41 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		sketchPage.panels.left = My;
 	}
 
-	My.setPreview = async function(el){
-		My.preview = el;
-		if(el == null) return;
+	let recheckPreviewSize;
+	My.setPreview = function(el){
+		if(el == null || My.preview !== el){
+			recheckPreviewSize?.disconnect();
+			recheckPreviewSize = null;
+		}
 
-		await $.afterRepaint();
-		let rect = el.getBoundingClientRect();
-		My.previewWidth = rect.width;
-		My.scaledPreviewHeight = rect.height * (200 / rect.width);
+		My.preview = el;
+		My.previewScale = 1;
+		My.scaledPreviewHeight = 1;
+
+		if(recheckPreviewSize != null || el == null)
+			return;
+
+		let checkTime = 0;
+		let checker = async function(){
+			await $.afterRepaint();
+
+			let width = el.clientWidth;
+			let height = el.clientHeight;
+			let scale = My.previewWidth / width;
+
+			checkTime = Math.round(Date.now() / 100);
+
+			My.previewScale = scale;
+			My.scaledPreviewHeight = height * scale;
+		}
+
+		recheckPreviewSize = new ResizeObserver(function(items){
+			if(checkTime === Math.round(Date.now() / 100)) return;
+			setTimeout(checker, 200);
+		});
+		recheckPreviewSize.observe(el);
+
+		setTimeout(checker, 100);
 	}
 
 	function removeBlur(){
