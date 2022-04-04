@@ -109,9 +109,40 @@ sf.component('sketch-page', function(My){
 
 		let suggestedNode = Blackprint.Sketch.suggestNodeForPort(ev.port);
 		container.nodeScope.menu(ev.event, suggestedNode);
+
+		let ifaceList = sketch.ifaceList;
+		let oldLastNode = ifaceList[ifaceList.length-1];
+
+		setTimeout(() => {
+			$(sf.Window).once('pointerup', function(){
+				setTimeout(() => {
+					let lastNode = ifaceList[ifaceList.length-1];
+					if(oldLastNode === lastNode) return;
+
+					let owner = ev.cable.owner;
+					let targetPorts = lastNode[owner.source === 'input' ? 'output' : 'input'];
+					let compatiblePorts = [];
+
+					if(targetPorts == null) return;
+
+					for(let key in targetPorts){
+						if(key === '_list') continue; // ToDo: remove this after the engine get updated
+
+						let port = targetPorts[key];
+						if(isConnectablePort(owner.source, owner.type, port.type))
+							compatiblePorts.push(port);
+					}
+					
+					// Auto connect if found only one compatible port
+					if(compatiblePorts.length === 1)
+						compatiblePorts[0].connectCable(ev.cable);
+				}, 100);
+			});
+		}, 200);
 	});
 
 	// This may cause one memory leak because this will never being cleared
+	// But will only be replaced if the user is clicked other nodes
 	sketch.on('node.click', {slot: 'bp-editor'}, ev => {
 		My.panels.right.selectNode(ev.iface);
 		NodeHoverInfo(ev, false);
