@@ -19,3 +19,7 @@ class extends Blackprint.Node {
 		page.panels.left.setPreview(this.input.Element);
 	}
 });
+
+setTimeout(() => {
+	Blackprint.nodes.BP_Editor.hidden = true;
+}, 1000);
