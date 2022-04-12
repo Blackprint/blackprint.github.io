@@ -120,7 +120,8 @@ sf.component('sketch-page', function(My){
 					if(oldLastNode === lastNode) return;
 
 					let owner = ev.cable.owner;
-					let targetPorts = lastNode[owner.source === 'input' ? 'output' : 'input'];
+					let sourcePort = owner.source;
+					let targetPorts = lastNode[sourcePort === 'input' ? 'output' : 'input'];
 					let compatiblePorts = [];
 
 					if(targetPorts == null) return;
@@ -129,13 +130,24 @@ sf.component('sketch-page', function(My){
 						if(key === '_list') continue; // ToDo: remove this after the engine get updated
 
 						let port = targetPorts[key];
-						if(isConnectablePort(owner.source, owner.type, port.type))
+						if(isConnectablePort(owner.type, port.type))
 							compatiblePorts.push(port);
 					}
 					
 					// Auto connect if found only one compatible port
-					if(compatiblePorts.length === 1)
+					if(compatiblePorts.length === 1){
 						compatiblePorts[0].connectCable(ev.cable);
+
+						// ToDo: remove this after Blackprint Sketch was updated
+						if(sourcePort === 'input'){
+							let port = compatiblePorts[0];
+							let rect = port.findPortElement(targetPorts._list.getElement(port)).getBoundingClientRect();
+			
+							let { offset, pos, scale } = port._scope('container');
+							ev.cable.head1[0] = (rect.x + rect.width/2 - offset.x - pos.x) / scale;
+							ev.cable.head1[1] = (rect.y + rect.height/2 - offset.y - pos.y) / scale;
+						}
+					}
 				}, 100);
 			});
 		}, 200);
