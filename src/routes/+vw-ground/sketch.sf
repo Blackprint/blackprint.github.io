@@ -70,4 +70,56 @@ sf.model('sketch-pages', function(My){
 			// $(now)
 		}
 	};
+
+	if(My._eventOnce == null){
+		My._eventOnce = true;
+
+		$(window).on('keydown', async (ev) => {
+			// Skip textbox/input element
+			if(ev.target.tagName !== 'BODY') return;
+
+			let pageIndex = views.currentPath.match(/\/sketch\/([0-9]+)/)?.[1];
+			if(pageIndex == null) return;
+
+			let sketch = SketchList[pageIndex-1];
+			let container = sketch.scope('container');
+
+			// Skip if no selected nodes/cables
+			if(container.nodeScope.selected.length === 0
+			&& container.cableScope.selected.length === 0){
+				return;
+			}
+
+			// Currently we only support copy/paste/delete for nodes
+			if(container.nodeScope.selected.length === 0) return;
+
+			if(ev.key === 'Delete'){
+				let selected = container.nodeScope.selected;
+
+				for(let i=0; i<selected.length; i++)
+					sketch.deleteNode(selected[i]);
+			}
+
+			if(ev.ctrlKey && ev.key === 'c'){
+				let data = sketch.exportJSON({selectedOnly: true});
+
+				// Reduce nodes position
+				data = JSON.parse(data);
+
+				console.log(data);
+
+				navigator.clipboard.writeText(JSON.stringify(data));
+			}
+
+			if(ev.ctrlKey && ev.key === 'v'){
+				let data = await navigator.clipboard.readText();
+				data = JSON.parse(data);
+
+				// Reposition the nodes near the pointer or current container
+
+				sketch.importJSON(data, {appendMode: true});
+				
+			}
+		});
+	}
 });
