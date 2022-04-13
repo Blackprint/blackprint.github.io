@@ -71,24 +71,34 @@ sf.model('sketch-pages', function(My){
 		}
 	};
 
+	function checkIfHasSelection(ev, skipSelectionCheck){
+		// Skip textbox/input element
+		let tagName = ev.target.tagName;
+		if(tagName === 'INPUT' || tagName === 'TEXTAREA')
+			return;
+
+		let pageIndex = views.currentPath.match(/\/sketch\/([0-9]+)/)?.[1];
+		if(pageIndex == null) return;
+
+		let sketch = SketchList[pageIndex-1];
+		let container = sketch.scope('container');
+
+		// Skip if no selected nodes/cables
+		if(!skipSelectionCheck && container.nodeScope.selected.length === 0
+		&& container.cableScope.selected.length === 0){
+			return;
+		}
+
+		return {sketch, container};
+	}
+
 	if(My._eventOnce == null){
 		My._eventOnce = true;
 
 		$(window).on('keydown', async (ev) => {
-			// Skip textbox/input element
-			if(ev.target.tagName !== 'BODY') return;
-
-			let pageIndex = views.currentPath.match(/\/sketch\/([0-9]+)/)?.[1];
-			if(pageIndex == null) return;
-
-			let sketch = SketchList[pageIndex-1];
-			let container = sketch.scope('container');
-
-			// Skip if no selected nodes/cables
-			if(container.nodeScope.selected.length === 0
-			&& container.cableScope.selected.length === 0){
-				return;
-			}
+			let passed = checkIfHasSelection(ev);
+			if(!passed) return;
+			let {sketch, container} = passed;
 
 			// Currently we only support copy/paste/delete for nodes
 			if(container.nodeScope.selected.length === 0) return;
@@ -96,30 +106,88 @@ sf.model('sketch-pages', function(My){
 			if(ev.key === 'Delete'){
 				let selected = container.nodeScope.selected;
 
-				for(let i=0; i<selected.length; i++)
+				for(let i=0; i < selected.length; i++)
 					sketch.deleteNode(selected[i]);
 			}
+		})
+		.on('copy', function(ev){
+			let passed = checkIfHasSelection(ev);
+			if(!passed) return;
+			let {sketch, container} = passed;
+			
+			// Currently we only support copy/paste/delete for nodes
+			if(container.nodeScope.selected.length === 0) return;
 
-			if(ev.ctrlKey && ev.key === 'c'){
-				let data = sketch.exportJSON({selectedOnly: true});
+			let data = sketch.exportJSON({selectedOnly: true});
+			data = JSON.parse(data);
 
-				// Reduce nodes position
-				data = JSON.parse(data);
+			// Find lowest position value
+			let x = Infinity, y = Infinity;
+			for(let key in data){
+				if(key === '_') continue;
 
-				console.log(data);
-
-				navigator.clipboard.writeText(JSON.stringify(data));
+				let val = data[key];
+				for(let i=0; i < val.length; i++){
+					let node = val[i];
+					if(node.x < x) x = node.x;
+					if(node.y < y) y = node.y;
+				}
 			}
 
-			if(ev.ctrlKey && ev.key === 'v'){
-				let data = await navigator.clipboard.readText();
-				data = JSON.parse(data);
+			if(x === Infinity) x = 0;
+			if(y === Infinity) y = 0;
 
-				// Reposition the nodes near the pointer or current container
+			// Reduce nodes positions
+			for(let key in data){
+				if(key === '_') continue;
 
-				sketch.importJSON(data, {appendMode: true});
-				
+				let val = data[key];
+				for(let i=0; i < val.length; i++){
+					let node = val[i];
+					node.x -= x;
+					node.y -= y;
+				}
 			}
+
+			ev.clipboardData.setData('text/plain', JSON.stringify(data));
+			ev.preventDefault();
+		})
+		.on('paste', async function(ev){
+			let passed = checkIfHasSelection(ev, true);
+			if(!passed) return;
+			let {sketch, container} = passed;
+			
+			// Currently we only support copy/paste/delete for nodes
+			if(container.nodeScope.selected.length === 0) return;
+
+			let data = ev.clipboardData.getData('text/plain');
+			data = JSON.parse(data);
+
+			let {x, y} = container.pos; // Negative value
+
+			// Reposition the nodes near the pointer or current container
+			for(let key in data){
+				if(key === '_') continue;
+
+				let val = data[key];
+				for(let i=0; i < val.length; i++){
+					let node = val[i];
+					node.x -= x;
+					node.y -= y;
+				}
+			}
+
+			let lastIndex = container.nodeScope.list.length;
+			await sketch.importJSON(data, {appendMode: true});
+
+			let { cableScope, nodeScope } = container;
+			cableScope.selected.forEach(v => v.selected = false);
+			cableScope.selected.splice(0);
+
+			nodeScope.selected.forEach(v => v._nodeSelected = false);
+			nodeScope.selected.splice(0);
+			nodeScope.selected.push(...nodeScope.list.slice(lastIndex));
+			nodeScope.selected.forEach(v => v._nodeSelected = true);
 		});
 	}
 });
