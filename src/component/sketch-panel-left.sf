@@ -12,13 +12,18 @@
 			<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" @pointerdown="checkDragNode">
+			<div class="tree-view" tree-section="variables" @pointerdown="checkDragNode">
 				<div class="tree-item collapsed" sf-each="key, val in variables"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-					{{@if val.constructor === Object:
-						@return new $TreeList({parentKey: '', key, val});
+					{{@if val.childs != null:
+						@return new $TreeList({
+							parentKey: '',
+							key,
+							val: val.childs,
+							hasChild: varFuncChildCheck
+						});
 					}}
 				</div>
 			</div>
@@ -28,13 +33,18 @@
 			<div class="button" @click="createFunction"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" @pointerdown="checkDragNode">
+			<div class="tree-view" tree-section="functions" @pointerdown="checkDragNode">
 				<div class="tree-item collapsed" sf-each="key, val in functions"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-					{{@if val.constructor === Object:
-						@return new $TreeList({parentKey: '', key, val});
+					{{@if val.childs != null:
+						@return new $TreeList({
+							parentKey: '',
+							key,
+							val: val.childs,
+							hasChild: varFuncChildCheck
+						});
 					}}
 				</div>
 			</div>
@@ -44,7 +54,7 @@
 			<div class="button" @click="createCustomNode"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" @pointerdown="checkDragNode">
+			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode">
 				<div class="tree-item collapsed" sf-each="key, val in nodes"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -160,7 +170,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.functionCount = 0;
 	My.nodeCount = 0;
 
-	function deepCount(obj){
+	function deepCount(obj, isNodes){
 		let len = 0;
 		if(obj.hidden) return len;
 
@@ -168,29 +178,46 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			let temp = obj[key];
 			if(temp == null) continue;
 
-			if(temp instanceof Function)
-				len++;
-			else len += deepCount(temp);
+			if(isNodes){
+				if(temp instanceof Function)
+					len++;
+				else len += deepCount(temp, isNodes);
+			}
+			else {
+				if(temp.childs == null)
+					len++;
+				else len += deepCount(temp.childs, isNodes);
+			}
 		}
 
 		obj.refresh?.();
 		return len;
 	}
 	
-	let pendingRefresh;
-	const refreshCounter = () => {
-		clearTimeout(pendingRefresh);
+	let pendingRefreshModule;
+	const refreshNodesCounter = () => {
+		clearTimeout(pendingRefreshModule);
 
-		pendingRefresh = setTimeout(() => {
-			My.nodeCount = deepCount(Blackprint.availableNode);
+		pendingRefreshModule = setTimeout(() => {
+			My.nodeCount = deepCount(Blackprint.availableNode, true);
 		}, 500);
 	}
-	
-	Blackprint.on('moduleAdded', refreshCounter);
-	Blackprint.on('moduleDelete', refreshCounter);
-	Blackprint.on('moduleUpdate', refreshCounter);
-	Blackprint.on('bp_editorNodeAvailability', refreshCounter);
-	$(refreshCounter);
+	let pendingRefreshVars;
+	const refreshVarsCounter = () => {
+		clearTimeout(pendingRefreshVars);
+
+		pendingRefreshVars = setTimeout(() => {
+			My.variableCount = deepCount(sketch.variables);
+			My.functionCount = deepCount(sketch.functions);
+		}, 500);
+	}
+
+	sketch.on('json.imported', refreshVarsCounter);
+	Blackprint.on('moduleAdded', refreshNodesCounter);
+	Blackprint.on('moduleDelete', refreshNodesCounter);
+	Blackprint.on('moduleUpdate', refreshNodesCounter);
+	Blackprint.on('bp_editorNodeAvailability', refreshNodesCounter);
+	$(refreshNodesCounter);
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
@@ -269,10 +296,15 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let focus = ev.target;
 		if(focus.nextElementSibling != null) return;
 
-		let key = focus.parentNode.getAttribute('tree-item-key');
-		if(key == null) return;
+		focus = $(focus);
 
-		let parent = $(focus).parent(".tree-item.has-child > tree-list")[0];
+		let section = focus.parent('.tree-view').attr('tree-section');
+		if(section === 'nodes'){
+			var key = focus[0].parentNode.getAttribute('tree-item-key');
+			if(key == null) return;
+		}
+
+		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
 
 		ToolTip.set("Create node");
@@ -285,10 +317,24 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 				$.afterRepaint().then(function(){
 					let offset = evUp.target.getBoundingClientRect();
 
-					sketch.createNode(namespace, {
-						x: evUp.clientX - offset.x,
-						y: evUp.clientY - offset.y
-					});
+					if(section === 'nodes'){
+						sketch.createNode(namespace, {
+							x: evUp.clientX - offset.x,
+							y: evUp.clientY - offset.y
+						});
+					}
+					else if(section === 'functions'){
+						sketch.createNode('BP/fn/input', {
+							x: evUp.clientX - offset.x,
+							y: evUp.clientY - offset.y
+						});
+					}
+					else if(section === 'variables'){
+						sketch.createNode('BP/var/set', {
+							x: evUp.clientX - offset.x,
+							y: evUp.clientY - offset.y
+						});
+					}
 				});
 			};
 		});
@@ -305,4 +351,6 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.createCustomNode = ev => {
 		Modal.goto('/custom-node-editor');
 	}
+
+	My.varFuncChildCheck = obj => obj.childs != null;
 });
