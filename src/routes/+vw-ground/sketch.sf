@@ -94,6 +94,7 @@ sf.model('sketch-pages', function(My){
 
 	if(My._eventOnce == null){
 		My._eventOnce = true;
+		let pointerX, pointerY;
 
 		$(window).on('keydown', async (ev) => {
 			let passed = checkIfHasSelection(ev);
@@ -109,6 +110,10 @@ sf.model('sketch-pages', function(My){
 				for(let i=0; i < selected.length; i++)
 					sketch.deleteNode(selected[i]);
 			}
+		})
+		.on('pointermove', function(ev){
+			pointerX = ev.clientX;
+			pointerY = ev.clientY;
 		})
 		.on('copy', function(ev){
 			let passed = checkIfHasSelection(ev);
@@ -164,6 +169,7 @@ sf.model('sketch-pages', function(My){
 			data = JSON.parse(data);
 
 			let {x, y} = container.pos; // Negative value
+			let {x: oX, y: oY} = container.offset; // Negative value
 
 			// Reposition the nodes near the pointer or current container
 			for(let key in data){
@@ -172,8 +178,8 @@ sf.model('sketch-pages', function(My){
 				let val = data[key];
 				for(let i=0; i < val.length; i++){
 					let node = val[i];
-					node.x -= x;
-					node.y -= y;
+					node.x += -x - oX + pointerX;
+					node.y += -y - oY + pointerY;
 				}
 			}
 
