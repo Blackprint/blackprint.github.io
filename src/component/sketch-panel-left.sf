@@ -322,7 +322,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 						});
 					}
 					else if(section === 'functions'){
-						sketch.createNode('BP/fn/input', {
+						sketch.createNode('BP/Fn/Main', {
 							data: {name: key},
 							x: evUp.clientX - offset.x,
 							y: evUp.clientY - offset.y
@@ -331,7 +331,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					else if(section === 'variables'){
 						DropDown.show([{
 							title: "Get " + key, callback(){
-								sketch.createNode('BP/var/get', {
+								sketch.createNode('BP/Var/Get', {
 									data: {name: key},
 									x: evUp.clientX - offset.x,
 									y: evUp.clientY - offset.y
@@ -339,7 +339,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 							}
 						}, {
 							title: "Set " + key, callback(){
-								sketch.createNode('BP/var/set', {
+								sketch.createNode('BP/Var/Set', {
 									data: {name: key},
 									x: evUp.clientX - offset.x,
 									y: evUp.clientY - offset.y
