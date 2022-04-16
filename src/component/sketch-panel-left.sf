@@ -13,7 +13,7 @@
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" tree-section="variables" @pointerdown="checkDragNode">
-				<div class="tree-item collapsed" sf-each="key, val in variables"
+				<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in variables"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
@@ -34,7 +34,7 @@
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" tree-section="functions" @pointerdown="checkDragNode">
-				<div class="tree-item collapsed" sf-each="key, val in functions"
+				<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in functions"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
@@ -299,10 +299,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		focus = $(focus);
 
 		let section = focus.parent('.tree-view').attr('tree-section');
-		if(section === 'nodes'){
-			var key = focus[0].parentNode.getAttribute('tree-item-key');
-			if(key == null) return;
-		}
+		let key = focus[0].parentNode.getAttribute('tree-item-key');
+		if(key == null) return;
 
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
@@ -325,15 +323,29 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					}
 					else if(section === 'functions'){
 						sketch.createNode('BP/fn/input', {
+							data: {name: key},
 							x: evUp.clientX - offset.x,
 							y: evUp.clientY - offset.y
 						});
 					}
 					else if(section === 'variables'){
-						sketch.createNode('BP/var/set', {
-							x: evUp.clientX - offset.x,
-							y: evUp.clientY - offset.y
-						});
+						DropDown.show([{
+							title: "Get " + key, callback(){
+								sketch.createNode('BP/var/get', {
+									data: {name: key},
+									x: evUp.clientX - offset.x,
+									y: evUp.clientY - offset.y
+								});
+							}
+						}, {
+							title: "Set " + key, callback(){
+								sketch.createNode('BP/var/set', {
+									data: {name: key},
+									x: evUp.clientX - offset.x,
+									y: evUp.clientY - offset.y
+								});
+							}
+						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
 					}
 				});
 			};
