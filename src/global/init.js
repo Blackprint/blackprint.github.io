@@ -19,6 +19,9 @@ $(function(){
 		if(/android|ios/i.test(navigator.userAgent) || !/chrome/i.test(navigator.userAgent)){
 			sf.model('header').disableVFX();
 		}
+
+		if(views.data.page != null && /\/sketch\/[^0-9]/.test(views.currentPath))
+			views.goto("/sketch/1");
 	}, 100);
 
 	$(sf.Window).on('resize', ev => {
@@ -46,4 +49,14 @@ $(function(){
 		// ToDo: show popup to select if user is prefer old version or the newest version
 		return Object.entries(map).forEach(v => v.useOld = false);
 	};
+
+	
+	// this.variables = {}; // { name => { value, type, title, category } }
+	// this.functions = {}; // { name => { variables, input, output, used: [], node, title, category, description } }
+
+	setTimeout(()=>{
+		let sketch = SketchList[0];
+		sketch.createVariable("MyVar");
+		sketch.createFunction("Category/MyFunc", {description: "desc"});
+	}, 2000)
 });

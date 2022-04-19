@@ -24,7 +24,7 @@ var EditorHeader = sf.model('header', function(My, include){
 
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
-		let sketch = SketchList[views.data.page - 1];
+		let sketch = window.CurrentSketch;
 
 		include('dropdown').show([{
 			title: 'Sketch',
@@ -262,7 +262,7 @@ var EditorHeader = sf.model('header', function(My, include){
 
 	My.cloneActive = false;
 	My.cloneContainer = function(){
-		let sketch = SketchList[views.data.page - 1];
+		let sketch = window.CurrentSketch;
 		sketch.page.cloneContainer();
 		My.cloneActive = sketch.page.cloneActive;
 	}
