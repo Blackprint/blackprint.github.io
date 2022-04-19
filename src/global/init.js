@@ -40,7 +40,7 @@ $(function(){
 
 	// Auto switch to dev mode when being used on localhost
 	$(function(){
-		if(location.hostname === 'localhost' && !location.pathname.includes('/dev.html'))
+		if(/localhost|127\.0\.0\.1|\.repl\.co/.test(location.hostname) && !location.pathname.includes('/dev.html'))
 			location.pathname = '/dev.html';
 	});
 
