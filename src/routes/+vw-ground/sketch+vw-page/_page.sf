@@ -58,7 +58,10 @@ sketch-page{
 	on:{
 		coming(data){ // data === views.data
 			console.log("Sketch page data:", data);
-			let sketch = SketchList[data.page - 1];
+			let sketch = data.bpInstance ?? SketchList[data.page - 1];
+
+			if(sketch == null || sketch._abandon) return;
+			window.CurrentSketch = sketch;
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;
 			$('body > .background .tile').css('display', 'none');
@@ -66,9 +69,12 @@ sketch-page{
 			if(sketch.ifaceList.length === 0 && !sketch.__importing)
 				sketch.page.panels.bottom.openPanel();
 		},
-		leaving(){
+		leaving(targetURL){
 			console.log("Leaving from sketch page data:", arguments);
-			$('body > .background .tile').css('display', '');
+			if(!/^\/sketch\//m.test(targetURL)){
+				$('body > .background .tile').css('display', '');
+				window.CurrentSketch = null;
+			}
 		}
 	}
 }
@@ -79,7 +85,30 @@ sketch-page{
 var SketchList = [];
 sf.component('sketch-page', function(My){
 	// URL: #page/sketch/{data.page}
-	let sketch = My.sketch = SketchList[views.data.page - 1] ??= new Blackprint.Sketch();
+	let sketch;
+	if(views.data.bpInstance == null){
+		if(views.data.page.startsWith('node-')){
+			// Remove this page
+			setTimeout(()=>{
+				My.$el.parent('sf-page-view').remove();
+				views.lastSibling = null;
+			}, 500);
+
+			this.CurrentSketch = {
+				_abandon: true,
+				variables:{},
+				functions:{},
+				on(){}
+			};
+			My.panels = {};
+			return console.log("Returning to other page because bpInstance was not found");
+		}
+
+		sketch = My.sketch = SketchList[views.data.page - 1] ??= new Blackprint.Sketch();
+	}
+	else sketch = My.sketch = views.data.bpInstance;
+
+	window.CurrentSketch = sketch;
 	sketch.page = My;
 
 	// Will be filled by each panel component after initialized
@@ -151,6 +180,15 @@ sf.component('sketch-page', function(My){
 				}, 100);
 			});
 		}, 200);
+	});
+
+	sketch.on('node.function.open', {slot: 'bp-editor'}, async ev => {
+		let name = ev.iface.namespace.split('/').join('-');
+		name += '-'+ev.iface.uniqId;
+
+		await views.goto("/sketch/node-"+name, {
+			bpInstance: ev.iface.bpInstance
+		});
 	});
 
 	// This may cause one memory leak because this will never being cleared
