@@ -11,6 +11,24 @@ sf-space[blackprint]{
 				padding-left: 22px;
 			}
 
+			&.func-in-out .header{
+				height: 20px;
+				.icon{
+					margin-top: 2px;
+					&:before{
+						font-family: "Font Awesome 5 Free";
+						font-weight: 400;
+						content: "\f277";
+						font-size: 16px;
+						padding-right: 4px;
+						vertical-align: top;
+					}
+				}
+				.text{
+					margin-top: 1px;
+				}
+			}
+
 			&.event .header{
 				.icon{
 					font-family: "Font Awesome 5 Free";

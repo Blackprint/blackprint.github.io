@@ -151,10 +151,13 @@ sketch-page > .panels sketch-panel-left {
 		}
 	}
 }
+.anim-element sketch-page > .panels sketch-panel-left.opened .content {
+	visibility: hidden;
+}
 
 ## js-global
 sf.component('sketch-panel-left', {template: #this.path}, function(My){
-	let sketch = My.sketch = SketchList[views.data.page - 1];
+	let sketch = My.sketch = window.CurrentSketch;
 
 	My.opened = false;
 	My.preview = null;
@@ -299,7 +302,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		focus = $(focus);
 
 		let section = focus.parent('.tree-view').attr('tree-section');
-		let key = focus[0].parentNode.getAttribute('tree-item-key');
+		let itemEl = focus[0].parentNode;
+		let key = itemEl.getAttribute('tree-item-key');
 		if(key == null) return;
 
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
@@ -322,8 +326,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 						});
 					}
 					else if(section === 'functions'){
-						sketch.createNode('BP/Fn/Main', {
-							data: {name: key},
+						itemEl.model.createNode(sketch, {
 							x: evUp.clientX - offset.x,
 							y: evUp.clientY - offset.y
 						});
@@ -354,10 +357,12 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 	My.createVariable = ev => {
 		SmallNotif.add("Still under development");
+		// sketch.createVariable("MyVar", {value: 123, type: Number});
 	}
 
 	My.createFunction = ev => {
 		SmallNotif.add("Still under development");
+		// sketch.createFunction("Category/MyFunc", {input:{Number}, output:{String}, description: "desc"});
 	}
 
 	My.createCustomNode = ev => {
