@@ -58,6 +58,9 @@ sketch-page > .panels sketch-panel-bottom {
 		}
 	}
 }
+.anim-element sketch-page > .panels sketch-panel-bottom.opened .content {
+	visibility: hidden;
+}
 
 ## js-global
 sf.component('sketch-panel-bottom', {template: #this.path}, function(My){

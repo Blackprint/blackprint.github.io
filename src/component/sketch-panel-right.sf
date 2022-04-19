@@ -87,6 +87,9 @@ sketch-page > .panels sketch-panel-right {
 		}
 	}
 }
+.anim-element sketch-page > .panels sketch-panel-right.opened .content {
+	visibility: hidden;
+}
 
 // bpsprf = Blackprint Sketch Panel Right Field
 .bpsprf-default, .bpsprf-iface {
