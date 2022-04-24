@@ -1,6 +1,6 @@
 Blackprint.registerNode('BP_Editor/LeftPanel/Preview',
 class extends Blackprint.Node {
-	static input = { Element: HTMLElement };
+	static input = { Element };
 	constructor(instance){
 		super(instance);
 
