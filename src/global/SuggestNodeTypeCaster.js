@@ -20,6 +20,9 @@ function SuggestNodeTypeCaster(ev){
 
 	let { cable, port, target, handler } = ev;
 
+	if(target.iface.namespace === "BP/Fn/Input") return;
+	if(target.iface.namespace === "BP/Fn/Output") return;
+
 	let input, output;
 	if(cable.owner.source === 'input'){
 		input = port;
