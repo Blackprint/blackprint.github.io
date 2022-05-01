@@ -53,10 +53,4 @@ $(function(){
 	
 	// this.variables = {}; // { name => { value, type, title, category } }
 	// this.functions = {}; // { name => { variables, input, output, used: [], node, title, category, description } }
-
-	setTimeout(()=>{
-		let sketch = SketchList[0];
-		sketch.createVariable("MyVar");
-		sketch.createFunction("Category/MyFunc", {description: "desc"});
-	}, 2000)
 });

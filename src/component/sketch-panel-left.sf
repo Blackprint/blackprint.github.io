@@ -355,14 +355,30 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		});
 	}
 
-	My.createVariable = ev => {
+	My.createVariable = async ev => {
 		SmallNotif.add("Still under development");
-		// sketch.createVariable("MyVar", {value: 123, type: Number});
+		let val = await Swal.fire({
+			title: "Variable name",
+			input: "text",
+		});
+
+		val = val.value;
+		if(!val) return;
+
+		sketch.createVariable(val);
 	}
 
-	My.createFunction = ev => {
+	My.createFunction = async ev => {
 		SmallNotif.add("Still under development");
-		// sketch.createFunction("Category/MyFunc", {input:{Number}, output:{String}, description: "desc"});
+		let val = await Swal.fire({
+			title: "Function name",
+			input: "text",
+		});
+
+		val = val.value;
+		if(!val) return;
+
+		sketch.createFunction(val, {description: "No description"});
 	}
 
 	My.createCustomNode = ev => {
