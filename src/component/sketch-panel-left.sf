@@ -111,6 +111,7 @@ sketch-page > .panels sketch-panel-left {
 		.title, .button{
 			display: inline-block;
 			cursor: pointer;
+			white-space: nowrap;
 		}
 		.button{
 			margin-right: 10px;
