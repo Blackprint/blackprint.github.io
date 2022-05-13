@@ -8,7 +8,7 @@
 	<div class="content">
 		<div>
 			<div class="row" sf-each="x in list" @keyup="itemChanged(x)">
-				<input class="column key" type="text" @input="(this.value = x.key = validateKey(this.value))" sf-bind="x.key" placeholder="...">
+				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" sf-bind="x.key" placeholder="...">
 				<input class="column" type="text" sf-bind="x.value" placeholder="...">
 			</div>
 		</div>
@@ -137,20 +137,39 @@ sf.model('environment-variables', function(My){
 			// Assign the value of each list on the map
 			for (var i = 0; i < list.length; i++) {
 				let item = list[i];
-				map[item.key] = item.value;
 				uniq.add(item.key);
+
+				if(map[item.key] !== item.value)
+					Blackprint.Environment.set(item.key, item.value);
 			}
 
 			// Remove key that not exist on the list
 			for(let key in map){
 				if(!uniq.has(key))
-					Blackprint.Environment.delete(key, true);
+					Blackprint.Environment.delete(key);
 			}
 		}, 1000);
 	}
 
 	My.validateKey = function(value){
 		return value.replace(/[ \-]+/gm, '_').replace(/\W+/gm, '').replace(/^[0-9]+/gm, '').toUpperCase();
+	}
+
+	My.renameEnv = function(item, element, oldKey){
+		let temp = My.validateKey(element.value);
+
+		// Skip if this was a new env
+		if(!(temp in Blackprint.Environment.map)){
+			item.key = temp;
+			return;
+		}
+
+		if(temp == ''){
+			Blackprint.Environment.delete(oldKey);
+			return;
+		}
+
+		Blackprint.Environment._rename(oldKey, temp);
 	}
 
 	My.close = function(){
