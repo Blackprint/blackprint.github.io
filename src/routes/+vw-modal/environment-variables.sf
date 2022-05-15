@@ -9,7 +9,7 @@
 		<div>
 			<div class="row" sf-each="x in list" @keyup="itemChanged(x)">
 				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" sf-bind="x.key" placeholder="...">
-				<input class="column" type="text" sf-bind="x.value" placeholder="...">
+				<input class="column bpe-value" type="text" value="{{ x.value }}" placeholder="...">
 			</div>
 		</div>
 		<div class="row">
@@ -99,8 +99,6 @@ sf.model('environment-variables', function(My){
 	My.newValue = '';
 	My.newKey = '';
 
-	// Blackprint.Environment.import([{key: 'TEST', value:'123'}]);
-
 	My.v2m$newKey = function(now){
 		now = My.validateKey(now);
 
@@ -114,10 +112,10 @@ sf.model('environment-variables', function(My){
 	}
 
 	function caretFocusOnLastItem(){
-		$('input', My.list.getElement(My.list.length-1))[0].focus();
+		$('input', My.list.getElements(My.list.length-1))[0].focus();
 	}
 
-	My.itemChanged = function(item){
+	My.itemChanged = function(item, ev){
 		refreshEnvironment();
 
 		if(item.key.length === 0 && (Number.isNaN(item.value) || !item.value)){
@@ -139,8 +137,9 @@ sf.model('environment-variables', function(My){
 				let item = list[i];
 				uniq.add(item.key);
 
-				if(map[item.key] !== item.value)
-					Blackprint.Environment.set(item.key, item.value);
+				let value = list.$el('.bpe-value', i)[0].value;
+				if(map[item.key] !== value)
+					Blackprint.Environment.set(item.key, value);
 			}
 
 			// Remove key that not exist on the list
