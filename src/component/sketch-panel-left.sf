@@ -7,24 +7,38 @@
 			</div>
 		</div>
 
-		<div class="variable-list collapsed">
-			<div class="title" @click="collapseSubPanel(this)">Variables ({{ variableCount }})</div>
-			<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
+		<div class="variable-list">
+			<div class="title" @click="collapseSubPanel(this)">Variables</div>
 
-			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" tree-section="variables" @pointerdown="checkDragNode">
-				<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in variables"
-					style="display: {{ val.hidden ? 'none' : '' }}">
-					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+			<div class="tree-view tree-item has-child collapsed">
+				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Environment ({{ _envVar.length }})</div>
+				<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
 
-					{{@if val.childs != null:
-						@return new $TreeList({
-							parentKey: '',
-							key,
-							val: val.childs,
-							hasChild: varFuncChildCheck
-						});
-					}}
+				<div class="tree-view tree-group" tree-section="environmentVar" @pointerdown="checkDragNode">
+					<div class="tree-item" sf-each="val in _envVar" tree-item-key="{{ val.key }}">
+						<div class="title"><i class="fa tree-icon"></i> {{ val.key }}</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tree-view tree-item has-child collapsed">
+				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Instance ({{ variableCount }})</div>
+				<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
+
+				<!-- /src/component/tree-list.sf -->
+				<div class="tree-view tree-group" tree-section="variables" @pointerdown="checkDragNode">
+					<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in variables" style="display: {{ val.hidden ? 'none' : '' }}">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+						{{@if val.childs != null:
+							return new $TreeList({
+								parentKey: '',
+								key,
+								val: val.childs,
+								hasChild: varFuncChildCheck
+							});
+						}}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -39,7 +53,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.childs != null:
-						@return new $TreeList({
+						return new $TreeList({
 							parentKey: '',
 							key,
 							val: val.childs,
@@ -60,7 +74,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						@return new $TreeList({parentKey: '', key, val});
+						return new $TreeList({parentKey: '', key, val});
 					}}
 				</div>
 			</div>
@@ -122,6 +136,9 @@ sketch-page > .panels sketch-panel-left {
 			max-height: 500px;
 			width: 185px;
 			overflow: auto;
+			&.collapsed > .tree-group {
+				display: none;
+			}
 		}
 		&.collapsed {
 			.tree-view {
@@ -166,6 +183,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.previewScale = 1;
 	My.scaledPreviewHeight = 1;
 
+	My._envVar = Blackprint.Environment.list;
 	My.variables = sketch.variables;
 	My.functions = sketch.functions;
 	My.nodes = Blackprint.nodes;
@@ -197,7 +215,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		obj.refresh?.();
 		return len;
 	}
-	
+
 	let pendingRefreshModule;
 	const refreshNodesCounter = () => {
 		clearTimeout(pendingRefreshModule);
@@ -217,11 +235,12 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	sketch.on('json.imported', refreshVarsCounter);
-	Blackprint.on('moduleAdded', refreshNodesCounter);
+	sketch.on('variable.new function.new', refreshVarsCounter);
+	Blackprint.on('moduleAdded', refreshNodesCounter); // ToDo: use dot to separate event scope
 	Blackprint.on('moduleDelete', refreshNodesCounter);
 	Blackprint.on('moduleUpdate', refreshNodesCounter);
 	Blackprint.on('bp_editorNodeAvailability', refreshNodesCounter);
-	$(refreshNodesCounter);
+	$(refreshNodesCounter); // Run when all script/page is loaded
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
@@ -285,11 +304,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		el = el.nextElementSibling;
 		if(el == null) return;
 
-		let hidden = el.model.hidden = !el.model.hidden;
+		let hidden;
+		let parent = $(el.parentNode);
+
+		if(parent.hasClass('tree-view'))
+			hidden = !parent.hasClass('collapsed');
+		else hidden = el.model.hidden = !el.model.hidden;
 
 		if(hidden)
-			$(el.parentNode).addClass("collapsed");
-		else $(el.parentNode).removeClass("collapsed");
+			parent.addClass("collapsed");
+		else parent.removeClass("collapsed");
 	}
 
 	My.collapseSubPanel = el => {
@@ -316,41 +340,49 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 			if(evUp.target.closest('sketch-page') == null) return;
 			if(evUp.target.closest('sf-m.cables') != null){
-				let namespace = parent.model.parentKey + '/' + key;
+				let parentKey = parent.model.parentKey;
+				let namespace = !!parentKey ? (parentKey + '/' + key) : key;
+
 				$.afterRepaint().then(function(){
 					let offset = evUp.target.getBoundingClientRect();
+					let nodeOptions = {
+						x: evUp.clientX - offset.x,
+						y: evUp.clientY - offset.y
+					};
 
 					if(section === 'nodes'){
-						sketch.createNode(namespace, {
-							x: evUp.clientX - offset.x,
-							y: evUp.clientY - offset.y
-						});
+						sketch.createNode(namespace, nodeOptions);
 					}
 					else if(section === 'functions'){
-						itemEl.model.createNode(sketch, {
-							x: evUp.clientX - offset.x,
-							y: evUp.clientY - offset.y
-						});
+						itemEl.model.createNode(sketch, nodeOptions);
 					}
 					else if(section === 'variables'){
 						DropDown.show([{
 							title: "Get " + key, callback(){
-								sketch.createNode('BP/Var/Get', {
-									data: {name: key},
-									x: evUp.clientX - offset.x,
-									y: evUp.clientY - offset.y
-								});
+								nodeOptions.data = { name: key };
+								sketch.createNode('BP/Var/Get', nodeOptions);
 							}
 						}, {
 							title: "Set " + key, callback(){
-								sketch.createNode('BP/Var/Set', {
-									data: {name: key},
-									x: evUp.clientX - offset.x,
-									y: evUp.clientY - offset.y
-								});
+								nodeOptions.data = { name: key };
+								sketch.createNode('BP/Var/Set', nodeOptions);
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
 					}
+					else if(section === 'environmentVar'){
+						DropDown.show([{
+							title: "Get " + key, callback(){
+								nodeOptions.data = { name: key };
+								sketch.createNode('BP/Env/Get', nodeOptions);
+							}
+						}, {
+							title: "Set " + key, callback(){
+								nodeOptions.data = { name: key };
+								sketch.createNode('BP/Env/Set', nodeOptions);
+							}
+						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
+					}
+					else console.error("Unhandled side panel section:", section);
 				});
 			};
 		});
