@@ -97,7 +97,7 @@ function SuggestNodeTypeCaster(ev){
 SuggestNodeTypeCaster.primitive = new Set([String, Number, Boolean, BigInt]);
 SuggestNodeTypeCaster.createNode = function(namespace, ev, input){
 	let instance =  ev.instance;
-	let rect = input.iface.input._list.getElement(input).getBoundingClientRect();
+	let rect = input.iface.input._portList.getElement(input).getBoundingClientRect();
 	let container = instance.scope('container');
 
 	let Ofst = container.offset;

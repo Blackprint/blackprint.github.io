@@ -65,9 +65,6 @@ sketch-page{
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;
 			$('body > .background .tile').css('display', 'none');
-
-			if(sketch.ifaceList.length === 0 && !sketch.__importing)
-				sketch.page.panels.bottom.openPanel();
 		},
 		leaving(targetURL){
 			console.log("Leaving from sketch page data:", arguments);
@@ -156,8 +153,6 @@ sf.component('sketch-page', function(My){
 					if(targetPorts == null) return;
 
 					for(let key in targetPorts){
-						if(key === '_list') continue; // ToDo: remove this after the engine get updated
-
 						let port = targetPorts[key];
 						if(isConnectablePort(owner.type, port.type))
 							compatiblePorts.push(port);
@@ -170,7 +165,7 @@ sf.component('sketch-page', function(My){
 						// ToDo: remove this after Blackprint Sketch was updated
 						if(sourcePort === 'input'){
 							let port = compatiblePorts[0];
-							let rect = port.findPortElement(targetPorts._list.getElement(port)).getBoundingClientRect();
+							let rect = port.findPortElement(targetPorts._portList.getElement(port)).getBoundingClientRect();
 			
 							let { offset, pos, scale } = port._scope('container');
 							ev.cable.head1[0] = (rect.x + rect.width/2 - offset.x - pos.x) / scale;
