@@ -79,6 +79,8 @@ function SuggestNodeTypeCaster(ev){
 		});
 	}
 	else if(!SuggestNodeTypeCaster.primitive.has(output.type) && SuggestNodeTypeCaster.primitive.has(input.type)){
+		if(output.type.feature != null || input.type.feature != null) return;
+
 		handler(() => {
 			let iface = SuggestNodeTypeCaster.createNode('Data/Object/GetValue', ev, input);
 
