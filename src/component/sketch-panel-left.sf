@@ -12,7 +12,7 @@
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Environment ({{ _envVar.length }})</div>
-				<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
+				<div class="button" @click="Modal.goto('/environment-variables')"><i class="fa fa-plus-square"></i></div>
 
 				<div class="tree-view tree-group" tree-section="environmentVar" @pointerdown="checkDragNode">
 					<div class="tree-item" sf-each="val in _envVar" tree-item-key="{{ val.key }}">
@@ -22,22 +22,85 @@
 			</div>
 
 			<div class="tree-view tree-item has-child collapsed">
-				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Instance ({{ variableCount }})</div>
-				<div class="button" @click="createVariable"><i class="fa fa-plus-square"></i></div>
+				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Public ({{ variableCount }})</div>
+				<div class="button" @click="createVariable(event, 'public')"><i class="fa fa-plus-square"></i></div>
 
 				<!-- /src/component/tree-list.sf -->
 				<div class="tree-view tree-group" tree-section="variables" @pointerdown="checkDragNode">
-					<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in variables" style="display: {{ val.hidden ? 'none' : '' }}">
-						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+					<div class="tree-item collapsed" tree-item-key="{{ val.id }}" sf-each="val in variables" style="display: {{ val.hidden ? 'none' : '' }}">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ val.id }}</div>
 
 						{{@if val.childs != null:
 							return new $TreeList({
 								parentKey: '',
-								key,
+								key: val.id,
 								val: val.childs,
 								hasChild: varFuncChildCheck
 							});
 						}}
+					</div>
+				</div>
+			</div>
+
+			<div class="tree-view tree-item has-child" style="display: {{ isFunctionSketch ? '' : 'none' }}">
+				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Function </div>
+
+				<div class="tree-view tree-group">
+					<div class="tree-view tree-item has-child collapsed">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Input ({{ funcInput.length }}) </div>
+
+						<div class="tree-view tree-group" tree-section="functionInputs" @pointerdown="checkDragNode">
+							<div class="tree-item collapsed" tree-item-key="{{ val.name }}" sf-each="val in funcInput">
+								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ val.name }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="tree-view tree-item has-child collapsed">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Output ({{ funcOutput.length }}) </div>
+
+						<div class="tree-view tree-group" tree-section="functionOutputs" @pointerdown="checkDragNode">
+							<div class="tree-item collapsed" tree-item-key="{{ val.name }}" sf-each="val in funcOutput">
+								<div class="title"><i class="fa tree-icon"></i> {{ val.name }}</div>
+							</div>
+						</div>
+					</div>
+					<div class="tree-view tree-item has-child collapsed">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Shared ({{ functionSharedVariableLength }}) </div>
+						<div class="button" @click="createVariable(event, 'shared')"><i class="fa fa-plus-square"></i></div>
+
+						<div class="tree-view tree-group" tree-section="sharedVariables" @pointerdown="checkDragNode">
+							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcSharedVariable" style="display: {{ val.hidden ? 'none' : '' }}">
+								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+								{{@if val.childs != null:
+									return new $TreeList({
+										parentKey: '',
+										key,
+										val: val.childs,
+										hasChild: varFuncChildCheck
+									});
+								}}
+							</div>
+						</div>
+					</div>
+					<div class="tree-view tree-item has-child collapsed">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Private ({{ functionVariableLength }}) </div>
+						<div class="button" @click="createVariable(event, 'private')"><i class="fa fa-plus-square"></i></div>
+
+						<div class="tree-view tree-group" tree-section="privateVariables" @pointerdown="checkDragNode">
+							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcVariable" style="display: {{ val.hidden ? 'none' : '' }}">
+								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+								{{@if val.childs != null:
+									return new $TreeList({
+										parentKey: '',
+										key,
+										val: val.childs,
+										hasChild: varFuncChildCheck
+									});
+								}}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -134,7 +197,7 @@ sketch-page > .panels sketch-panel-left {
 		.tree-view{
 			position: relative;
 			max-height: 500px;
-			width: 185px;
+			// width: 185px;
 			overflow: auto;
 			&.collapsed > .tree-group {
 				display: none;
@@ -177,17 +240,29 @@ sketch-page > .panels sketch-panel-left {
 sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	let sketch = My.sketch = window.CurrentSketch;
 
-	My.opened = false;
+	My.opened = true;
 	My.preview = null;
 	My.previewWidth = 200;
 	My.previewScale = 1;
 	My.scaledPreviewHeight = 1;
 
-	My._envVar = Blackprint.Environment.list;
-	My.variables = sketch.variables;
+	let funcNodeInstance = sketch._funcMain?.node._funcInstance;
+	if(funcNodeInstance != null)
+		My.variables = funcNodeInstance.rootInstance.variables;
+	else My.variables = sketch.variables;
+
 	My.functions = sketch.functions;
 	My.nodes = Blackprint.nodes;
 
+	My.isFunctionSketch = sketch._funcMain != null;
+	My.funcInput = sketch._funcMain?.input._portList ?? [];
+	My.funcOutput = sketch._funcMain?.output._portList ?? [];
+	My.funcSharedVariable = funcNodeInstance?.variables ?? {}; // shared function variables
+	My.funcVariable = sketch.variables ?? {}; // private function variables
+
+	My._envVar = Blackprint.Environment.list;
+	My.functionSharedVariableLength = 0;
+	My.functionVariableLength = 0;
 	My.variableCount = 0;
 	My.functionCount = 0;
 	My.nodeCount = 0;
@@ -229,18 +304,28 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		clearTimeout(pendingRefreshVars);
 
 		pendingRefreshVars = setTimeout(() => {
-			My.variableCount = deepCount(sketch.variables);
-			My.functionCount = deepCount(sketch.functions);
+			My.variableCount = deepCount(My.variables);
+			My.functionCount = deepCount(My.functions);
+
+			if(My.isFunctionSketch){
+				My.functionSharedVariableLength = deepCount(My.funcSharedVariable);
+				My.functionVariableLength = deepCount(My.funcVariable);
+			}
 		}, 500);
 	}
 
 	sketch.on('json.imported', refreshVarsCounter);
 	sketch.on('variable.new function.new', refreshVarsCounter);
+
+	if(My.isFunctionSketch)
+		funcNodeInstance.on('variable.new', refreshVarsCounter);
+
 	Blackprint.on('moduleAdded', refreshNodesCounter); // ToDo: use dot to separate event scope
 	Blackprint.on('moduleDelete', refreshNodesCounter);
 	Blackprint.on('moduleUpdate', refreshNodesCounter);
 	Blackprint.on('bp_editorNodeAvailability', refreshNodesCounter);
 	$(refreshNodesCounter); // Run when all script/page is loaded
+	$(refreshVarsCounter); // Run when all script/page is loaded
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
@@ -307,7 +392,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let hidden;
 		let parent = $(el.parentNode);
 
-		if(parent.hasClass('tree-view'))
+		if(parent.hasClass('tree-view') || parent.hasClass('tree-no-model'))
 			hidden = !parent.hasClass('collapsed');
 		else hidden = el.model.hidden = !el.model.hidden;
 
@@ -356,15 +441,20 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					else if(section === 'functions'){
 						itemEl.model.createNode(sketch, nodeOptions);
 					}
-					else if(section === 'variables'){
+					else if(section === 'variables' || section === 'sharedVariables' || section === 'privateVariables'){
+						let scope;
+						if(section === 'variables') scope = 'public';
+						else if(section === 'sharedVariables') scope = 'shared';
+						else if(section === 'privateVariables') scope = 'private';
+
 						DropDown.show([{
 							title: "Get " + key, callback(){
-								nodeOptions.data = { name: key };
+								nodeOptions.data = { name: key, scope };
 								sketch.createNode('BP/Var/Get', nodeOptions);
 							}
 						}, {
 							title: "Set " + key, callback(){
-								nodeOptions.data = { name: key };
+								nodeOptions.data = { name: key, scope };
 								sketch.createNode('BP/Var/Set', nodeOptions);
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
@@ -382,13 +472,21 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
 					}
+					else if(section === 'functionInputs'){
+						nodeOptions.data = { name: key };
+						sketch.createNode('BP/FnVar/Input', nodeOptions);
+					}
+					else if(section === 'functionOutputs'){
+						nodeOptions.data = { name: key };
+						sketch.createNode('BP/FnVar/Output', nodeOptions);
+					}
 					else console.error("Unhandled side panel section:", section);
 				});
 			};
 		});
 	}
 
-	My.createVariable = async ev => {
+	My.createVariable = async (ev, scope) => {
 		SmallNotif.add("Still under development");
 		let val = await Swal.fire({
 			title: "Variable name",
@@ -398,7 +496,14 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		val = val.value;
 		if(!val) return;
 
-		sketch.createVariable(val);
+		let funcInstance = sketch._funcMain?.node._funcInstance;
+		let rootInstance = funcInstance?.rootInstance ?? sketch;
+
+		if(scope === 'public')
+			rootInstance.createVariable(val);
+		else if(scope === 'shared' || scope === 'private')
+			funcInstance.createVariable(val, { scope });
+		else throw new Error("Unhandled scope: "+scope);
 	}
 
 	My.createFunction = async ev => {
@@ -411,7 +516,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		val = val.value;
 		if(!val) return;
 
-		sketch.createFunction(val, {description: "No description"});
+		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
+		rootInstance.createFunction(val, {description: "No description"});
 	}
 
 	My.createCustomNode = ev => {
