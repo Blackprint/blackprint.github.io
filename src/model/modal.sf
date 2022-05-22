@@ -59,9 +59,18 @@ var Modal = sf.model('modal', function(My){
 		My.views = sf.Views.listSelector['vw-modal'];
 	}
 
+	let onHide = {};
+	My.onHide = function(path, callback){
+		let list = onHide[path] ??= [];
+		list.push(callback);
+	}
+
 	My.hide = function(){
 		My.showed = false;
 		My.$el('.modal-dialog').off('pointerdown', My.hide, {outside: true});
+
+		let list = onHide[My.views.currentPath];
+		list?.forEach(v => v());
 	}
 
 	My.goto = function(path){
