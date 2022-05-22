@@ -18,6 +18,9 @@ var BlackprintEventFallback = {
 	},
 	'cable.replaced'({ cable, port }){
 		SmallNotif.add("Cable was replaced because input doesn't support array", 'yellow');
+	},
+	'cable.unsupported_dynamic_port'({ cable, port }){
+		SmallNotif.add("Connecting cable between dynamically generated port is not supported", 'yellow');
 	}
 };
 
