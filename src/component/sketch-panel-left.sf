@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="variable-list">
-			<div class="title" @click="collapseSubPanel(this)">Variables</div>
+			<div class="title" @click="collapseSubPanel(this, true)">Variables</div>
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Environment ({{ _envVar.length }})</div>
@@ -87,7 +87,7 @@
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Private ({{ functionVariableLength }}) </div>
 						<div class="button" @click="createVariable(event, 'private')"><i class="fa fa-plus-square"></i></div>
 
-						<div class="tree-view tree-group" tree-section="privateVariables" @pointerdown="checkDragNode">
+						<div class="tree-view tree-group" tree-section="privateVars" @pointerdown="checkDragNode">
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcVariable" style="display: {{ val.hidden ? 'none' : '' }}">
 								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
@@ -106,7 +106,7 @@
 			</div>
 		</div>
 		<div class="function-list collapsed">
-			<div class="title" @click="collapseSubPanel(this)">Functions ({{ functionCount }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)">Functions ({{ functionCount }})</div>
 			<div class="button" @click="createFunction"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -127,7 +127,7 @@
 			</div>
 		</div>
 		<div class="node-list">
-			<div class="title" @click="collapseSubPanel(this)">Nodes ({{ nodeCount }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)">Nodes ({{ nodeCount }})</div>
 			<div class="button" @click="createCustomNode"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -168,6 +168,9 @@ sketch-page > .panels sketch-panel-left {
 	.content {
 		align-self: baseline;
 		visibility: hidden;
+		display: flex;
+		height: calc(100vh - 51px);
+		flex-direction: column;
 		.preview{
 			// border-bottom: 1px dashed white;
 			max-width: 200px;
@@ -182,6 +185,7 @@ sketch-page > .panels sketch-panel-left {
 		color: white;
 		position: relative;
 		width: 190px;
+		max-height: -webkit-fill-available;
 		border-top: 1px solid white;
 		padding: 5px 5px;
 		// border-bottom: 1px dashed white;
@@ -196,8 +200,8 @@ sketch-page > .panels sketch-panel-left {
 		}
 		.tree-view{
 			position: relative;
-			max-height: 500px;
-			// width: 185px;
+			max-height: calc(100% - 22px);
+			max-width: 185px;
 			overflow: auto;
 			&.collapsed > .tree-group {
 				display: none;
@@ -260,7 +264,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.funcSharedVariable = funcNodeInstance?.variables ?? {}; // shared function variables
 	My.funcVariable = sketch.variables ?? {}; // private function variables
 
-	My._envVar = Blackprint.Environment.list;
+	My._envVar = Blackprint.Environment._list;
 	My.functionSharedVariableLength = 0;
 	My.functionVariableLength = 0;
 	My.variableCount = 0;
@@ -287,7 +291,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			}
 		}
 
+		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b))
 		obj.refresh?.();
+
 		return len;
 	}
 
@@ -330,6 +336,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
 		sketchPage.panels.left = My;
+		My.recalculateMenu();
 	}
 
 	let recheckPreviewSize;
@@ -401,8 +408,51 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		else parent.removeClass("collapsed");
 	}
 
-	My.collapseSubPanel = el => {
+	My.collapseSubPanel = (el, isMain) => {
 		$(el).parent().toggleClass("collapsed");
+
+		if(!isMain) return;
+		My.recalculateMenu();
+	}
+
+	My.recalculateMenu = async function(){
+		let variableMenu = $('.variable-list');
+		let functionMenu = $('.function-list');
+		let nodeMenu = $('.node-list');
+
+		let menuContainer = variableMenu.parent();
+		let maxContainerHeight = menuContainer[0].offsetHeight;
+		let maxMenuHeight = Math.round(maxContainerHeight/3);
+
+		variableMenu.css('max-height', ``);
+		functionMenu.css('max-height', ``);
+		nodeMenu.css('max-height', ``);
+
+		await $.afterRepaint();
+
+		// collapsed menu => the height is lower than 40px
+		let variableHeight = variableMenu[0].offsetHeight;
+		let functionHeight = functionMenu[0].offsetHeight;
+		let nodeHeight = nodeMenu[0].offsetHeight;
+
+		console.log(maxContainerHeight, variableHeight, functionHeight, nodeHeight);
+
+		let mH = maxMenuHeight;
+		if(
+			(variableHeight < mH && functionHeight < mH && nodeHeight < mH)
+			|| (variableHeight > mH && functionHeight < mH && nodeHeight < mH)
+			|| (variableHeight < mH && functionHeight > mH && nodeHeight < mH)
+			|| (variableHeight < mH && functionHeight < mH && nodeHeight > mH)
+		){
+			variableMenu.css('max-height', `${maxContainerHeight-nodeHeight-functionHeight-10}px`);
+			functionMenu.css('max-height', `${maxContainerHeight-variableHeight-nodeHeight-10}px`);
+			nodeMenu.css('max-height', `${maxContainerHeight-variableHeight-functionHeight-10}px`);
+		}
+		else{
+			variableMenu.css('max-height', `${maxMenuHeight-10}px`);
+			functionMenu.css('max-height', `${maxMenuHeight-10}px`);
+			nodeMenu.css('max-height', `${maxMenuHeight-10}px`);
+		}
 	}
 
 	My.checkDragNode = ev => {
@@ -441,11 +491,11 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					else if(section === 'functions'){
 						itemEl.model.createNode(sketch, nodeOptions);
 					}
-					else if(section === 'variables' || section === 'sharedVariables' || section === 'privateVariables'){
+					else if(section === 'variables' || section === 'sharedVariables' || section === 'privateVars'){
 						let scope;
 						if(section === 'variables') scope = 'public';
 						else if(section === 'sharedVariables') scope = 'shared';
-						else if(section === 'privateVariables') scope = 'private';
+						else if(section === 'privateVars') scope = 'private';
 
 						DropDown.show([{
 							title: "Get " + key, callback(){
