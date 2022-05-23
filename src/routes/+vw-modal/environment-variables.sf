@@ -5,7 +5,7 @@
 		<div class="row">Key</div>
 		<div class="row">Value</div>
 	</div>
-	<div class="content">
+	<div class="content {{ !showValue && 'hide-value'}}">
 		<div>
 			<div class="row" sf-each="x in list" @keyup="itemChanged(x)">
 				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" sf-bind="x.key" placeholder="...">
@@ -18,6 +18,8 @@
 		</div>
 	</div>
 	<div class="menu">
+		<div class="item {{ showValue && 'hide'}}" @click="showValue = true" title="Show value"><i class="fa fa-eye-slash"></i></div>
+		<div class="item {{ !showValue && 'hide'}}" @click="showValue = false" title="Hide value"><i class="fa fa-eye"></i></div>
 		<div class="item" @click="close" title="Close"><i class="fa fa-times"></i></div>
 	</div>
 </sf-m>
@@ -55,6 +57,10 @@ sf-m[name="environment-variables"] {
 	}
 
 	.content{
+		&.hide-value .bpe-value{
+			text-security: disc;
+			-webkit-text-security: disc;
+		}
 		.row{
 			display: flex;
 			.column{
@@ -75,29 +81,33 @@ sf-m[name="environment-variables"] {
 
 	.menu{
 		position: absolute;
-		right: -5px;
-		top: -10px;
+		right: 0;
+		top: 0;
 		text-align: center;
+		display: flex;
 		.item{
 			cursor: pointer;
 			padding: 5px;
 			width: 20px;
 			height: 20px;
-			margin: 10px;
 			border: 1px solid #000;
 			border-radius: 20px;
-			background: #000000a8;
+			background: #585858a8;
 			color: #fff;
 			box-shadow: 0 0 5px black;
+			&.hide{
+				display: none;
+			}
 		}
 	}
 }
 
 ## js-global
 sf.model('environment-variables', function(My){
-	My.list = Blackprint.Environment.list;
+	My.list = Blackprint.Environment._list;
 	My.newValue = '';
 	My.newKey = '';
+	My.showValue = false;
 
 	My.v2m$newKey = function(now){
 		now = My.validateKey(now);
@@ -110,6 +120,11 @@ sf.model('environment-variables', function(My){
 
 		return '';
 	}
+
+	// Always hide when being closed
+	Modal.onHide('/environment-variables', function(){
+		My.showValue = false;
+	});
 
 	function caretFocusOnLastItem(){
 		$('input', My.list.getElements(My.list.length-1))[0].focus();
@@ -129,15 +144,15 @@ sf.model('environment-variables', function(My){
 	function refreshEnvironment(){
 		clearTimeout(_refreshEnvironment);
 		_refreshEnvironment = setTimeout(function(){
-			let { map, list } =  Blackprint.Environment;
+			let { map, _list } =  Blackprint.Environment;
 			let uniq = new Set();
 
 			// Assign the value of each list on the map
-			for (var i = 0; i < list.length; i++) {
-				let item = list[i];
+			for (var i = 0; i < _list.length; i++) {
+				let item = _list[i];
 				uniq.add(item.key);
 
-				let value = list.$el('.bpe-value', i)[0].value;
+				let value = _list.$el('.bpe-value', i)[0].value;
 				if(map[item.key] !== value)
 					Blackprint.Environment.set(item.key, value);
 			}
