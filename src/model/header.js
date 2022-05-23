@@ -92,12 +92,14 @@ var EditorHeader = sf.model('header', function(My, include){
 							return;
 
 						let option = {};
-						if(confirm.isConfirmed){
+						if(confirm.isConfirmed){ // Prettified
 							option.toJS = true;
 							option.space = '\t';
 						}
-						else if(confirm.isDenied)
+						else if(confirm.isDenied){ // Minimal JSON export (no position/comment)
 							option.position = false;
+							option.comment = false;
+						}
 
 						var temp = sketch.exportJSON(option);
 						navigator.clipboard.writeText(temp);

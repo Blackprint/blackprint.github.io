@@ -50,7 +50,6 @@ $(function(){
 		return Object.entries(map).forEach(v => v.useOld = false);
 	};
 
-	
 	// this.variables = {}; // { name => { value, type, title, category } }
 	// this.functions = {}; // { name => { variables, input, output, used: [], node, title, category, description } }
 });
