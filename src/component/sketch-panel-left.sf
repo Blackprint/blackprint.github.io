@@ -435,8 +435,6 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let functionHeight = functionMenu[0].offsetHeight;
 		let nodeHeight = nodeMenu[0].offsetHeight;
 
-		console.log(maxContainerHeight, variableHeight, functionHeight, nodeHeight);
-
 		let mH = maxMenuHeight;
 		if(
 			(variableHeight < mH && functionHeight < mH && nodeHeight < mH)
