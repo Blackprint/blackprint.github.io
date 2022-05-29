@@ -130,7 +130,7 @@ sf.component('sketch-page', function(My){
 		if(ev.iface != null) NodeHoverInfo(ev, false);
 	});
 	sketch.on('cable.dropped', {slot: 'bp-editor'}, ev => {
-		if(ev.event.ctrlKey || !ev.afterCreated) return;
+		if(ev.event.ctrlKey || !ev.afterCreated || ev.cable.isRoute) return;
 		if(ev.event.target.parentNode.model !== sketch.scope('cables')) return;
 
 		let suggestedNode = Blackprint.Sketch.suggestNodeForPort(ev.port);
