@@ -409,16 +409,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	My.collapseSubPanel = (el, isMain) => {
-		$(el).parent().toggleClass("collapsed");
+		My.$el(el).parent().toggleClass("collapsed");
 
 		if(!isMain) return;
 		My.recalculateMenu();
 	}
 
 	My.recalculateMenu = async function(){
-		let variableMenu = $('.variable-list');
-		let functionMenu = $('.function-list');
-		let nodeMenu = $('.node-list');
+		let variableMenu = My.$el('.variable-list');
+		let functionMenu = My.$el('.function-list');
+		let nodeMenu = My.$el('.node-list');
 
 		let menuContainer = variableMenu.parent();
 		let maxContainerHeight = menuContainer[0].offsetHeight;
