@@ -409,7 +409,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	My.collapseSubPanel = (el, isMain) => {
-		My.$el(el).parent().toggleClass("collapsed");
+		$(el).parent().toggleClass("collapsed");
 
 		if(!isMain) return;
 		My.recalculateMenu();
