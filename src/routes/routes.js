@@ -4,6 +4,13 @@
 // ====== Main content routes ======
 var views = (new sf.Views('vw-ground', 'page')) // page = http://url.com/#page/...
 .on('finish', function(current, target, data){
+	// Skip page animation when switching between sketch page
+	if(current.startsWith('/sketch/') && target.startsWith('/sketch/')){
+		if(views.lastSibling) $(views.lastSibling).addClass('disable-anim');
+		if(views.showedSibling) $(views.showedSibling).removeClass('disable-anim');
+		return;
+	}
+
 	// Add animation
 	animatePageTransition(views);
 });
