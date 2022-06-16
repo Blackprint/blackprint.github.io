@@ -28,7 +28,7 @@ function PortHoverInfo(ev, hovered){
 	clearTimeout(NodeHoverInfo._timer);
 	clearTimeout(PortHoverInfo._timer);
 	PortHoverInfo._timer = setTimeout(()=> {
-		ToolTip.set((ev.port.classAdd || '') + ev.port.type.name, event);
+		ToolTip.set(ev.port, event, 'port');
 		PortHoverInfo._show = true;
 	}, 400);
 }

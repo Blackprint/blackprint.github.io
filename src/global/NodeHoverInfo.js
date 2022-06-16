@@ -30,7 +30,7 @@ function NodeHoverInfo(ev, hovered){
 
 	clearTimeout(NodeHoverInfo._timer);
 	NodeHoverInfo._timer = setTimeout(()=> {
-		ToolTip.set(ev.iface.namespace, event);
+		ToolTip.set(ev.iface, event, 'node');
 		NodeHoverInfo._show = true;
 	}, 400);
 }

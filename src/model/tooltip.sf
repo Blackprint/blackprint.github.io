@@ -1,7 +1,15 @@
 ## html.append-to-body
 <!-- /src/model/tooltip.sf -->
 <sf-m name="tooltip" class="{{ showed && 'show' }}" style="transform: translate({{ x }}px, {{ y }}px);">
-	<div class="desc">{{ desc }}</div>
+	<div class="{{ type === 'basic' ? '' : 'hide-this' }} basic desc">{{ desc }}</div>
+	<div class="{{ type === 'port' ? '' : 'hide-this' }} port">
+		<div class="type">Type: <span style="color: {{ port.color }}">{{ port.type }}</span></div>
+		<div class="desc">{{ port.desc }}</div>
+	</div>
+	<div class="{{ type === 'node' ? '' : 'hide-this' }} node">
+		<div class="path">Path: <span>{{ node.path }}</span></div>
+		<div class="desc">{{ node.desc }}</div>
+	</div>
 </sf-m>
 
 ## scss-global
@@ -15,14 +23,31 @@ sf-m[name="tooltip"]{
 	position: fixed;
 	top: 15px;
 	left: 10px;
-	color: white;
+	color: #dbdbdb;
 	opacity: 0;
 	z-index: 1;
 	transition: 0.3s ease-in opacity;
 
+	.path{
+		color: gray;
+		font-size: 16px;
+	}
+
+	.type {
+		color: gray;
+		span{
+			font-weight: bold;
+			letter-spacing: 1px;
+		}
+	}
+
+	.hide-this {
+		display: none;
+	}
+
 	.desc{
-	    white-space: pre-wrap;
-	    // font-size: 14px;
+		white-space: pre-wrap;
+		// font-size: 14px;
 	}
 
 	&.show{
@@ -38,22 +63,26 @@ sf-m[name="tooltip"]{
 ## js-global
 var ToolTip = sf.model('tooltip', function(My){
 	My.showed = false;
-	My.desc = '';
 	My.x = 0;
 	My.y = 0;
+
+	My.type = 'basic';
+	My.desc = '';
+	My.port = {type:'', desc:'', color:''};
+	My.node = {path:'', desc:''};
 
 	My._listener = function(ev){
 		My.x = ev.clientX;
 		My.y = ev.clientY;
 	}
 
-	My.set = function(text, ev){
+	My.set = function(data, ev, type='basic'){
 		if(ev != null){
 			My.x = ev.x;
 			My.y = ev.y;
 		}
 
-		if(text && My.showed === false){
+		if(data && My.showed === false){
 			My.showed = true;
 			$(window).on('pointermove', My._listener);
 		}
@@ -62,6 +91,21 @@ var ToolTip = sf.model('tooltip', function(My){
 			$(window).off('pointermove', My._listener);
 		}
 
-		My.desc = text;
+		My.type = type;
+
+		if(!data) return;
+
+		if(!type) My.desc = data;
+		else if(type === 'node'){
+			My.node.path = data.namespace;
+			My.node.desc = data.docs.description;
+		}
+		else if(type === 'port'){
+			My.port.type = (data.classAdd || '') + data.type.name;
+			My.port.desc = data.docs.description;
+
+			let color = data.iface[data.source]._portList.getElement(data).querySelector('.port').computedStyleMap().get('background-color').toString();
+			My.port.color = color;
+		}
 	}
 });
