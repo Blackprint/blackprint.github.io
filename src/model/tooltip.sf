@@ -98,11 +98,11 @@ var ToolTip = sf.model('tooltip', function(My){
 		if(!type) My.desc = data;
 		else if(type === 'node'){
 			My.node.path = data.namespace;
-			My.node.desc = data.docs.description;
+			My.node.desc = data.docs?.description || '';
 		}
 		else if(type === 'port'){
 			My.port.type = (data.classAdd || '') + data.type.name;
-			My.port.desc = data.docs.description;
+			My.port.desc = data.docs?.description || '';
 
 			let color = data.iface[data.source]._portList.getElement(data).querySelector('.port').computedStyleMap().get('background-color').toString();
 			My.port.color = color;
