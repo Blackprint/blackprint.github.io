@@ -44,6 +44,12 @@ $(function(){
 			location.pathname = '/dev.html';
 	});
 
+	if(window.___browserSync___ != null){
+		window.___browserSync___.socket.on('bp-docs-append', function(data){
+			Blackprint.Sketch.registerDocs(data);
+		});
+	}
+
 	// Always use the newest module
 	Blackprint.onModuleConflict = async map =>{
 		// ToDo: show popup to select if user is prefer old version or the newest version

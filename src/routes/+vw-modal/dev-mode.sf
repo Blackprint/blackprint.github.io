@@ -134,6 +134,10 @@ sf.model('modal-dev-mode', function(My){
 		socket.io.uri = url;
 		socket.connect();
 
+		socket.on('bp-docs-append', function(data){
+			Blackprint.Sketch.registerDocs(data);
+		});
+
 		let newModuleLoaded = false;
 		try{
 			let moduleList = Object.values(await $.getJSON(_url+'/api/module-list'));
