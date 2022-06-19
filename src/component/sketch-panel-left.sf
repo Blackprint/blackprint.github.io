@@ -291,7 +291,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			}
 		}
 
-		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b))
+		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b));
 		obj.refresh?.();
 
 		return len;
@@ -337,6 +337,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
 		sketchPage.panels.left = My;
 		My.recalculateMenu();
+		refreshNodesCounter();
 	}
 
 	let recheckPreviewSize;
