@@ -95,7 +95,7 @@ var ToolTip = sf.model('tooltip', function(My){
 
 		if(!data) return;
 
-		if(!type) My.desc = data;
+		if(type === 'basic') My.desc = data;
 		else if(type === 'node'){
 			My.node.path = data.namespace;
 			My.node.desc = data.docs?.description || '';
