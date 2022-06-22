@@ -15,7 +15,7 @@ class extends Blackprint.Node {
 	}
 
 	update(){
-		let { page } = this._instance;
+		let { page } = this.instance;
 		page.panels.left.setPreview(this.input.Element);
 	}
 });
