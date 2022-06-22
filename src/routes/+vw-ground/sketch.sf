@@ -77,10 +77,7 @@ sf.model('sketch-pages', function(My){
 		if(tagName === 'INPUT' || tagName === 'TEXTAREA')
 			return;
 
-		let pageIndex = views.currentPath.match(/\/sketch\/([0-9]+)/)?.[1];
-		if(pageIndex == null) return;
-
-		let sketch = SketchList[pageIndex-1];
+		let sketch = CurrentSketch;
 		let container = sketch.scope('container');
 
 		// Skip if no selected nodes/cables
@@ -161,9 +158,6 @@ sf.model('sketch-pages', function(My){
 			let passed = checkIfHasSelection(ev, true);
 			if(!passed) return;
 			let {sketch, container} = passed;
-			
-			// Currently we only support copy/paste/delete for nodes
-			if(container.nodeScope.selected.length === 0) return;
 
 			let data = ev.clipboardData.getData('text/plain');
 			data = JSON.parse(data);
