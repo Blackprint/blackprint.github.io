@@ -1,15 +1,22 @@
 ## html
-<sf-m name="module-example-list-deep">
-	<div class="description">Examples for: <b>{{ packageName }}</b></div>
-	<div class="list">
-		<div class="item" sf-each="x in list" @click="openExample(x)">
-			{{ x.name }}
+<div style="height: 70vh;">
+	<sf-m name="module-example-list-deep">
+		<div class="description">Examples for: <b>{{ packageName }}</b></div>
+		<div class="refresh-button" @click="refreshCache()">Click here to refresh cache</div>
+		<div class="source-menu">
+			<div class="item {{ currentSource === 'npm' ? 'selected' : '' }}" @click="selectSource('npm')"><i class="fab fa-npm"></i> NPM (v{{ packageVersion }})</div>
+			<div class="item {{ currentSource === 'gh' ? 'selected' : '' }}" @click="selectSource('gh')" title="Example from repository's main branch"><i class="fab fa-github"></i> GitHub (main)</div>
 		</div>
-	</div>
-	<div class="menu">
-		<div class="item" @click="back" title="Back"><i class="fa fa-reply"></i></div>
-	</div>
-</sf-m>
+		<div class="list">
+			<div class="item" sf-each="x in list" @click="openExample(x)">
+				{{ x.name }}
+			</div>
+		</div>
+		<div class="menu">
+			<div class="item" @click="back" title="Back"><i class="fa fa-reply"></i></div>
+		</div>
+	</sf-m>
+</div>
 
 ## scss-global
 sf-m[name="module-example-list-deep"] {
@@ -18,10 +25,35 @@ sf-m[name="module-example-list-deep"] {
 	border: 2px solid black;
 	position: relative;
 	box-shadow: 0 0 20px 0px white;
+	.source-menu{
+		display: flex;
+		background: black;
+		padding: 5px;
+		justify-content: space-evenly;
+		.item {
+			padding: 5px;
+			color: white;
+			width: 100%;
+			cursor: pointer;
+			text-align: center;
+			&.selected {
+				color: #fdabab;
+			}
+		}
+	}
+
+	.refresh-button{
+		text-align: center;
+		background: black;
+		font-size: 12px;
+		margin-top: -10px;
+	}
 	.description{
+		background: black;
 		padding: 10px;
 		color: white;
 		margin-right: 40px;
+		width: calc(100% - 20px);
 		a{
 			color: skyblue;
 		}
@@ -57,7 +89,7 @@ sf-m[name="module-example-list-deep"] {
 			border-radius: 20px;
 			background: #000000a8;
 			color: #fff;
-			box-shadow: 0 0 5px black;
+			box-shadow: 0 0 10px white;
 		}
 	}
 }
@@ -65,13 +97,27 @@ sf-m[name="module-example-list-deep"] {
 ## js-global
 sf.model('module-example-list-deep', function(My){
 	My.packageName = '';
+	My.packageURL = ''; // https://cdn.jsdelivr.net/npm/@blackprint/package@version/
+	My.githubURL = ''; // https://github.com/Blackprint/repository
+	My.packageVersion = '0.?';
+	My.pkg = null;
 	My.baseUrl = '';
+	My.currentSource = 'npm';
 	My.list = [];
 
 	My.openModal = function(pkg){
-		My.packageName = pkg.packageName;
+		My.pkg = pkg;
+		My.packageName = pkg.packageName ?? '';
+		My.packageURL = pkg.packageURL ?? '';
+		My.githubURL = pkg.githubURL ?? '';
+		My.packageVersion = pkg.packageURL.match(/(?<=\w@)[\w.-_]+/)?.[0] ?? '';
 
-		let list = pkg.examples;
+		let list = pkg.npmExamples;
+		if(list == null && pkg.examples != null){
+			list = pkg.npmExamples = pkg.examples;
+			delete pkg.examples;
+		}
+
 		for (var i = 0; i < list.length; i++) {
 			let temp = list[i];
 
@@ -84,7 +130,7 @@ sf.model('module-example-list-deep', function(My){
 			}
 		}
 
-		My.list = list;
+		My.list = list.slice(0); // copy list
 		My.baseUrl = pkg.packageURL;
 	}
 
@@ -99,7 +145,85 @@ sf.model('module-example-list-deep', function(My){
 		SketchImporter.loadJSON(obj);
 	}
 
+	// Selecting the source again will refresh the cache
+	My.selectSource = function(which){
+		My.currentSource = which;
+
+		if(which === 'npm')
+			My.list = My.pkg.npmExamples;
+		else My.list = My.pkg.ghExamples ?? [];
+
+		let list = My.list;
+		for (var i = 0; i < list.length; i++) {
+			let temp = list[i];
+
+			if(!temp.name){
+				temp.name = temp.url
+					.replace('example/', '')
+					.replace(/^\//, '')
+					.replace('.json', '')
+					.replace(/\-/g, ' ');
+			}
+		}
+	}
+
 	My.back = function(){
 		Modal.goto('/module-example-list');
+	}
+
+	My.refreshCache = async function(packageJSON){
+		if(packageJSON == null){
+			let packageURL = My.packageURL;
+			if(!packageURL.includes('@latest')){
+				packageURL = packageURL.match(/.*?@[0-9]/)?.[0];
+				if(packageURL != null) packageURL += '@latest';
+			}
+
+			if(!packageURL) throw new Error("Saved package URL was not found");
+
+			SmallNotif.add("Obtaining package.json");
+			packageJSON = await $.getJSON(`${My.packageURL}/package.json`);
+		}
+
+		let npmName = packageJSON.name;
+		let ghName = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '').replace(/^.*?github.com\//m, '');
+
+		SmallNotif.add("Obtaining NPM file list");
+		let npmData = await $.getJSON(`https://data.jsdelivr.com/v1/package/npm/${npmName}@${packageJSON.version}`);
+		let npmExamples = getPackageExamples(npmData);
+
+		let ghExamples = [];
+		if(!!ghName){
+			SmallNotif.add("Obtaining repository's file list");
+			let ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@main`);
+			ghExamples = getPackageExamples(ghData);
+		}
+
+		ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
+
+		My.pkg.npmExamples = npmExamples;
+		My.pkg.ghExamples = ghExamples;
+
+		My.selectSource(My.currentSource);
+	}
+
+	function getPackageExamples(jsdelivrData){
+		let files = jsdelivrData.files;
+		let examples = [];
+
+		for (var i = 0; i < files.length; i++) {
+			let dir = files[i];
+			if(dir.name === 'example'){
+				let temp = dir.files;
+				for (var a = 0; a < temp.length; a++) {
+					let file = temp[a];
+					if(file.type !== 'file') continue;
+					examples.push({url: `/example/${file.name}`});
+				}
+				break;
+			}
+		}
+
+		return examples;
 	}
 });

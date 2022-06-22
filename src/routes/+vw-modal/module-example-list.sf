@@ -1,12 +1,14 @@
 ## html
-<sf-m name="module-example-list">
-	<div class="description">Please select one of the module to load the example list</div>
-	<div class="list">
-		<div class="item" sf-each="x in list" @click="open(x)">
-			{{ x.packageName }}
+<div style="height: 70vh;">
+	<sf-m name="module-example-list">
+		<div class="description">Please select one of the module to load the example list</div>
+		<div class="list">
+			<div class="item" sf-each="x in list" @click="open(x)">
+				{{ x.packageName }}
+			</div>
 		</div>
-	</div>
-</sf-m>
+	</sf-m>
+</div>
 
 ## scss-global
 sf-m[name="module-example-list"] {
@@ -14,10 +16,14 @@ sf-m[name="module-example-list"] {
 	border-radius: 10px;
 	border: 2px solid black;
 	position: relative;
+	height: 400px;
 	box-shadow: 0 0 20px 0px white;
 	.description{
 		padding: 10px;
 		color: white;
+		text-align: center;
+		background: #00000040;
+		border-bottom: 1px solid black;
 		a{
 			color: skyblue;
 		}
@@ -26,14 +32,14 @@ sf-m[name="module-example-list"] {
 		padding: 5px;
 		.item{
 			color: #fff;
-			background: #0000009e;
+			background: #00000052;
 			cursor: pointer;
-			border-radius: 4px;
-			padding: 5px;
+			border-radius: 17px;
+			padding: 5px 8px;
 			margin: 5px;
-			border: 1px solid #000;
+			border: 1px solid #8b6d0099;
 			&:hover{
-				background: #000000de;
+				background: #ffffff12;
 			}
 		}
 	}
@@ -74,7 +80,8 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 			ref.push({
 				packageName,
 				packageURL,
-				examples: list,
+				npmExamples: list,
+				ghExamples: [],
 			});
 
 			My.list = ref = ref.sort((a, b) => a.packageName.localeCompare(b.packageName));
@@ -86,7 +93,36 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 
 			SmallNotif.add(`"${packageName}" example has been added`, 'green');
 		}
-		else ref[i].examples = list;
+		else ref[i].npmExamples = list;
+
+		localStorage.bpModuleExampleList = JSON.stringify(My.list);
+	}
+
+	My.replacePackageExample = function(packageJSON, npmExample, ghExample){
+		let packageName = packageJSON.name;
+
+		let list = My.list;
+		for (var i = 0; i < list.length; i++) {
+			let ref = list[i];
+			if(ref.packageName === packageName){
+				ref.npmExamples = npmExample;
+				ref.ghExamples = ghExample;
+				break;
+			}
+		}
+
+		if(list.length === i){
+			let packageURL = `https://cdn.jsdelivr.net/npm/${packageName}@${packageJSON.version}/`;
+			let githubURL = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '');
+
+			list.push({
+				packageName,
+				packageURL,
+				githubURL,
+				npmExamples: npmExample,
+				ghExamples: ghExample,
+			});
+		}
 
 		localStorage.bpModuleExampleList = JSON.stringify(My.list);
 	}
