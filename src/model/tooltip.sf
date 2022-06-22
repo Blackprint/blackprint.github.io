@@ -105,6 +105,8 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.port.desc = data.docs?.description || '';
 
 			let color = data.iface[data.source]._portList.getElement(data).querySelector('.port').computedStyleMap().get('background-color').toString();
+
+			if(color === 'rgba(0, 0, 0, 0)') color = 'white';
 			My.port.color = color;
 		}
 	}
