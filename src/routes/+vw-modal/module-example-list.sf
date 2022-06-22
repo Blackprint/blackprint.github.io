@@ -2,6 +2,9 @@
 <div style="height: 70vh;">
 	<sf-m name="module-example-list">
 		<div class="description">Please select one of the module to load the example list</div>
+		<div class="url-input">
+			<input class="column" type="text" @keyup.Enter="addExampleFromURL()" sf-bind="urlInput" placeholder="Paste URL of GitHub repository or NPM registry here and press enter">
+		</div>
 		<div class="list">
 			<div class="item" sf-each="x in list" @click="open(x)">
 				{{ x.packageName }}
@@ -26,6 +29,17 @@ sf-m[name="module-example-list"] {
 		border-bottom: 1px solid black;
 		a{
 			color: skyblue;
+		}
+	}
+	.url-input{
+		display: flex;
+		.column{
+			width: 100%;
+			color: gray;
+			background: #00000094;
+			border: none;
+			padding: 7px;
+			outline: none;
 		}
 	}
 	.list{
@@ -55,6 +69,7 @@ sf-m[name="module-example-list"] {
 ## js-global
 var ModuleExampleList = sf.model('module-example-list', function(My){
 	My.list = EditorHeader._moduleExampleList;
+	My.urlInput = '';
 
 	init();
 	function init() {
@@ -125,5 +140,29 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 		}
 
 		localStorage.bpModuleExampleList = JSON.stringify(My.list);
+	}
+
+	My.addExampleFromURL = async function(url){
+		if(!url) url = My.urlInput;
+		if(!url) throw new Error("URL mustn't be empty");
+		let packageJSON;
+
+		// Check for recognized GitHub/NPM URL pattern
+		if(/github.com\//.test(url)){
+			let name = url.match(/(?<=github.com\/).*?\/.*?(?=$|.git|\/|\?)/m)[0];
+			packageJSON = await $.getJSON(`https://cdn.jsdelivr.net/gh/${name}@main/package.json`);
+		}
+		else if(/npmjs.com\/package\//.test(url)){
+			let name = url.match(/(?<=npmjs.com\/package\/).*?(?=$|\?)/m)[0];
+			packageJSON = await $.getJSON(`https://cdn.jsdelivr.net/npm/${name}@latest/package.json`);
+		}
+		else throw new Error("URL is not recognized as GitHub repository or NPM registry");
+
+		if(packageJSON.dependencies?.['@blackprint/engine'] == null && packageJSON.devDependencies?.['@blackprint/engine'] == null){
+			throw new Error("Package is not recognized as Blackprint module, as @blackprint/engine was not exist in dependencies or devDependencies");
+		}
+
+		sf.model('module-example-list-deep').refreshCache(packageJSON);
+		My.urlInput = '';
 	}
 });

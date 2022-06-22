@@ -110,7 +110,7 @@ sf.model('module-example-list-deep', function(My){
 		My.packageName = pkg.packageName ?? '';
 		My.packageURL = pkg.packageURL ?? '';
 		My.githubURL = pkg.githubURL ?? '';
-		My.packageVersion = pkg.packageURL.match(/(?<=\w@)[\w.-_]+/)?.[0] ?? '';
+		My.packageVersion = pkg.packageURL.match(/(?<=\w@)[\w.\-_]+/)?.[0] ?? '';
 
 		let list = pkg.npmExamples;
 		if(list == null && pkg.examples != null){
