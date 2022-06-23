@@ -3,6 +3,11 @@ Small Notification
 You can call this from anywhere
 ```js
 SmallNotif.add('message', 'color', /* delay in ms*/);
+SmallNotif.add('message', {
+  color: '',
+  icon: '',
+  timeout: 0 // in ms
+});
 ```
 
 ## comment, this will automatically appended to body
@@ -11,6 +16,7 @@ SmallNotif.add('message', 'color', /* delay in ms*/);
 <sf-m name="small.notif">
   <div class="notify-container right-top">
     <div sf-each="x in list" class="notify-base notify-{{ x.color }}">
+      <i class="item-icon {{ x.icon ? x.icon : 'hide-icon' }}"></i>
       <span>{{ x.message }}</span>
       <button @click="close(x)" class="close">×</button>
     </div>
@@ -39,7 +45,16 @@ var SmallNotif = sf.model('small.notif', function(My){
   });
 
   My.add = function(message, color, delay){
-    var item = {message, color:color || 'yellow'};
+    var icon;
+    if(typeof color === 'object'){
+      let obj = color;
+
+      color = obj.color ?? 'yellow';
+      delay = obj.delay;
+      icon = obj.icon;
+    }
+
+    var item = {message, color: color || 'yellow', icon};
     My.list.push(item);
 
     if(delay !== false){
@@ -66,7 +81,8 @@ var SmallNotif = sf.model('small.notif', function(My){
   border: 1px solid;
   border-color: rgba(255, 255, 255, 0.97);
   box-shadow: 0 0 7px 0px rgba(255, 255, 255, 0.97);
-  border-radius: 4px;
+  border-radius: 500px;
+  // border-radius: 4px;
   min-width: 51%;
   white-space: nowrap;
   position: relative;
@@ -74,6 +90,13 @@ var SmallNotif = sf.model('small.notif', function(My){
   margin: 10px 10px 0 10px;
   display: flex;
   align-items: center;
+
+  .item-icon{
+    margin-right: 4px;
+    &.hide-icon{
+      display: none;
+    }
+  }
 
   span{
     white-space: pre-line;
