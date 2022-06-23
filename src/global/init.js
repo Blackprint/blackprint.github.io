@@ -6,12 +6,19 @@ $(function(){
 
 	let importSketch = sf.URI.data.importSketch;
 	if(importSketch !== void 0){
-		Modal.hide();
+		requestAnimationFrame(function(){
+			setTimeout(()=> {
+				importSketch = pako.inflateRaw(Base64.toUint8Array(importSketch[0]), {to: 'string'});
+				SketchImporter.loadJSON(importSketch);
+			}, 500);
+		});
+	}
 
-		setTimeout(()=> {
-			importSketch = pako.inflateRaw(Base64.toUint8Array(importSketch[0]), {to: 'string'});
-			SketchImporter.loadJSON(importSketch);
-		}, 500);
+	let exampleURL = sf.URI.data.openExample;
+	if(importSketch == null && exampleURL !== void 0){
+		requestAnimationFrame(()=> {
+			setTimeout(()=> ModuleExampleList.addExampleFromURL(exampleURL[0]), 500);
+		});
 	}
 
 	setTimeout(()=> {

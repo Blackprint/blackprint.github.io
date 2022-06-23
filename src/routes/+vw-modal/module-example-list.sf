@@ -150,6 +150,7 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 		}
 
 		localStorage.bpModuleExampleList = JSON.stringify(My.list);
+		SmallNotif.add("Example data updated", 'green');
 	}
 
 	My.addExampleFromURL = async function(url){
@@ -171,13 +172,30 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 			throw new Error("URL is not recognized as GitHub repository or NPM registry");
 		}
 
+		if(navigateIfExist(packageJSON.name)) return;
+
 		if(packageJSON.dependencies?.['@blackprint/engine'] == null && packageJSON.devDependencies?.['@blackprint/engine'] == null){
 			SmallNotif.add("Package is not recognized as Blackprint module, as @blackprint/engine was not exist in dependencies or devDependencies");
 			throw new Error("Package is not recognized as Blackprint module, as @blackprint/engine was not exist in dependencies or devDependencies");
 		}
 
-		sf.model('module-example-list-deep').refreshCache(packageJSON);
-		SmallNotif.add("Data saved", 'green');
+		await sf.model('module-example-list-deep').refreshCache(packageJSON);
 		My.urlInput = '';
+
+		navigateIfExist(packageJSON.name);
+	}
+
+	function navigateIfExist(packageName){
+		let list = My.list;
+		for (let i=0; i < list.length; i++) {
+			let temp = list[i];
+			if(temp.packageName === packageName){
+				sf.model('module-example-list-deep').openModal(temp);
+				Modal.goto('/module-example-list-deep');
+				return true;
+			}
+		}
+
+		return false;
 	}
 });

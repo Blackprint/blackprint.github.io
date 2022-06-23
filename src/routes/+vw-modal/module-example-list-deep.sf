@@ -201,10 +201,11 @@ sf.model('module-example-list-deep', function(My){
 
 		ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
 
-		My.pkg.npmExamples = npmExamples;
-		My.pkg.ghExamples = ghExamples;
-
-		My.selectSource(My.currentSource);
+		if(My.pkg != null && My.packageName === npmName){
+			My.pkg.npmExamples = npmExamples;
+			My.pkg.ghExamples = ghExamples;
+			My.selectSource(My.currentSource);
+		}
 	}
 
 	function getPackageExamples(jsdelivrData){
