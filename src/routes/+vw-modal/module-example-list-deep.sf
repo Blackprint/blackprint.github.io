@@ -101,7 +101,8 @@ sf.model('module-example-list-deep', function(My){
 	My.githubURL = ''; // https://github.com/Blackprint/repository
 	My.packageVersion = '0.?';
 	My.pkg = null;
-	My.baseUrl = '';
+	My.npmBaseUrl = '';
+	My.ghBaseUrl = '';
 	My.currentSource = 'npm';
 	My.list = [];
 
@@ -131,7 +132,13 @@ sf.model('module-example-list-deep', function(My){
 		}
 
 		My.list = list.slice(0); // copy list
-		My.baseUrl = pkg.packageURL;
+		My.npmBaseUrl = pkg.packageURL;
+		My.ghBaseUrl = '';
+
+		if(!!My.githubURL){
+			let repoName = My.githubURL.match(/(?<=github\.com\/).*?\/.*?($|\?|\/)/m)[0];
+			My.ghBaseUrl = `https://cdn.jsdelivr.net/gh/${repoName}@main`
+		}
 	}
 
 	My.openExample = async function(item){
@@ -141,7 +148,16 @@ sf.model('module-example-list-deep', function(My){
 		if(url.slice(0, 1) !== '/')
 			url = `/${url}`;
 
-		let obj = await $.getJSON(My.baseUrl+url);
+		let baseURL;
+		if(My.currentSource === 'npm')
+			baseURL = My.npmBaseUrl;
+		else if(My.currentSource === 'gh')
+			baseURL = My.ghBaseUrl;
+		else throw new Error("Unknown source");
+
+		url = (baseURL+url).split('//').join('/');
+
+		let obj = await $.getJSON(url);
 		SketchImporter.loadJSON(obj);
 	}
 

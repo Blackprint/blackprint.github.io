@@ -76,7 +76,7 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 	My.urlValidity = 'valid';
 
 	My.on$urlInput = function(now){
-		if(now && !/(?<=github.com\/).*?\/./.test(now) && !/npmjs.com\/package\//.test(now))
+		if(now && !/(?<=github\.com\/).*?\/./.test(now) && !/npmjs\.com\/package\//.test(now))
 			My.urlValidity = 'invalid';
 		else My.urlValidity = 'valid';
 	}
@@ -159,12 +159,12 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 		let packageJSON;
 
 		// Check for recognized GitHub/NPM URL pattern
-		if(/github.com\//.test(url)){
-			let name = url.match(/(?<=github.com\/).*?\/.*?(?=$|.git|\/|\?)/m)[0];
+		if(/github\.com\//.test(url)){
+			let name = url.match(/(?<=github\.com\/).*?\/.*?(?=$|.git|\/|\?)/m)[0];
 			packageJSON = await $.getJSON(`https://cdn.jsdelivr.net/gh/${name}@main/package.json`);
 		}
-		else if(/npmjs.com\/package\//.test(url)){
-			let name = url.match(/(?<=npmjs.com\/package\/).*?(?=$|\?)/m)[0];
+		else if(/npmjs\.com\/package\//.test(url)){
+			let name = url.match(/(?<=npmjs\.com\/package\/).*?(?=$|\?)/m)[0];
 			packageJSON = await $.getJSON(`https://cdn.jsdelivr.net/npm/${name}@latest/package.json`);
 		}
 		else{
