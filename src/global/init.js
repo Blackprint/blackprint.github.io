@@ -4,6 +4,12 @@ $(function(){
 		location.hash = decodeURIComponent(location.hash)
 	}
 
+	// Global sf.loader background load's progress bar
+	sf.loader.onProgress(function(loaded, total){
+		Loading.set(`Loading ${loaded}/${total}`);
+		if(loaded === total) Loading.set();
+	}, true);
+
 	let importSketch = sf.URI.data.importSketch;
 	if(importSketch !== void 0){
 		requestAnimationFrame(function(){

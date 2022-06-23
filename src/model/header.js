@@ -10,18 +10,6 @@ var EditorHeader = sf.model('header', function(My, include){
 		sf.URI.parse(); // Trigger to reparse current URL
 	}
 
-	async function importJSON(sketch, json){
-		Loading.set("Importing nodes");
-		sf.loader.onProgress(function(loaded, total){
-			if(loaded === total)
-				Loading.set("Importing nodes");
-			else Loading.set(`Downloading ${loaded}/${total}`);
-		});
-
-		await sketch.importJSON(json);
-		Loading.set('');
-	}
-
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
 		let sketch = window.CurrentSketch;

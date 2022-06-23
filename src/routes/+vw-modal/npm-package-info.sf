@@ -136,61 +136,14 @@ sf.model('npm-package-info', function(My){
 		Modal.goto('/npm-package-info');
 	}
 
-	let progressToast;
-	async function theProgress(){
-		if(progressToast) return;
-
-		progressToast = SmallNotif.add("Loading", 'yellow', false);
-
-		// todo: fix: sf.loader.onProgress
-		let temp = (function(loaded, total){
-			if(loaded === total){
-				sf.loader.DOMWasLoaded = true;
-				progressToast.message = `Loading ${loaded}/${total}`;
-
-				progressToast = false;
-				return;
-			}
-
-			if(!progressToast) return;
-			progressToast.message = `Loading ${loaded}/${total}`;
-		});
-
-		let intv = setInterval(()=> {
-			temp(sf.loader.loadedContent, sf.loader.totalContent);
-		}, 500);
-
-		try{
-			await sf.loader.task;
-		} catch(e){
-			SmallNotif.add(e.message, 'red');
-			console.error(e);
-		}
-
-		clearInterval(intv);
-
-		let list = SmallNotif.list;
-		list.splice(list.indexOf(progressToast), 1);
-	}
-
 	My.load = async function(item){
-		sf.loader.DOMWasLoaded = false; // flag because we may load new module
-
-		setTimeout(()=> {
-			if(sf.loader.totalContent !== sf.loader.loadedContent)
-				theProgress();
-		}, 500);
-
 		item.active = 'loading';
 
 		try{
 			await Blackprint.loadModuleFromURL([My.packageURL + item.url], {
 				loadBrowserInterface: true // set to "false" for Node.js/Deno
 			});
-		} finally {
-			if(sf.loader.totalContent === sf.loader.loadedContent)
-				sf.loader.DOMWasLoaded = true;
-		}
+		} finally { }
 
 		if(My.exampleList.length !== 0)
 			ModuleExampleList.add(My.title, My.exampleList, My.packageURL);

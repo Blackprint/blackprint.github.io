@@ -34,9 +34,9 @@ var Loading = sf.model('loading', function(My){
 	My.desc = '';
 
 	My.set = function(text){
-		if(text && My.showed === false)
-			My.showed = true;
-		else My.showed = false;
+		if(!text)
+			My.showed = false;
+		else My.showed = true;
 
 		My.desc = text;
 	}

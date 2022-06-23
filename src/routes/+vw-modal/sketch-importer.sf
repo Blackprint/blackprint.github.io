@@ -167,16 +167,6 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		sketch.__importing = true;
 
 		async function pageShowed(){
-			sf.loader.DOMWasLoaded = false; // flag because we may load new module
-
-			// Add listener only once until finish
-			if(progressTriggered){
-				sf.loader.onProgress(function(loaded, total){
-					progressToast.message = `Loading ${loaded}/${total}`;
-					progressTriggered = true;
-				});
-			}
-
 			// Import from JSON, and also load required modules if exist
 			try{
 				await sketch.importJSON(My.pendingLoad);
@@ -184,7 +174,6 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 				SmallNotif.add("Failed to import data", 'red');
 				throw e;
 			} finally {
-				sf.loader.DOMWasLoaded = true;
 				delete sketch.__importing;
 				My.pendingLoad = void 0;
 			}

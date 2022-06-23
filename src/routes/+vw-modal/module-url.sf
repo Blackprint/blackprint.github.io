@@ -202,12 +202,6 @@ let _editorModuleURL = sf.model('module-url', function(My){
 		My.newURL = '';
 
 		let progressToast = SmallNotif.add("Loading", 'yellow', false);
-
-		sf.loader.DOMWasLoaded = false; // flag because we may load new module
-		sf.loader.onProgress(function(loaded, total){
-			progressToast.message = `Loading ${loaded}/${total}`;
-		});
-
 		try {
 			await Blackprint.loadModuleFromURL(url, options);
 			await sf.loader.task;
@@ -216,8 +210,6 @@ let _editorModuleURL = sf.model('module-url', function(My){
 			SmallNotif.add("Failed to load module", 'red');
 			console.error(e);
 			My.newURL = temp;
-		} finally {
-			sf.loader.DOMWasLoaded = true; // reset flag
 		}
 
 		// Clear toast
