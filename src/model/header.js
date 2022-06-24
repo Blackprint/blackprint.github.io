@@ -250,11 +250,8 @@ var EditorHeader = sf.model('header', function(My, include){
 		});
 	}
 
-	My.cloneActive = false;
 	My.cloneContainer = function(){
-		let sketch = window.CurrentSketch;
-		sketch.page.cloneContainer();
-		My.cloneActive = sketch.page.cloneActive;
+		window.CurrentSketch.page.cloneContainer();
 	}
 
 	My.disableVFXActive = false;

@@ -88,7 +88,6 @@ sketch-page{
 			if(sketch == null || sketch._abandon) return;
 			window.CurrentSketch = sketch;
 
-			sf.model('header').cloneActive = sketch.page.cloneActive;
 			$('body > .background .tile').css('display', 'none');
 
 			if(SketchSettings.showSketchMinimap){
@@ -267,10 +266,7 @@ sf.component('sketch-page', function(My){
 	My.importJSON = json => sketch.importJSON(json);
 	My.clearNodes = ()=> sketch.clearNodes();
 
-	My.cloneActive = false;
 	My.cloneContainer = function(){
-		My.cloneActive = !My.cloneActive;
-
 		// Clone into new window
 		new sf.Window({
 			title: "Cloned Sketch Container",
