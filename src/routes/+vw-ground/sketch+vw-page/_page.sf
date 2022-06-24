@@ -14,10 +14,35 @@
 		<!-- /src/component/sketch-panel-right.sf -->
 		<sketch-panel-right></sketch-panel-right>
 	</div>
+
+	<div class="mini-blackprint disable-effect {{ miniViewer.topRightHidden && 'hidden' }}">
+		<!-- Will be replaced with element returned by Blackprint.cloneContainer(true) -->
+		<sf-slot for="miniViewer.topRight"></sf-slot>
+	</div>
 </sketch-page>
 
 ## scss-global
 sketch-page{
+	.mini-blackprint{
+		width: 240px;
+		height: 190px;
+		position: absolute;
+		top: 5px;
+		right: 0;
+		overflow: hidden;
+		box-shadow: 0 0 6px #ffffff6b;
+		background: #ffffff40;
+		border-radius: 10px;
+
+		sf-m[name="container"]{
+			pointer-events: none;
+		}
+
+		&.hidden{
+			display: none;
+		}
+	}
+
 	&> .bottom-message {
 		position: absolute;
 		bottom: 0;
@@ -65,6 +90,18 @@ sketch-page{
 
 			sf.model('header').cloneActive = sketch.page.cloneActive;
 			$('body > .background .tile').css('display', 'none');
+
+			if(SketchSettings.showSketchMinimap){
+				let ref = sketch.page.miniViewer;
+				if(ref.topRight == null){
+					ref.topRight = sketch.cloneContainer(true); // Clone and get the MiniMap
+
+					// Remove the dropdown from minimap
+					$('sf-m[name="dropdown"]', ref.topRight).remove();
+				}
+
+				ref.topRightHidden = false;
+			}
 		},
 		leaving(targetURL){
 			console.log("Leaving from sketch page data:", arguments);
@@ -81,6 +118,19 @@ sketch-page{
 // sketch.scope = shortcut to obtain your model scope/context
 var SketchList = [];
 sf.component('sketch-page', function(My){
+	My.miniViewer = {
+		topRight: null,
+		topRightHidden: true,
+		on$topRight(now){
+			if(now === null)
+				return My.miniViewer.topRightHidden = true;
+
+			My.miniViewer.topRightHidden = false;
+			// now => <sf-space>
+			// $(now)
+		}
+	};
+
 	// URL: #page/sketch/{data.page}
 	let sketch;
 	if(views.data.bpInstance == null){
@@ -221,50 +271,20 @@ sf.component('sketch-page', function(My){
 	My.cloneContainer = function(){
 		My.cloneActive = !My.cloneActive;
 
-		if(My.cloneActive){
-			if(My.disableVFXActive === false)
-				My.disableVFX();
+		// Clone into new window
+		new sf.Window({
+			title: "Cloned Sketch Container",
+			templateHTML: sketch.cloneContainer() // Clone 2
+		}, refreshViewport);
 
-			// Reset current container view
-			var container = sketch.scope('container');
-			container.pos.x = 0;
-			container.pos.y = 0;
-			container.scale = 1; // 100% scale
-
-			var mini;
-			if(container.minimap)
-				mini = container.minimap;
-			else{
-				mini = sketch.cloneContainer(true); // Clone and get the MiniMap
-
-				// Remove the dropdown from minimap
-				$('sf-m[name="dropdown"]', mini).remove();
-			}
-
-			// Clone into new window
-			new sf.Window({
-				title: "Cloned Sketch Container",
-				templateHTML: sketch.cloneContainer() // Clone 2
-			}, refreshViewport);
-
-			// Put the mini container into DOM
-			SketchPages.miniViewer.topRight = mini;
-
-			// Refresh mini viewport size
-			// I put it like this for a reason
-			refreshViewport();
-			function refreshViewport(){
+		// Refresh mini viewport size
+		function refreshViewport(){
+			setTimeout(function(){
+				container.pos.x = -0.1;
 				setTimeout(function(){
-					container.pos.x = -0.1;
-					setTimeout(function(){
-						container.pos.x = 0;
-					}, 500);
-				}, 1000);
-			}
-		}
-		else{
-			SketchPages.miniViewer.topRight = null;
-			sf.Window.destroy();
+					container.pos.x = 0;
+				}, 500);
+			}, 1000);
 		}
 	}
 

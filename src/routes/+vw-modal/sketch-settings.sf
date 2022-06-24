@@ -17,6 +17,10 @@
 			<div class="title">Hide unused port</div>
 			<input type="checkbox" sf-bind="hideUnusedPort">
 		</div>
+		<div class="item">
+			<div class="title">Show sketch minimap</div>
+			<input type="checkbox" sf-bind="showSketchMinimap">
+		</div>
 	</div>
 </sf-m>
 
@@ -57,7 +61,7 @@ sf-m[name="sketch-settings"] {
 }
 
 ## js-global
-sf.model('sketch-settings', function(My){
+var SketchSettings = sf.model('sketch-settings', function(My){
 	My.theme = 'default';
 	My.on$theme = function(now){
 		$('body')
@@ -86,6 +90,42 @@ sf.model('sketch-settings', function(My){
 		}
 
 		localStorage.bpHideUnusedPort = now;
+	}
+
+	My.showSketchMinimap = localStorage.bpShowSketchMinimap == 'true' || false;
+	My.on$showSketchMinimap = function(now){
+		for (var i = 0; i < SketchList.length; i++) {
+			let sketch = SketchList[i];
+			let ref = sketch.page.miniViewer;
+
+			if(now === true && ref.topRight == null){
+				ref.topRight = sketch.cloneContainer(true); // Clone and get the MiniMap
+
+				// Remove the dropdown from minimap
+				$('sf-m[name="dropdown"]', ref.topRight).remove();
+
+				// Reset current container view
+				var container = sketch.scope('container');
+				container.pos.x = 0;
+				container.pos.y = 0;
+				container.scale = 1; // 100% scale
+
+				// Refresh mini viewport size
+				refreshViewport();
+				function refreshViewport(){
+					setTimeout(function(){
+						container.pos.x = -0.1;
+						setTimeout(function(){
+							container.pos.x = 0;
+						}, 500);
+					}, 1000);
+				}
+			}
+
+			ref.topRightHidden = !now; // hide on false, show on true
+		}
+
+		localStorage.bpShowSketchMinimap = now;
 	}
 
 	if(My.background) My.on$background(My.background);

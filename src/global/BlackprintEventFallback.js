@@ -47,6 +47,7 @@ Blackprint.on('error', {slot: 'bp-editor'}, function(ev){
 
 window.addEventListener('error', function(e){
 	let message = e.message || "Something went wrong..";
+	if(message.includes('ResizeObserver')) return (e);
 	message = message.replace('Uncaught ', '');
 
 	SmallNotif.add(message, 'red');
@@ -54,6 +55,7 @@ window.addEventListener('error', function(e){
 
 window.addEventListener('onunhandledrejection', function(e){
 	let message = e.message || "Something went wrong..";
+	if(message.includes('ResizeObserver')) return (e);
 	message = message.replace('Uncaught ', '');
 
 	SmallNotif.add(message, 'red');
