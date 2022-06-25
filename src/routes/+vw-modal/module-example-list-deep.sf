@@ -97,7 +97,7 @@ sf-m[name="module-example-list-deep"] {
 ## js-global
 sf.model('module-example-list-deep', function(My){
 	My.packageName = '';
-	My.packageURL = ''; // https://cdn.jsdelivr.net/npm/@blackprint/package@version/
+	My.packageURL = ''; // https://cdn.jsdelivr.net/npm/@blackprint/package@version
 	My.githubURL = ''; // https://github.com/Blackprint/repository
 	My.packageVersion = '0.?';
 	My.pkg = null;
@@ -109,6 +109,13 @@ sf.model('module-example-list-deep', function(My){
 	My.openModal = function(pkg){
 		My.pkg = pkg;
 		My.packageName = pkg.packageName ?? '';
+
+		if(pkg.packageURL.slice(-1) === '/')
+			pkg.packageURL = pkg.packageURL.slice(0, -1);
+
+		if(pkg.githubURL.slice(-1) === '/')
+			pkg.githubURL = pkg.githubURL.slice(0, -1);
+
 		My.packageURL = pkg.packageURL ?? '';
 		My.githubURL = pkg.githubURL ?? '';
 		My.packageVersion = pkg.packageURL.match(/(?<=\w@)[\w.\-_]+/)?.[0] ?? '';
@@ -155,9 +162,7 @@ sf.model('module-example-list-deep', function(My){
 			baseURL = My.ghBaseUrl;
 		else throw new Error("Unknown source");
 
-		url = (baseURL+url).split('//').join('/');
-
-		let obj = await $.getJSON(url);
+		let obj = await $.getJSON(baseURL+url);
 		SketchImporter.loadJSON(obj);
 	}
 
@@ -205,15 +210,31 @@ sf.model('module-example-list-deep', function(My){
 		let ghName = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '').replace(/^.*?github.com\//m, '');
 
 		SmallNotif.add("Obtaining NPM file list");
-		let npmData = await $.getJSON(`https://data.jsdelivr.com/v1/package/npm/${npmName}@${packageJSON.version}`);
-		let npmExamples = getPackageExamples(npmData);
+
+		try{
+			var npmData = await $.getJSON(`https://data.jsdelivr.com/v1/package/npm/${npmName}@${packageJSON.version}`);
+		} catch(e){
+			SmallNotif.add("Failed to obtain example from NPM", 'red');
+			console.error(e);
+		}
+
+		let npmExamples = npmData ? getPackageExamples(npmData) : [];
 
 		let ghExamples = [];
 		if(!!ghName){
 			SmallNotif.add("Obtaining repository's file list");
-			let ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@main`);
-			ghExamples = getPackageExamples(ghData);
+
+			try{
+				var ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@main`);
+			} catch(e){
+				SmallNotif.add("Failed to obtain example from NPM", 'red');
+				console.error(e);
+			}
+			ghExamples = ghData ? getPackageExamples(ghData) : [];
 		}
+
+		if(npmExamples.length === 0 && ghExamples.length === 0)
+			throw new Error("Examples was not found");
 
 		ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
 
