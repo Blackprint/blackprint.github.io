@@ -43,7 +43,9 @@ sf.model('sketch-pages', function(My){
 		if(tagName === 'INPUT' || tagName === 'TEXTAREA')
 			return;
 
-		let sketch = CurrentSketch;
+		let sketch = window.CurrentSketch;
+		if(sketch == null) return;
+
 		let container = sketch.scope('container');
 
 		// Skip if no selected nodes/cables
