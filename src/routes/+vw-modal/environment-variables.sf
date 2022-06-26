@@ -1,6 +1,6 @@
 ## html
 <sf-m name="environment-variables">
-	<div class="title">Environment Variables</div>
+	<div class="title" title="Environment variables will be stored on your browser's localStorage">Environment Variables</div>
 	<div class="head">
 		<div class="row">Key</div>
 		<div class="row">Value</div>
@@ -121,13 +121,21 @@ sf.model('environment-variables', function(My){
 		return '';
 	}
 
+	My.init = function(){
+		let data = localStorage.bpEnvData;
+		if(!data) return;
+
+		data = JSON.parse(data);
+		Blackprint.Environment.import(data);
+	}
+
 	// Always hide when being closed
 	Modal.onHide('/environment-variables', function(){
 		My.showValue = false;
 	});
 
 	function caretFocusOnLastItem(){
-		$('input', My.list.getElements(My.list.length-1))[0].focus();
+		$('input', My.list.getElements(My.list.length-1))[0]?.focus();
 	}
 
 	My.itemChanged = function(item, ev){
@@ -162,6 +170,9 @@ sf.model('environment-variables', function(My){
 				if(!uniq.has(key))
 					Blackprint.Environment.delete(key);
 			}
+
+			localStorage.bpEnvData = JSON.stringify(Blackprint.Environment.map);
+			SmallNotif.add("Environment data was saved", 'green');
 		}, 1000);
 	}
 
