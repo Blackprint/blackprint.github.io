@@ -56,6 +56,9 @@
 </div>
 
 <div class="welcome-right">
+	<a target="_blank" style="cursor: pointer;" onclick="Modal.goto('/terms-and-privacy')">
+		Terms and Privacy <i class="fas fa-file-alt"></i>
+	</a>
 	<a target="_blank" style="cursor: pointer;" onclick="Modal.goto('/npm-packages')">
 		Package List <i class="fas fa-boxes"></i>
 	</a>
@@ -110,6 +113,9 @@
 			color: white;
 			margin: 0 5px;
 		}
+		a:hover {
+			filter: drop-shadow(0 0 5px white);
+		}
 	}
 }
 
@@ -122,6 +128,10 @@
 	i{
 		margin-right: 5px;
 	}
+	a:hover {
+		color: white;
+		text-shadow: 0 0 4px white;
+	}
 }
 
 .welcome-right{
@@ -133,6 +143,10 @@
 	text-align: right;
 	i{
 		margin-left: 5px;
+	}
+	a:hover {
+		color: white;
+		text-shadow: 0 0 4px white;
 	}
 }
 

@@ -1,0 +1,72 @@
+## html
+<sf-m name="terms-and-privacy">
+	<h1>Terms and Privacy</h1>
+	<h3>Terms of use:</h3>
+	<ul>
+		<li>May you do good and not evil.</li>
+		<li>May you find forgiveness for yourself and forgive others.</li>
+		<li>May you share freely, never taking more than you give.</li>
+	</ul>
+	<div class="adapted">Adapted from: SQLite's License</div>
+	<h3>When you're using this editor:</h3>
+	<ul>
+		<li>There are no information collected and transmitted from this editor to the maintainer of this editor. There are no telemetry, analytics, user registration, or ads.</li>
+		<li>This editor is using some third party like GitHub, JSDelivr which serve the editor's assets.</li>
+		<li>This editor may store information in IndexedDB, LocalStorage/SessionStorage, Cache, and WebSQL.</li>
+		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
+	</ul>
+	<h3>When you're using external modules:</h3>
+	<ul>
+		<li>Depends on which CDN you use, the CDN may record the downloaded module for their analytics purpose (like JSDelivr).</li>
+		<li>Depends on what module you loaded, the module may can collect information and send to third party depends on their purposes (like you programmed the nodes to connect to Telegram or Discord server to send message to someone).</li>
+		<li>Be careful if you're didn't recognize and unable to trust/verify the module author as this feature can execute code from the module, just like "npm install".</li>
+	</ul>
+	<h3>When you're using remote control feature:</h3>
+	<ul>
+		<li>Node structure, data (may include input/output/environment), cables, loaded modules, name, messages, will be transmitted and synced to the third party. The third party can be the server for collaborating with your friend, or your own server to handle remote control.</li>
+		<li>Becareful if you're using this feature with someone you're not recognize and trust, as this is a remote control. You will need to control which data that can be synced to increase security.</li>
+	</ul>
+	If you think some information was misleading or need clarification, feel free to contact the maintainer or do pull request.
+
+	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. We're looking forward for your contribution back :)
+</sf-m>
+
+## scss-global
+sf-m[name="terms-and-privacy"] {
+	background: #ffffff;
+    color: black;
+	padding: 20px;
+	border-radius: 10px;
+	max-width: 700px;
+	border: 2px solid black;
+	position: relative;
+	white-space: pre-line;
+	box-shadow: 0 0 20px 0px white;
+	h1{
+		margin: 0;
+		margin-top: -20px;
+		border-bottom: 1px dashed;
+	}
+	h3{
+		margin-bottom: -15px;
+		margin-top: 0;
+	}
+	ul{
+		margin: 0;
+		margin: -10px 0 5px 0;
+		list-style: decimal;
+		li {
+			margin: -5px;
+		}
+	}
+	.adapted {
+		margin: -35px 0 0px 0;
+		font-size: 12px;
+		color: #bfbfbf;
+	}
+}
+
+## js-global
+sf.model('terms-and-privacy', function(My){
+	My.open = function(key){}
+});
