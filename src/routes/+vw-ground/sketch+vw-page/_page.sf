@@ -43,6 +43,16 @@ sketch-page{
 		}
 	}
 
+	sf-m[name="container"] {
+		margin-left: 200px;
+	}
+
+	.mini-blackprint, &.left-menu-hide {
+		sf-m[name="container"]{
+			margin-left: 0;
+		}
+	}
+
 	&> .bottom-message {
 		position: absolute;
 		bottom: 0;
@@ -271,19 +281,9 @@ sf.component('sketch-page', function(My){
 
 		// Clone into new window
 		new sf.Window({
-			title,
+			title: `Sketch: ${title}`,
 			templateHTML: sketch.cloneContainer() // Clone 2
-		}, refreshViewport);
-
-		// Refresh mini viewport size
-		function refreshViewport(){
-			setTimeout(function(){
-				container.pos.x = -0.1;
-				setTimeout(function(){
-					container.pos.x = 0;
-				}, 500);
-			}, 1000);
-		}
+		});
 	}
 
 	sketch.on('node.menu', function({ iface, menu }){

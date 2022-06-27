@@ -384,13 +384,17 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 	My.openPanel = function(){
 		removeBlur();
+		My.$el.parent('sketch-page').removeClass('left-menu-hide');
 		My.opened = true;
+		CurrentSketch.recalculatePosition();
 	}
 
 	My.closePanel = function(ev){
 		removeBlur();
 		ev.stopPropagation();
+		My.$el.parent('sketch-page').addClass('left-menu-hide');
 		My.opened = false;
+		CurrentSketch.recalculatePosition();
 	}
 
 	My.collapseTree = function(el){
