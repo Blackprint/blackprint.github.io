@@ -164,9 +164,10 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 		My.ifaceField = iface._bpeditorpanel || null;
 
 		if(_firstTimeOpen){
+			My.opened = true;
 			setTimeout(()=>{
 				_firstTimeOpen = false;
-				My.opened = true;
+				My.opened = false;
 			}, 500);
 		}
 	}
