@@ -32,13 +32,18 @@ body sketch-page > .panels sketch-panel-right {
 	backdrop-filter: blur(8px); // Long CSS rule = more priority
 }
 
+sketch-page > .panels.has-minimap sketch-panel-right {
+	height: calc(100% - 200px);
+}
+
 sketch-page > .panels sketch-panel-right {
 	position: absolute;
 	// visibility: hidden;
 	bottom: 0;
 	right: 0;
 	width: 240px;
-	height: calc(100% - 200px);
+	border-left: 1px solid #202020;
+    height: 100%;
 	transform: translate(230px, 0);
 	transition: 0.3s ease-out transform;
 	display: flex;

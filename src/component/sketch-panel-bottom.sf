@@ -21,6 +21,7 @@ sketch-page > .panels sketch-panel-bottom {
 	width: calc(100% - 200px - 240px - 80px);
 	margin-left: -20px;
 	bottom: 0;
+	border: 1px solid #181818;
 	transform: translate(-50%, 90px);
 	transition: 0.3s ease-out transform;
 	display: flex;

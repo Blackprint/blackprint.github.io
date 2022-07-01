@@ -4,7 +4,7 @@
 	<sf-slot for="space"></sf-slot>
 
 	<!-- Panels -->
-	<div class="panels">
+	<div class="panels {{ !miniViewer.topRightHidden && 'has-minimap' }}">
 		<!-- /src/component/sketch-panel-left.sf -->
 		<sketch-panel-left></sketch-panel-left>
 
