@@ -28,7 +28,6 @@
 		<li>Node structure, data (may include input/output/environment), cables, loaded modules, name, messages, will be transmitted and synced to the third party. The third party can be the server for collaborating with your friend, or your own server to handle remote control.</li>
 		<li>Becareful if you're using this feature with someone you're not recognize and trust, as this is a remote control. You will need to control which data that can be synced to increase security.</li>
 	</ul>
-	<div class="small-note">Blackprint doesn't provide official remote control server. The server should be operated by the community or third party.</div>
 
 	If you think some information was misleading or need clarification, feel free to contact the maintainer or do pull request.
 
