@@ -23,7 +23,7 @@
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Public ({{ variableCount }})</div>
-				<div class="button" @click="createVariable(event, 'public')"><i class="fa fa-plus-square"></i></div>
+				<div class="button" @click="createVariable(event, Blackprint.VarScope.Public)"><i class="fa fa-plus-square"></i></div>
 
 				<!-- /src/component/tree-list.sf -->
 				<div class="tree-view tree-group" tree-section="variables" @pointerdown="checkDragNode">
@@ -496,9 +496,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					}
 					else if(section === 'variables' || section === 'sharedVariables' || section === 'privateVars'){
 						let scope;
-						if(section === 'variables') scope = 'public';
-						else if(section === 'sharedVariables') scope = 'shared';
-						else if(section === 'privateVars') scope = 'private';
+						if(section === 'variables') scope = 0;
+						else if(section === 'sharedVariables') scope = 2;
+						else if(section === 'privateVars') scope = 1;
 
 						DropDown.show([{
 							title: "Get " + key, callback(){
@@ -540,9 +540,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	My.createVariable = async (ev, scope) => {
-		SmallNotif.add("Still under development");
 		let val = await Swal.fire({
-			title: "Variable name",
+			title: "Variable Name:",
 			input: "text",
 		});
 
@@ -552,17 +551,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let funcInstance = sketch._funcMain?.node._funcInstance;
 		let rootInstance = funcInstance?.rootInstance ?? sketch;
 
-		if(scope === 'public')
+		if(scope === Blackprint.VarScope.Public)
 			rootInstance.createVariable(val);
-		else if(scope === 'shared' || scope === 'private')
+		else if(scope === Blackprint.VarScope.Shared || scope === Blackprint.VarScope.Private)
 			funcInstance.createVariable(val, { scope });
-		else throw new Error("Unhandled scope: "+scope);
+		else throw new Error("Unhandled scope: " + scope);
 	}
 
 	My.createFunction = async ev => {
-		SmallNotif.add("Still under development");
 		let val = await Swal.fire({
-			title: "Function name",
+			title: "Function Name:",
 			input: "text",
 		});
 
