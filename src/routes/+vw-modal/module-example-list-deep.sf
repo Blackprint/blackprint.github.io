@@ -225,9 +225,10 @@ sf.model('module-example-list-deep', function(My){
 			SmallNotif.add("Obtaining repository's file list");
 
 			try{
-				var ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@main`);
+				var commitHash = await $.getJSON(`https://api.github.com/repos/${ghName}/commits?per_page=1`);
+				var ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@${commitHash[0].sha}`);
 			} catch(e){
-				SmallNotif.add("Failed to obtain example from NPM", 'red');
+				SmallNotif.add("Failed to obtain example from GitHub", 'red');
 				console.error(e);
 			}
 			ghExamples = ghData ? getPackageExamples(ghData) : [];
