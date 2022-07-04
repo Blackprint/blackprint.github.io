@@ -1,0 +1,220 @@
+## html.append-to-body
+<sf-m name="tutorial" style="display: {{ active ? '' : 'none'}}">
+	<div class="highlighter">
+		<div class="dark-ground"></div>
+
+		<div>
+			<div class="light" sf-each="val in light" style="transform: translate({{ val.position.x }}px, {{ val.position.y }}px);"></div>
+		</div>
+	</div>
+
+	<div class="hinter">
+		<div class="hints" sf-each="val in light" style="transform: translate({{ val.position.x }}px, {{ val.position.y }}px);">
+			<div class="light"></div>
+			<div class="message">{{ val.message }}</div>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="tutorial"]{
+	$highlightWidth: 500px;
+	$highlightHeight: 500px;
+	z-index: 10;
+ 
+	@keyframes pulse-ring {
+		0% { transform: scale(0.1); }
+		80%, 100% { opacity: 0; }
+	}
+	@keyframes pulse-dot {
+		0% { transform: scale(0.7); }
+		50% { transform: scale(1); }
+		100% { transform: scale(0.7); }
+	}
+
+	.highlighter{
+		z-index: 5;
+		position: fixed;
+		top: 0;
+		left: 0;
+		mix-blend-mode: multiply;
+		pointer-events: none;
+		.dark-ground{
+			position: fixed;
+			width: 100vw;
+			height: 100vh;
+			background: rgba(0,0,0,0.8);
+		}
+		.light{
+			position: fixed;
+			width: $highlightWidth;
+			height: $highlightHeight;
+			margin-left: -$highlightWidth/2;
+			margin-top: -$highlightHeight/2;
+			border-radius: 100%;
+			background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 8%, rgba(255,255,255,0.7) 15%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 60%);
+		}
+	}
+	.hinter .hints{
+		position: fixed;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+		.light{
+			position: fixed;
+			width: 10px;
+			height: 10px;
+			margin-left: -5px;
+			margin-top: -5px;
+			&:before {
+				content: "";
+				position: relative;
+				display: block;
+				width: 500%;
+				height: 500%;
+				margin-left: -200%;
+				margin-top: -200%;
+				border-radius: 45px;
+				background-color: #01a4e9;
+				animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+			}
+			&:after {
+				content: "";
+				position: absolute;
+				top: 0;
+				display: block;
+				width: 100%;
+				height: 100%;
+				background-color: #ffffff69;
+				border-radius: 15px;
+				box-shadow: 0 0 8px black;
+				animation: pulse-dot 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) -0.4s infinite;
+			}
+		}
+		.message{
+			position: fixed;
+			// pointer-events: all;
+			font-size: 16px;
+			color: white;
+			background: #000000bb;
+			border: 1px solid #48484873;
+			border-radius: 10px;
+			padding: 4px 8px;
+			box-shadow: 0 0 8px black;
+			margin-left: 25px;
+			margin-top: -12px;
+		}
+	}
+}
+
+## js-global
+window.Tutorial = sf.model('tutorial', My => {
+	My.light = [];
+	My.pending = [];
+	My.active = false;
+
+	/* data = [
+		{message, position:{x, y}, onShow(){}, onLeave(){}}, // use XY
+		{message, element, origin: 'center'}, // use element position
+		{message, element, onEvent(){}, listenEvent: 'pointerup'}, // add event callback
+		[{message, position:{x, y}}, {message, element:{x, y}}] // multiple highlight [ToDo]
+	] */
+	My.loadTutorial = function(data){
+		if(!(data instanceof Array))
+			throw new Error("Tutorial must be an array");
+
+		// Make sure container element always on front
+		$(document.body).append(My.$el[0]);
+
+		My.pending = data.slice(0);
+	}
+
+	// Immediately show a highlight and clear previous tutorial
+	My.show = function(data){
+		My.pending = [data];
+		My.next();
+	}
+
+	My.addTutorial = function(...data){
+		My.pending.push(...data);
+	}
+
+	My.next = function(){
+		if(My.pending.length === 0){
+			My.light.splice(0);
+			My.active = false;
+			return;
+		}
+
+		// ToDo: optimize code below for multiple highlight
+		let old = My.light[0];
+		if(old != null){
+			old.onLeave?.();
+
+			if(old.listenEvent != null && old.onEvent != null)
+				$(old.element).off(old.listenEvent);
+		}
+
+		let data = My.pending.shift();
+		if(data.element != null){
+			let $el = $(data.element);
+			if($el[0] == null){
+				SmallNotif.add('Failed to find element "'+data.element+'" for the tutorial', 'red');
+				return;
+			}
+
+			let rect = $el[0].getBoundingClientRect();
+			let origin = data.origin || 'center';
+
+			var oX=0,oY=0;
+			if(origin === 'top-left') 1;
+			else if(origin === 'top-right')
+				oX += rect.width;
+			else if(origin === 'bottom-left')
+				oY += rect.height;
+			else if(origin === 'bottom-right')
+				oX += rect.width, oY += rect.height;
+			else if(origin === 'center')
+				oX += rect.width/2, oY += rect.height/2;
+			else if(origin === 'center-top')
+				oX += rect.width/2;
+			else if(origin === 'center-left')
+				oY += rect.height/2;
+			else if(origin === 'center-right')
+				oX += rect.width, oY += rect.height/2;
+			else if(origin === 'center-bottom')
+				oX += rect.width/2, oY += rect.height;
+
+			data.position = {x: rect.x + oX, y: rect.y + oY};
+
+			if(data.listenEvent != null && data.onEvent != null)
+				$el.once(data.listenEvent);
+		}
+
+		My.light = data.splice != null ? data : [data];
+		My.active = true;
+
+		data.onShow?.();
+	}
+
+	My.clearTutorial = function(){
+		My.light[0]?.onLeave?.();
+
+		My.light = [];
+		My.pending = [];
+	}
+
+	My.hotReloaded = function(){
+		// My.loadTutorial([{message:"hello\nwodlw", element: '.welcome-text', position:{x:100, y:100}, onShow(){
+		// 	$(document.body).once('pointerup', function(){
+		// 		My.next();
+		// 	});
+		// }}]);
+		// My.loadTutorial([[
+		// 	{message:"hello\nwodlw", position:{x:100, y:100}},
+		// 	{message:"aasd\nwodlw", position:{x:500, y:200}},
+		// ]]);
+
+		// My.next();
+	}
+});
