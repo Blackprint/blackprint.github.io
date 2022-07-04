@@ -7,28 +7,32 @@
 		<li>May you find forgiveness for yourself and forgive others.</li>
 		<li>May you share freely, never taking more than you give.</li>
 	</ul>
-	<div class="adapted">Adapted from: SQLite's License</div>
+	<div class="small-note">Adapted from: SQLite's License</div>
 	<h3>When you're using this editor:</h3>
 	<ul>
 		<li>There are no information collected and transmitted from this editor to the maintainer of this editor. There are no telemetry, analytics, user registration, or ads.</li>
 		<li>This editor is using some third party like GitHub, JSDelivr which serve the editor's assets.</li>
-		<li>This editor may store information in IndexedDB, LocalStorage/SessionStorage, Cache, and WebSQL.</li>
+		<li>This editor may store information in your browser's storage like IndexedDB or LocalStorage.</li>
 		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
+		<li>If you're using remote control or remote module, Socket.io may store cookies.</li>
 	</ul>
 	<h3>When you're using external modules:</h3>
 	<ul>
 		<li>Depends on which CDN you use, the CDN may record the downloaded module for their analytics purpose (like JSDelivr).</li>
-		<li>Depends on what module you loaded, the module may can collect information and send to third party depends on their purposes (like you programmed the nodes to connect to Telegram or Discord server to send message to someone).</li>
+		<li>Depends on what module you loaded, the module may can collect information and send to third party, depends on their purposes (like Telegram or Discord module that connect to their datacenter server to send message in their services).</li>
 		<li>Be careful if you're didn't recognize and unable to trust/verify the module author as this feature can execute code from the module, just like "npm install".</li>
 	</ul>
 	<h3>When you're using remote control feature:</h3>
+	<i>This feature is not enabled by default.</i>
 	<ul>
 		<li>Node structure, data (may include input/output/environment), cables, loaded modules, name, messages, will be transmitted and synced to the third party. The third party can be the server for collaborating with your friend, or your own server to handle remote control.</li>
 		<li>Becareful if you're using this feature with someone you're not recognize and trust, as this is a remote control. You will need to control which data that can be synced to increase security.</li>
 	</ul>
+	<div class="small-note">Blackprint doesn't provide official remote control server. The server should be operated by the community or third party.</div>
+
 	If you think some information was misleading or need clarification, feel free to contact the maintainer or do pull request.
 
-	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. We're looking forward for your contribution back :)
+	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. But, don't forget to contribute back to Blackprint someday 😆
 </sf-m>
 
 ## scss-global
@@ -59,7 +63,7 @@ sf-m[name="terms-and-privacy"] {
 			margin: -5px;
 		}
 	}
-	.adapted {
+	.small-note {
 		margin: -35px 0 0px 0;
 		font-size: 12px;
 		color: #bfbfbf;
