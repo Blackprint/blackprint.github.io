@@ -259,6 +259,41 @@ sf.component('sketch-page', function(My){
 		if(!sfm.eq(0).hasClass('bg-tile')){
 			sfm.prepend('<div class="bg-tile"></div>');
 		}
+
+		My.registerListener();
+	}
+
+	My.registerListener = function(){
+		function pointerOver(targetEl){
+			if(targetEl.tagName === 'path'){
+				targetEl.parentElement.model.disconnect();
+			}
+		}
+
+		function pmEvent(ev){ pointerOver(ev.target) }
+		function tmEvent(ev){
+			let touch = ev.touches[0];
+			pointerOver(document.elementFromPoint(touch.clientX, touch.clientY));
+		}
+
+		let temp = My.$el('sf-m[name="cables"]');
+		let evRegistered = false;
+		temp.on('pointerdown', function(ev){
+			if(ev.altKey && !evRegistered){
+				evRegistered = true;
+				if(ev.pointerType === 'touch')
+					temp.on('touchmove', tmEvent);
+				else temp.on('pointermove', pmEvent);
+			}
+		})
+		.on('pointerup', function(ev){
+			if(evRegistered){
+				evRegistered = false;
+				if(ev.pointerType === 'touch')
+					temp.off('touchmove', tmEvent);
+				else temp.off('pointermove', pmEvent);
+			}
+		});
 	}
 
 	My.importJSON = json => sketch.importJSON(json);
