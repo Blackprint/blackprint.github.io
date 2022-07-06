@@ -472,17 +472,29 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
 
+		let endEvent = 'pointerup';
+		if(ev.pointerType === 'touch')
+			endEvent = 'touchend';
+
 		ToolTip.set("Create node");
-		$(sf.Window).once('pointerup', evUp => {
+		$(sf.Window).once(endEvent, evUp => {
 			ToolTip.set();
 
-			if(evUp.target.closest('sketch-page') == null) return;
-			if(evUp.target.closest('sf-m.cables') != null){
+			let targetEl = evUp.target;
+			if(endEvent === 'touchend'){
+				let { clientX, clientY } = evUp.changedTouches[0];
+				evUp.clientX = clientX;
+				evUp.clientY = clientY;
+				targetEl = document.elementFromPoint(clientX, clientY);
+			}
+
+			if(targetEl.closest('sketch-page') == null) return;
+			if(targetEl.closest('sf-m.cables') != null){
 				let parentKey = parent.model.parentKey;
 				let namespace = !!parentKey ? (parentKey + '/' + key) : key;
 
 				$.afterRepaint().then(function(){
-					let offset = evUp.target.getBoundingClientRect();
+					let offset = targetEl.getBoundingClientRect();
 					let nodeOptions = {
 						x: evUp.clientX - offset.x,
 						y: evUp.clientY - offset.y
