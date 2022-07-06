@@ -67,13 +67,20 @@ sf.model('sketch-pages', function(My){
 			let {sketch, container} = passed;
 
 			// Currently we only support copy/paste/delete for nodes
-			if(container.nodeScope.selected.length === 0) return;
+			if(container.nodeScope.selected.length === 0 && container.cableScope.selected.length === 0) return;
 
 			if(ev.key === 'Delete'){
 				let selected = container.nodeScope.selected;
-
 				for(let i=0; i < selected.length; i++)
 					sketch.deleteNode(selected[i]);
+
+				selected.splice(0);
+
+				selected = container.cableScope.selected;
+				for(let i=0; i < selected.length; i++)
+					selected[i].disconnect();
+
+				selected.splice(0);
 			}
 		})
 		.on('pointermove', function(ev){
