@@ -27,7 +27,7 @@ sketch-page{
 		width: 240px;
 		height: 190px;
 		position: absolute;
-		top: 5px;
+		top: 0;
 		right: 0;
 		overflow: hidden;
 		box-shadow: 0 0 6px #ffffff6b;
@@ -321,20 +321,18 @@ sf.component('sketch-page', function(My){
 
 				if(ref.isConfirmed === false) return;
 
-				let sketch = SketchList[0];
+				let sketch = iface.node.instance;
 				let val = ref.value;
 
 				if(val === ''){
-					delete sketch.iface[iface.id];
-					iface.id = val;
+					iface.node.instance.changeNodeId(iface, val);
 					return;
 				}
 
 				if(sketch.iface[val] !== void 0)
 					throw new Error("ID already exist");
 
-				iface.id = val;
-				sketch.iface[val] = iface;
+				iface.node.instance.changeNodeId(iface, val);
 			}
 		}, {
 			title: "View source code",

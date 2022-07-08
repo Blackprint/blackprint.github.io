@@ -1,5 +1,5 @@
 ## html
-<sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ nodeSelected == null ? 'hide' : '' }}">
+<sketch-panel-right class="panel {{ opened ? 'opened' : ''}} {{ ifaceSelected == null ? 'hide' : '' }}">
 	<div class="content">
 		<div class="panel-title">Properties</div>
 		<div class="bpsprf-default">
@@ -42,7 +42,7 @@ sketch-page > .panels sketch-panel-right {
 	bottom: 0;
 	right: 0;
 	width: 240px;
-	border-left: 1px solid #202020;
+	border: 1px solid #202020;
     height: 100%;
 	transform: translate(230px, 0);
 	transition: 0.3s ease-out transform;
@@ -123,14 +123,16 @@ sketch-page > .panels sketch-panel-right {
 ## js-global
 sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	My.opened = false;
-	My.nodeSelected = null;
+	My.ifaceSelected = null;
 	My.ifaceField = null;
 
 	My.data = {title:'', namespace:'',
 		id:'',
-		v2m$id(val){ My.nodeSelected.id = val },
+		v2m$id(val){
+			My.ifaceSelected.node.instance.changeNodeId(My.ifaceSelected, val);
+		},
 		comment:'',
-		v2m$comment(val){ My.nodeSelected.comment = val },
+		v2m$comment(val){ My.ifaceSelected.comment = val },
 	};
 
 	My.init = function(){
@@ -144,12 +146,12 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	}
 
 	My.hide = function(){
-		My.nodeSelected = null;
+		My.ifaceSelected = null;
 	}
 
 	let _firstTimeOpen = true;
 	My.selectNode = function(iface){
-		My.nodeSelected = iface;
+		My.ifaceSelected = iface;
 		My.data.title = iface.title;
 		My.data.namespace = iface.namespace;
 		My.data.id = iface.id || '';
