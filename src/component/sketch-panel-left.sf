@@ -181,9 +181,6 @@ sketch-page > .panels sketch-panel-left {
 			}
 		}
 	}
-	.variable-list {
-		border-top: none;
-	}
 	.variable-list, .function-list, .node-list {
 		color: white;
 		position: relative;
@@ -215,6 +212,9 @@ sketch-page > .panels sketch-panel-left {
 				display: none;
 			}
 		}
+	}
+	.variable-list {
+		border-top: none;
 	}
 	.opener{
 		cursor: pointer;
