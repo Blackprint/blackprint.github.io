@@ -71,4 +71,11 @@ $(function(){
 
 	if(navigator.serviceWorker != null)
 		navigator.serviceWorker.register("/service-worker.js");
+
+	Blackprint.on('menu.create.node', function(ev){
+		let { list, isSuggestion } = ev;
+		if(!isSuggestion) return;
+
+		delete list.Example; // Delete example nodes from suggestion
+	});
 });

@@ -219,7 +219,8 @@ sf.component('sketch-page', function(My){
 				// Auto connect if found only one compatible port
 				if(compatiblePorts.length === 1)
 					compatiblePorts[0].connectCable(ev.cable);
-			}
+			},
+			suggest: true,
 		});
 	});
 
