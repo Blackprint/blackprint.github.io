@@ -181,6 +181,9 @@ sketch-page > .panels sketch-panel-left {
 			}
 		}
 	}
+	.variable-list {
+		border-top: none;
+	}
 	.variable-list, .function-list, .node-list {
 		color: white;
 		position: relative;

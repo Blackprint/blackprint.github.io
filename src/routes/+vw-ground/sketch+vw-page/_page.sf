@@ -25,7 +25,7 @@
 sketch-page{
 	.mini-blackprint{
 		width: 240px;
-		height: 190px;
+		height: 195px;
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -64,7 +64,6 @@ sketch-page{
 
 	&> .panels {
 		sketch-panel-left, sketch-panel-bottom, sketch-panel-right {
-			z-index: 1;
 			backdrop-filter: blur(1px);
 			box-shadow: 0 0 8px 0 black;
 		}
