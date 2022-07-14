@@ -7,8 +7,8 @@
 	</div>
 	<div class="content {{ !showValue && 'hide-value'}}">
 		<div>
-			<div class="row" sf-each="x in list" @keyup="itemChanged(x)">
-				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" sf-bind="x.key" placeholder="...">
+			<div class="row" sf-each="x in list" @keyup="itemChanged(x, event)">
+				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" value="{{ x.key }}" placeholder="...">
 				<input class="column bpe-value" type="text" value="{{ x.value }}" placeholder="...">
 			</div>
 		</div>
@@ -121,10 +121,9 @@ sf.model('environment-variables', function(My){
 		return '';
 	}
 
-	My.init = function(){
-		let data = localStorage.bpEnvData;
-		if(!data) return;
-
+	// Init
+	let data = localStorage.bpEnvData;
+	if(data){
 		data = JSON.parse(data);
 		Blackprint.Environment.import(data);
 	}
@@ -139,7 +138,8 @@ sf.model('environment-variables', function(My){
 	}
 
 	My.itemChanged = function(item, ev){
-		refreshEnvironment();
+		if(ev.target.classList.contains('bpe-value'))
+			refreshEnvironment();
 
 		if(item.key.length === 0 && (Number.isNaN(item.value) || !item.value)){
 			My.list.splice(My.list.indexOf(item), 1);
@@ -182,12 +182,6 @@ sf.model('environment-variables', function(My){
 
 	My.renameEnv = function(item, element, oldKey){
 		let temp = My.validateKey(element.value);
-
-		// Skip if this was a new env
-		if(!(temp in Blackprint.Environment.map)){
-			item.key = temp;
-			return;
-		}
 
 		if(temp == ''){
 			Blackprint.Environment.delete(oldKey);
