@@ -89,6 +89,8 @@ var EditorHeader = sf.model('header', function(My, include){
 							option.comment = false;
 						}
 
+						option.environment = false;
+
 						var temp = sketch.exportJSON(option);
 						navigator.clipboard.writeText(temp);
 
@@ -101,7 +103,8 @@ var EditorHeader = sf.model('header', function(My, include){
 					title: 'To File',
 					callback(){
 						var btn = document.createElement("a");
-						var file = new Blob([sketch.exportJSON()], {type: 'application/json'});
+						var opt = {environment: false};
+						var file = new Blob([sketch.exportJSON(opt)], {type: 'application/json'});
 						btn.href = URL.createObjectURL(file);
 						btn.download = 'blackprint.json';
 						btn.click();
@@ -114,7 +117,8 @@ var EditorHeader = sf.model('header', function(My, include){
 				}, {
 					title: 'To URL',
 					callback(){
-						var compress = pako.deflateRaw(sketch.exportJSON());
+						var opt = {environment: false};
+						var compress = pako.deflateRaw(sketch.exportJSON(opt));
 						var temp = Base64.fromUint8Array(compress, true);
 
 						sf.URI.data.importSketch = [temp];
@@ -149,7 +153,8 @@ var EditorHeader = sf.model('header', function(My, include){
 						return;
 
 					let sketch = SketchList[0];
-					let temp = sketch.exportJSON();
+					let opt = {environment: false};
+					let temp = sketch.exportJSON(opt);
 					sketch.clearNodes();
 
 					await sketch.importJSON(temp);
