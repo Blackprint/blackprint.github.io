@@ -149,7 +149,7 @@ var EditorHeader = sf.model('header', function(My, include){
 						showCloseButton: true
 					});
 
-					if(confirm.isDismissed && confirm.dismiss === 'backdrop')
+					if(val.isDismissed)
 						return;
 
 					let sketch = SketchList[0];
