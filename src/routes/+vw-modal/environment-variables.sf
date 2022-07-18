@@ -8,7 +8,7 @@
 	<div class="content {{ !showValue && 'hide-value'}}">
 		<div>
 			<div class="row" sf-each="x in list" @keyup="itemChanged(x, event)">
-				<input class="column key" type="text" @input="renameEnv(x, this, x.key)" value="{{ x.key }}" placeholder="...">
+				<input class="column key" type="text" @input="renameEnv(x, this)" value="{{ x.key }}" placeholder="...">
 				<input class="column bpe-value" type="text" value="{{ x.value }}" placeholder="...">
 			</div>
 		</div>
@@ -131,6 +131,7 @@ sf.model('environment-variables', function(My){
 	// Always hide when being closed
 	Modal.onHide('/environment-variables', function(){
 		My.showValue = false;
+		refreshEnvironment();
 	});
 
 	function caretFocusOnLastItem(){
@@ -180,15 +181,19 @@ sf.model('environment-variables', function(My){
 		return value.replace(/[ \-]+/gm, '_').replace(/\W+/gm, '').replace(/^[0-9]+/gm, '').toUpperCase();
 	}
 
-	My.renameEnv = function(item, element, oldKey){
-		let temp = My.validateKey(element.value);
+	let _renameEnv = 0;
+	My.renameEnv = function(item, element){
+		clearTimeout(_renameEnv);
+		_renameEnv = setTimeout(function(){
+			let temp = My.validateKey(element.value);
 
-		if(temp == ''){
-			Blackprint.Environment.delete(oldKey);
-			return;
-		}
+			if(temp == '' && item.value === ''){
+				Blackprint.Environment.delete(item.key);
+				return;
+			}
 
-		Blackprint.Environment._rename(oldKey, temp);
+			Blackprint.Environment._rename(item.key, temp);
+		}, 1000);
 	}
 
 	My.close = function(){
