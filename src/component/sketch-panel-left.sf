@@ -131,7 +131,7 @@
 			<div class="button" @click="createCustomNode"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode">
+			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode" @pointerover="nodeListHover"  @pointerleave="nodeListLeave">
 				<div class="tree-item collapsed" sf-each="key, val in nodes"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -460,6 +460,25 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			nodeMenu.css('max-height', `${maxMenuHeight-10}px`);
 		}
 	}
+
+	My.nodeListLeave = ev => ToolTip.set();
+	My.nodeListHover = ev => {
+		if(!ev.target.classList.contains('title')) return;
+
+		let itemEl = $(ev.target.parentNode);
+		if(itemEl.hasClass('has-child')) return;
+
+		let key = itemEl.attr('tree-item-key');
+		let parentKey = itemEl[0].parentNode.model.parentKey;
+
+		let keys = parentKey.split('.');
+		keys.push(key);
+
+		let docs = Blackprint._utils.deepProperty(Blackprint._docs, keys);
+		if(docs == null) return;
+
+		ToolTip.set(docs.description, ev, 'basic');
+	};
 
 	My.checkDragNode = ev => {
 		let focus = ev.target;
