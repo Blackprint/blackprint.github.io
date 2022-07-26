@@ -86,7 +86,7 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.showed = true;
 			$(window).on('pointermove', My._listener);
 		}
-		else{
+		else if(!data){
 			My.showed = false;
 			$(window).off('pointermove', My._listener);
 		}
