@@ -45,7 +45,7 @@ function pipeCallback(fileName, contentCallback){
 		}
 
 		let filePath = file.relative.slice(0, -3).split('\\').join('/').split('/');
-		deepAssign(jsContents, filePath, file.contents.toString('utf8'));
+		deepAssign(jsContents, filePath, file.contents.toString('utf8').split('\r').join(''));
 		cb();
 	}
 
