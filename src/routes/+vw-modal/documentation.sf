@@ -5,7 +5,7 @@
 		<div class="left-panel">
 			<!-- /src/component/tree-list2.sf -->
 			<div class="tree-view" @pointerdown="checkClick">
-				<div class="tree-item collapsed" sf-each="key, val in docs">
+				<div class="tree-item collapsed" sf-each="key, val in docs" tree-item-key="{{ key.replace(/\W/g, '_') }}">
 					<div class="title"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
@@ -14,10 +14,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="content">
+		<div class="content" @click="changeHeaderFocus">
 			<sf-slot for="content"></sf-slot>
 		</div>
-		<div class="right-panel">
+		<div class="right-panel" @click="changeHeaderFocus">
 			<sf-slot for="section"></sf-slot>
 		</div>
 	</div>
@@ -26,12 +26,12 @@
 ## scss-global
 sf-m[name="documentation"] {
 	background: #292929;
-    border: 2px solid black;
-    position: relative;
-    box-shadow: 0 0 20px 0px black;
-    width: 95vw;
-    height: 95vh;
-    overflow: hidden;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px black;
+	width: 95vw;
+	height: 95vh;
+	overflow: hidden;
 	.title{
 		color: white;
 		font-weight: bold;
@@ -65,6 +65,35 @@ sf-m[name="documentation"] {
 		color: #d7d7d7;
 		overflow: scroll;
 		height: 96%;
+		h1, h2, h3, h4, h5, h6 {
+			cursor: pointer;
+			&:hover {
+				color: white;
+				filter: drop-shadow(0 0 10px white);
+				&:after{
+					margin-left: 10px;
+					font-size: 16px;
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					content: '\f0c1';
+					vertical-align: middle;
+				}
+			}
+		}
+		a{
+			color: skyblue;
+			text-decoration: underline;
+		}
+		.active {
+			color: yellow;
+			filter: drop-shadow(0 0 10px yellow);
+			border-bottom: 1px dashed;
+		}
+	}
+	.tree-item.active > .title, .right-panel .active {
+		color: yellow;
+		filter: drop-shadow(0 0 10px yellow);
+		border-bottom: 1px dashed;
 	}
 	.tree-item {
 		// background: black;
@@ -85,6 +114,7 @@ sf-m[name="documentation"] {
 	.sc-H3{ margin-left: 20px; }
 	.sc-H4{ margin-left: 30px; }
 	.sc-H5{ margin-left: 40px; }
+	.sc-H6{ margin-left: 50px; }
 }
 
 ## js-global
@@ -93,6 +123,8 @@ sf.model('documentation', function(My){
 	My.cache = new WeakMap();
 	My.content = null;
 	My.section = null;
+	My.treePath = '';
+	My.sectionPath = '';
 
 	My.init = async function(){
 		___browserSync___.socket.on('bp-editor-docs', function(data){
@@ -120,10 +152,26 @@ sf.model('documentation', function(My){
 		let el = ev.target;
 		if(!el.classList.contains('title')) return;
 
-		let model = el.parentNode.model;
-		let cache = My.cache.get(model);
+		My.treePath = '';
+		My.sectionPath = '';
+		$(event.target).parents('.tree-item').each(function(){
+			let temp = My.treePath;
+			My.treePath = this.getAttribute('tree-item-key');
+
+			if(temp) My.treePath += '/'+temp;
+		});
+
+		changeContent(el.parentNode.model);
+	}
+
+	let currentContent;
+	function changeContent(obj){
+		if(currentContent === obj) return;
+		currentContent = obj;
+		
+		let cache = My.cache.get(obj);
 		if(cache == null){
-			let content = $(`<div>${marked.parse(model.content)}</div>`);
+			let content = $(`<div>${marked.parse(obj.content)}</div>`);
 
 			// Allow script evaluation
 			content.find('script').each(function(){
@@ -131,11 +179,12 @@ sf.model('documentation', function(My){
 			});
 
 			let section = '<div>';
-			content.find('h1, h2, h3, h4, h5, h6, h7, h8, h9, h10').each(function(){
-				section += `<div class="sc-${this.tagName}">${this.textContent}</div>`;
+			content.find('h1, h2, h3, h4, h5, h6').each(function(){
+				let id = this.textContent.toLowerCase().replace(/\W/g, '-');
+				section += `<div class="sc-${this.tagName}" section-id="${id}">${this.textContent}</div>`;
 			});
 
-			My.cache.set(model, cache = {
+			My.cache.set(obj, cache = {
 				content,
 				section: $(section+'</div>'),
 			});
@@ -143,5 +192,76 @@ sf.model('documentation', function(My){
 
 		My.content = cache.content[0];
 		My.section = cache.section[0];
+
+		refreshURL();
 	}
+
+	My.changeHeaderFocus = function(event){
+		let el = event.target;
+		let parentClass = el.parentNode.parentNode.classList;
+		if(!parentClass.contains('right-panel') && !parentClass.contains('content'))
+			return;
+
+		if(el.tagName !== 'DIV' && !el.tagName.startsWith('H'))
+			return;
+
+		My.changeHeaderFocusById(el.textContent);
+	}
+
+	My.changeHeaderFocusById = function(id){
+		id = id.toLowerCase().replace(/\W/g, '-');
+		My.sectionPath = id;
+
+		let target = My.content.querySelector(`#${id}`);
+		if(target == null) return;
+
+		My.$el('.content')[0].scrollTop = target.offsetTop - 40;
+		refreshURL();
+	}
+
+	function refreshURL(){
+		sf.URI.data.bpdocs = `${My.treePath}${My.sectionPath ? '+'+My.sectionPath : ''}`;
+		sf.URI.replace();
+
+		My.$el('.active').removeClass('active');
+
+		if(My.sectionPath !== ''){
+			My.$el(`[section-id="${My.sectionPath}"]`).addClass('active');
+			My.$el(`.container > .content #${My.sectionPath}`).addClass('active');
+		}
+
+		if(My.treePath !== ''){
+			let selector = `[tree-item-key="${My.treePath.split('/').join('"] [tree-item-key="')}"]`;
+			My.$el(selector).addClass('active');
+		}
+	}
+
+	function deepDive(obj, paths){
+		let path = paths.shift();
+		for(let key in obj){
+			if(key.replace(/\W/g, '_') !== path) continue;
+			if(paths.length === 0) return obj[key];
+			return deepDive(obj[key].branch, paths);
+		}
+	}
+
+	$(function(){
+		let bpdocs = sf.URI.data.bpdocs?.[0];
+		if(bpdocs == null) return;
+
+		let [path, section] = bpdocs.split('+');
+		let obj = deepDive(window.bpEditorDocs, path.split('/'));
+		if(obj == null) return SmallNotif.add("Document for the specified path was not found", 'red');
+
+		Modal.goto('/documentation');
+		changeContent(obj);
+
+		My.treePath = path;
+		My.sectionPath = section;
+
+		// Wait first load
+		setTimeout(function(){
+			if(section) My.changeHeaderFocusById(section);
+		}, 1000);
+	});
 });
