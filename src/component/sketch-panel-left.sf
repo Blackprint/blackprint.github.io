@@ -461,7 +461,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		}
 	}
 
-	My.nodeListLeave = ev => ToolTip.set();
+	My.nodeListLeave = ev => {
+		if(ev.pressure === 0) ToolTip.set();
+	};
 	My.nodeListHover = ev => {
 		if(!ev.target.classList.contains('title')) return;
 

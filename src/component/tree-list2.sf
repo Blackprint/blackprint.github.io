@@ -1,53 +1,28 @@
 This tree list accept: {
 	Key: {
-		DeepKey: {...}
+		branch: {
+			DeepKey: {branch: ...}
+		}
 	}
 }
 
 ## html
-<tree-list class="tree-list-menu {{ hidden ? 'hidden' : '' }}">
+<tree-list2 class="tree-list-menu {{ hidden ? 'hidden' : '' }}">
 	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
-		{{@if hasChild(val):
-			return new $TreeList({parentKey: parentKey, key, val});
+		{{@if val.branch != null:
+			return new $TreeList2({parentKey: parentKey, key, val: val.branch});
 		}}
 	</div>
-</tree-list>
-
-## scss-global
-.tree-list-menu.hidden {
-	display: none;
-}
-
-.tree-item{
-	padding-left: 20px;
-	&.has-child {
-		padding-left: 10px;
-	}
-	.title {
-		user-select: none;
-		cursor: pointer;
-	}
-}
-
-.tree-item.has-child > .title .tree-icon:before {
-	color: gray;
-	content: "\f0d7";
-	padding-right: 5px;
-}
-
-.tree-item.has-child.collapsed > .title .tree-icon:before {
-	content: "\f0da";
-}
+</tree-list2>
 
 ## js-global
-sf.component('tree-list', {template: #this.path}, function(My, include, $item={}){
+sf.component('tree-list2', {template: #this.path}, function(My, include, $item={}){
 	My.parentKey = $item.parentKey ?? '';
 	My.parentKey += $item.key && My.parentKey !== '' ? `/${$item.key}` : ($item.key ?? '');
 
 	My.deep = $item.val ?? {};
-	My.hidden = true;
-	My.hasChild = $item.hasChild ?? (obj => obj.constructor === Object);
+	My.hidden = false;
 
 	My.init = function(){
 		My.$el.parent().addClass("has-child").addClass("collapsed");

@@ -1,0 +1,147 @@
+## html
+<sf-m name="documentation">
+	<div class="title">Documentation</div>
+	<div class="container">
+		<div class="left-panel">
+			<!-- /src/component/tree-list2.sf -->
+			<div class="tree-view" @pointerdown="checkClick">
+				<div class="tree-item collapsed" sf-each="key, val in docs">
+					<div class="title"><i class="fa tree-icon"></i> {{ key }}</div>
+
+					{{@if val.constructor === Object:
+						return new $TreeList2({parentKey: '', key, val: val.branch});
+					}}
+				</div>
+			</div>
+		</div>
+		<div class="content">
+			<sf-slot for="content"></sf-slot>
+		</div>
+		<div class="right-panel">
+			<sf-slot for="section"></sf-slot>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="documentation"] {
+	background: #292929;
+    border: 2px solid black;
+    position: relative;
+    box-shadow: 0 0 20px 0px black;
+    width: 95vw;
+    height: 95vh;
+    overflow: hidden;
+	.title{
+		color: white;
+		font-weight: bold;
+		font-size: 20px;
+		text-align: center;
+		vertical-align: middle;
+		width: 100%;
+		background: black;
+		box-shadow: 0 0 7px black;
+		z-index: 1;
+	}
+	.container{
+		display: flex;
+		height: 100%;
+	}
+	.left-panel, .right-panel{
+		height: 100%;
+		padding-top: 5px;
+		.title{
+			font-size: 16px;
+			text-align: left;
+		}
+		width: 15%;
+		max-width: 300px;
+		background: #161616;
+		box-shadow: 0 0 7px black;
+	}
+	.content{
+		padding: 5px 20px;
+		width: 70%;
+		color: #d7d7d7;
+		overflow: scroll;
+		height: 96%;
+	}
+	.tree-item {
+		// background: black;
+		i {
+			display: none;
+		}
+		.title{
+			background: none;
+			box-shadow: none;
+			font-weight: normal;
+		}
+	}
+	.right-panel > div > div {
+		color: white;
+		cursor: pointer;
+	}
+	.sc-H2{ margin-left: 10px; }
+	.sc-H3{ margin-left: 20px; }
+	.sc-H4{ margin-left: 30px; }
+	.sc-H5{ margin-left: 40px; }
+}
+
+## js-global
+sf.model('documentation', function(My){
+	My.docs = window.bpEditorDocs;
+	My.cache = new WeakMap();
+	My.content = null;
+	My.section = null;
+
+	My.init = async function(){
+		___browserSync___.socket.on('bp-editor-docs', function(data){
+			Object.assign(My.docs, data.contents);
+		});
+
+		My.content = $(`<div>Welcome to Blackprint Documentation!</div>`)[0];
+
+		if(false && localStorage.firstTimeEditorVisit !== "1"){
+			localStorage.firstTimeEditorVisit = "1";
+
+			let confirm = await Swal.fire({
+				title:"Welcome!",
+				html:"<br>It's seems you're new here 🎉<br>Do you want to see small tutorial to use this editor?",
+				showCancelButton: true,
+			});
+
+			if(confirm.isConfirmed){
+				// ToDo
+			}
+		}
+	}
+
+	My.checkClick = function(ev){
+		let el = ev.target;
+		if(!el.classList.contains('title')) return;
+
+		let model = el.parentNode.model;
+		let cache = My.cache.get(model);
+		if(cache == null){
+			let content = $(`<div>${marked.parse(model.content)}</div>`);
+
+			// Allow script evaluation
+			content.find('script').each(function(){
+				eval(this.textContent);
+			});
+
+			let section = '<div>';
+			content.find('h1, h2, h3, h4, h5, h6, h7, h8, h9, h10').each(function(){
+				section += `<div class="sc-${this.tagName}">${this.textContent}</div>`;
+			});
+
+			My.cache.set(model, cache = {
+				content,
+				section: $(section+'</div>'),
+			});
+		}
+
+		My.content = cache.content[0];
+		My.section = cache.section[0];
+	}
+});

@@ -10,8 +10,8 @@
 		<div class="item" @click="openExamples">
 			<i class='fa fa-map-signs'></i> <span>Open examples</span>
 		</div>
-		<div class="item" style="cursor: default">
-			<i class='fa fa-book-open'></i> <span style="text-decoration: line-through">Learn from editor</span>
+		<div class="item" onclick="Modal.goto('/documentation')">
+			<i class='fa fa-book-open'></i> <span style="text-decoration: line-through">Documentation</span>
 		</div>
 	</div>
 
@@ -47,9 +47,10 @@
 	<a target="_blank" href="https://github.com/Blackprint/Blackprint">
 		<i class="fab fa-github"></i> GitHub
 	</a>
-	<a target="_blank" href="https://stefansarya.gitbook.io/blackprint">
+	<!--a target="_blank" href="https://stefansarya.gitbook.io/blackprint">
+	<a style="cursor: pointer" onclick="Modal.goto('/documentation')">
 		<i class="fa fa-book-open"></i> Documentation
-	</a>
+	</a-->
 	<a target="_blank" href="https://github.com/Blackprint/Blackprint/discussions">
 		<i class="fa fa-comments"></i> Discussions
 	</a>
@@ -154,7 +155,7 @@
 sf.model('welcome-text', function(My){
 	My.toWorkspace = function(){
 		if(SketchList.length === 0){
-			My.openExamples();
+			SketchList[0] = new Blackprint.Sketch();
 			return;
 		}
 
