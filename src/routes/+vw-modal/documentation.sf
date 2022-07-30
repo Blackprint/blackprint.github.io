@@ -75,7 +75,8 @@ sf-m[name="documentation"] {
 					font-size: 16px;
 					font-family: "Font Awesome 5 Free";
 					font-weight: 900;
-					content: '\f0c1';
+					// content: '\f0c1';
+					content: '\f292';
 					vertical-align: middle;
 				}
 			}
