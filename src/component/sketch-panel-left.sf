@@ -465,19 +465,24 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		if(ev.pressure === 0) ToolTip.set();
 	};
 	My.nodeListHover = ev => {
-		if(!ev.target.classList.contains('title')) return;
+		if(ev.pressure !== 0) return; // Run on hover only, and no button click
+
+		if(!ev.target.classList.contains('title'))
+			return ToolTip.set(false);
 
 		let itemEl = $(ev.target.parentNode);
-		if(itemEl.hasClass('has-child')) return;
+		if(itemEl.hasClass('has-child'))
+			return ToolTip.set(false);
 
 		let key = itemEl.attr('tree-item-key');
 		let parentKey = itemEl[0].parentNode.model.parentKey;
 
-		let keys = parentKey.split('.');
+		let keys = parentKey.split('/');
 		keys.push(key);
 
 		let docs = Blackprint._utils.deepProperty(Blackprint._docs, keys);
-		if(docs == null) return;
+		if(docs == null)
+			return ToolTip.set(false);
 
 		ToolTip.set(docs.description, ev, 'basic');
 	};
