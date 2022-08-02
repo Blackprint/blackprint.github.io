@@ -4,7 +4,7 @@
 		Search package on NPM repository
 		<i class="{{ loading ? 'fa fa-spinner fa-spin' : '' }}"></i>
 	</div>
-	<div class="mini-description" title="especially if you're not a developer, always becareful if someone ask you to do something with Blackprint, like inputting password or private key">Always becareful and verify the module's source code before going to production</div>
+	<div class="mini-description" title="Please verify the author trustworthiness before using their module. If you're not a developer, always becareful if someone ask you to do something with Blackprint, like inputting password or private key.">These modules is contributed by the community <a @click="reportClick">(click to report spam/scam)</a></div>
 	<div class="search">
 		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
 	</div>
@@ -37,11 +37,16 @@ sf-m[name="npm-packages"] {
 	}
 	> .mini-description{
 		padding: 10px;
-		color: white;
+		color: grey;
 		font-size: 12px;
 		margin-top: -20px;
+		a{
+			color: grey;
+			cursor: pointer;
+		}
 	}
 	> .description{
+		text-align: center;
 		padding: 10px;
 		color: white;
 		a{
@@ -191,5 +196,10 @@ sf.model('npm-packages', function(My){
 
 		My.loading = false;
 		sf.model('npm-package-info').open(pkg, dist, example);
+	}
+
+	My.reportClick = function(){
+		// ToDo: for now we will redirect to GitHub issue instead
+		window.open('https://github.com/Blackprint/blackprint.github.io/issues/new', '_blank');
 	}
 });
