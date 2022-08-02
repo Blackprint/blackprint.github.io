@@ -11,7 +11,7 @@
 	<h3>When you're using this editor:</h3>
 	<ul>
 		<li>There are no information collected and transmitted from this editor to the maintainer of this editor. There are no telemetry, user registration, or ads.</li>
-		<li>This editor is using some third party like GitHub, JSDelivr which serve the editor's assets. These services may count the traffic for analytics purposes.</li>
+		<li>This editor is using some third party like GitHub, Algolia, JSDelivr which serve the editor's assets. These services may count the traffic for analytics purposes.</li>
 		<li>This editor may store information in your browser's storage like IndexedDB or LocalStorage.</li>
 		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
 		<li>If you're using remote control or remote module, Socket.io may store cookies.</li>
@@ -33,7 +33,7 @@
 
 	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. We're looking forward for your awesome contribution someday 😆
 
-	Last updated: 29 July 2022
+	Last updated: 2 August 2022
 </sf-m>
 
 ## scss-global

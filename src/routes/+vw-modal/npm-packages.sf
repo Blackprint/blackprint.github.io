@@ -9,14 +9,14 @@
 		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
 	</div>
 	<div class="list">
-		<div class="item {{ x.package._active && 'active' }} {{ x.package._update && 'update' }}" sf-each="x in list" @click="open(x.package)">
+		<div class="item {{ x._active && 'active' }} {{ x._update && 'update' }}" sf-each="x in list" @click="open(x)">
 			<div>
-				<div class="title">{{ x.package.name }} <span>(v{{ x.package.version }})</span></div>
-				<div class="author">{{ x.package.publisher.username }}</div>
+				<div class="title">{{ x.name }} <span>(v{{ x.version }})</span></div>
+				<div class="author">{{ x.lastPublisher.name }}</div>
 			</div>
 			<div>
-				<div class="description">{{ x.package.description }}</div>
-				<div class="date">{{ x.package.date.split('T')[0] }}</div>
+				<div class="description">{{ x.description }}</div>
+				<div class="date">{{ (new Date(x.modified)).toDateString().slice(4) }}</div>
 			</div>
 		</div>
 	</div>
@@ -101,29 +101,45 @@ sf-m[name="npm-packages"] {
 
 ## js-global
 sf.model('npm-packages', function(My){
-	let query = 'https://registry.npmjs.org/-/v1/search?text=blackprint%20nodes';
 	My.list = [];
 	My.search = '';
 	My.loading = false;
+
+	My.jsDelivrSearch ??= (function(){
+		// These key is from: https://github.com/jsdelivr/www.jsdelivr.com/blob/master/src/public/js/utils/search.js#L2
+		// We will use their Application ID and it's search index, the API key is Search-Only (maybe)
+		let algolia = algoliasearch('OFCNCOG2CU', 'f54e21fa3a2a0160595bb058179bfb1e', { protocol: 'https:' });
+		let index = algolia.initIndex('npm-search');
+
+		let defaultAttr = ['deprecatedReason', 'description', 'devDependencies', 'githubRepo', 'license', 'name', 'lastPublisher', 'owner', 'version', 'versions', 'modified'];
+		return async function(query, options={}){
+			options.attributesToRetrieve = defaultAttr;
+
+			let data = await index.search(query, options);
+			return data.hits;
+		};
+	})();
 
 	My.init = function(){
 		My.refreshList();
 	}
 
 	My.refreshList = async function(){
-		let _query = query;
-		if(My.search !== '')
-			_query += '%20'+My.search;
+		let query = 'blackprint nodes';
+		if(My.search !== '') query += ' '+My.search;
 
 		My.loading = true;
-		let list = (await $.getJSON(_query)).objects;
+		let list = await sf.model.root['npm-packages'].jsDelivrSearch(query, {
+			page: 0,
+			hitsPerPage: 10,
+		})
 		My.loading = false;
 
 		// ToDo: check if version was different with current loaded module
 		let temp = Blackprint.modulesURL;
 		for(let key in temp){
 			for (var i = 0; i < list.length; i++) {
-				let item = list[i].package;
+				let item = list[i];
 
 				if(key.includes(item.name)){
 					item._active = true;
