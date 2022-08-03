@@ -196,14 +196,15 @@ sf.model('module-example-list-deep', function(My){
 		if(packageJSON == null){
 			let packageURL = My.packageURL;
 			if(!packageURL.includes('@latest')){
-				packageURL = packageURL.match(/.*?@[0-9]/)?.[0];
+				packageURL = packageURL.match(/.*?(?=@[0-9])/)?.[0];
 				if(packageURL != null) packageURL += '@latest';
 			}
 
 			if(!packageURL) throw new Error("Saved package URL was not found");
 
 			SmallNotif.add("Obtaining package.json");
-			packageJSON = await $.getJSON(`${My.packageURL}/package.json`);
+			packageJSON = await $.getJSON(`${packageURL}/package.json`);
+			My.packageVersion = packageJSON.version;
 		}
 
 		let npmName = packageJSON.name;
