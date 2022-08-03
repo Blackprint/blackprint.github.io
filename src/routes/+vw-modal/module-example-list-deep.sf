@@ -238,7 +238,9 @@ sf.model('module-example-list-deep', function(My){
 		if(npmExamples.length === 0 && ghExamples.length === 0)
 			throw new Error("Examples was not found");
 
-		ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
+		let info = ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
+		My.npmBaseUrl = info.packageURL;
+		My.ghBaseUrl = info.githubURL;
 
 		if(My.pkg != null && My.packageName === npmName){
 			My.pkg.npmExamples = npmExamples;

@@ -125,6 +125,8 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 
 	My.replacePackageExample = function(packageJSON, npmExample, ghExample){
 		let packageName = packageJSON.name;
+		let packageURL = `https://cdn.jsdelivr.net/npm/${packageName}@${packageJSON.version}`;
+		let githubURL = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '');
 
 		let list = My.list;
 		for (var i = 0; i < list.length; i++) {
@@ -132,14 +134,13 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 			if(ref.packageName === packageName){
 				ref.npmExamples = npmExample;
 				ref.ghExamples = ghExample;
+				ref.packageURL = packageURL;
+				ref.githubURL = githubURL;
 				break;
 			}
 		}
 
 		if(list.length === i){
-			let packageURL = `https://cdn.jsdelivr.net/npm/${packageName}@${packageJSON.version}/`;
-			let githubURL = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '');
-
 			list.push({
 				packageName,
 				packageURL,
@@ -151,6 +152,8 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 
 		localStorage.bpModuleExampleList = JSON.stringify(My.list);
 		SmallNotif.add("Example data updated", 'green');
+
+		return list[i];
 	}
 
 	My.addExampleFromURL = async function(url){
