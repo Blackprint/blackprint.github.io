@@ -200,6 +200,89 @@ sf.component('sketch-page', function(My){
 		let ifaceList = sketch.ifaceList;
 		let oldLastNode = ifaceList[ifaceList.length-1];
 
+		Blackprint.once('menu.create.node', function({ menu, coordinate, options }){
+			function createNode(namespace, data){
+				let offset = event.target.getBoundingClientRect();
+				let iface = sketch.createNode(namespace, {
+					x: event.clientX - offset.x,
+					y: event.clientY - offset.y,
+					data,
+				});
+
+				options.onCreated?.(iface);
+			}
+
+			let Variables = [];
+			if(ev.cable.source === 'output'){
+				async function promoteToVar(scope){
+					let ref = await My.panels.left.createVariable(null, scope);
+					let offset = event.target.getBoundingClientRect();
+					let iface = sketch.createNode('BP/Var/Set', {
+						x: event.clientX - offset.x,
+						y: event.clientY - offset.y,
+						data: { name: ref.id, scope }
+					});
+					iface.useType(ev.cable.owner);
+					iface.input.Val.connectCable(ev.cable);
+				}
+
+				Variables.push({
+					title: "New Public",
+					icon: 'fa fa-plus-square',
+					callback(){promoteToVar(Blackprint.VarScope.Public)}
+				});
+
+				// is inside function?
+				if(sketch._funcMain){
+					Variables.push({
+						title: "New Private",
+						icon: 'fa fa-plus-square',
+						callback(){promoteToVar(Blackprint.VarScope.Private)}
+					}, {
+						title: "New Shared",
+						icon: 'fa fa-plus-square',
+						callback(){promoteToVar(Blackprint.VarScope.Shared)}
+					});
+				}
+
+				if(ev.cable.owner.type === String || ev.cable.owner.type.any){
+					if(Blackprint.Environment._list.length !== 0){
+						Variables.unshift({
+							title: "Environment",
+							deep: Blackprint.Environment._list.map(v => ({
+								title: v.key,
+								callback(){createNode('BP/Env/Set', {name: v.key})}
+							}))
+						});
+					}
+				}
+			}
+			else if(ev.cable.source === 'input'){
+				if(ev.cable.owner.type === String || ev.cable.owner.type.any){
+					if(Blackprint.Environment._list.length !== 0){
+						Variables.unshift({
+							title: "Environment",
+							deep: Blackprint.Environment._list.map(v => ({
+								title: v.key,
+								callback(){createNode('BP/Env/Get', {name: v.key})}
+							}))
+						});
+					}
+				}
+			}
+
+			let port = ev.cable.owner;
+			let funcList = Blackprint.Sketch.suggestNode(port.source === 'input' ? 'output' : 'input', port.type, sketch.functions);
+
+			funcList = Object.keys(funcList).map(v => ({
+				title: v,
+				callback(){createNode(`BPI/F/${v}`)}
+			}));
+
+			if(Variables.length !== 0) menu.push({title: "Variables", deep: Variables});
+			if(funcList.length !== 0) menu.push({title: "Functions", deep: funcList});
+		});
+
 		let suggestedNode = Blackprint.Sketch.suggestNodeForPort(ev.port);
 		container.nodeScope.menu(event, suggestedNode, {
 			onCreated(iface){
@@ -219,6 +302,10 @@ sf.component('sketch-page', function(My){
 				// Auto connect if found only one compatible port
 				if(compatiblePorts.length === 1)
 					compatiblePorts[0].connectCable(ev.cable);
+				else { // Drop near the port
+					let posX = sourcePort === 'input' ? 20 : -20;
+					ev.cable.head2[0] += posX;
+				}
 			},
 			suggest: true,
 		});

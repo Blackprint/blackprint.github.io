@@ -593,9 +593,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let rootInstance = funcInstance?.rootInstance ?? sketch;
 
 		if(scope === Blackprint.VarScope.Public)
-			rootInstance.createVariable(val);
+			return rootInstance.createVariable(val);
 		else if(scope === Blackprint.VarScope.Shared || scope === Blackprint.VarScope.Private)
-			funcInstance.createVariable(val, { scope });
+			return funcInstance.createVariable(val, { scope });
 		else throw new Error("Unhandled scope: " + scope);
 	}
 
