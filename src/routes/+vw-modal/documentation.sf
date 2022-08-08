@@ -116,6 +116,15 @@ sf-m[name="documentation"] {
 	.sc-H4{ margin-left: 30px; }
 	.sc-H5{ margin-left: 40px; }
 	.sc-H6{ margin-left: 50px; }
+
+	@media(max-width: 800px){
+		.right-panel {
+			display: none;
+		}
+		.left-panel {
+			width: 30%
+		}
+	}
 }
 
 ## js-global
