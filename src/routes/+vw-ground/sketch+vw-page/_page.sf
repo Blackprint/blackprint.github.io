@@ -357,8 +357,13 @@ sf.component('sketch-page', function(My){
 			}
 		}
 
-		function pmEvent(ev){ pointerOver(ev.target) }
+		function pmEvent(ev){
+			if(!ev.altKey) return temp.off('pointermove', pmEvent);
+			pointerOver(ev.target);
+		}
 		function tmEvent(ev){
+			if(!ev.altKey) return temp.off('touchmove', tmEvent);
+
 			let touch = ev.touches[0];
 			pointerOver(document.elementFromPoint(touch.clientX, touch.clientY));
 		}
