@@ -110,6 +110,8 @@ sketch-page{
 
 				ref.topRightHidden = false;
 			}
+
+			sf.model('header').info.scale = sketch.scope('container').scale*100;
 		},
 		leaving(targetURL){
 			console.log("Leaving from sketch page data:", arguments);
@@ -161,7 +163,10 @@ sf.component('sketch-page', function(My){
 
 		sketch = My.sketch = SketchList[views.data.page - 1] ??= new Blackprint.Sketch();
 	}
-	else sketch = My.sketch = views.data.bpInstance;
+	else{
+		sketch = My.sketch = views.data.bpInstance;
+		setTimeout(() => My.fitToView(), 200);
+	}
 
 	window.CurrentSketch = sketch;
 	sketch.page = My;
@@ -386,6 +391,51 @@ sf.component('sketch-page', function(My){
 				else temp.off('pointermove', pmEvent);
 			}
 		});
+	}
+
+	My.fitToView = async function(){
+		await $.afterRepaint;
+		await sketch.recalculatePosition()
+		await $.afterRepaint;
+
+		let Ref = sketch.scope('container');
+		let {offsetHeight, offsetWidth} = Ref.$el[0].parentElement;
+		let nodes = Ref.nodeScope.list;
+		let maxX = 0, maxY = 0;
+		let W = 0, H = 0;
+
+		for (var i = 0; i < nodes.length; i++) {
+			let node = nodes[i];
+			if(maxX < node.x){
+				maxX = node.x;
+				W = node.w || 0;
+			}
+
+			if(maxY < node.y){
+				maxY = node.y;
+				H = node.h || 0;
+			}
+		}
+
+		maxX += W + 50;
+		maxY += H + 50;
+
+		if(maxX < Ref.origSize.w && maxY < Ref.origSize.h){
+			maxX = Ref.origSize.w;
+			maxY = Ref.origSize.h;
+		}
+
+		let A = offsetWidth / (maxX + 300);
+		let B = offsetHeight / (maxY + 300);
+
+		let decidedScale = A < B ? A : B;
+		decidedScale = decidedScale - (decidedScale % 0.05); // round decimal
+		Ref.scale = decidedScale > 1 ? 1 : decidedScale;
+
+		Ref.size.w = offsetWidth / decidedScale;
+		Ref.size.h = offsetHeight / decidedScale;
+
+		sf.model('header').info.scale = decidedScale*100;
 	}
 
 	My.importJSON = json => sketch.importJSON(json);

@@ -181,6 +181,10 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 			// Clear toast
 			let list = SmallNotif.list;
 			list.splice(list.indexOf(progressToast), 1);
+
+			// Fit all node to view
+			let currentSketchPage = $('.page-current > sketch-page')[0].model;
+			currentSketchPage.fitToView();
 		}
 
 		if(views.currentPath === '/sketch/1'){
