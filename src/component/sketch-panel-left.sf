@@ -524,10 +524,10 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 				$.afterRepaint().then(function(){
 					let offset = targetEl.getBoundingClientRect();
-					let nodeOptions = {
-						x: evUp.clientX - offset.x,
-						y: evUp.clientY - offset.y
-					};
+					let container = sketch.scope('container');
+					let posX = (evUp.clientX - offset.x) / container.scale;
+					let posY = (evUp.clientY - offset.y) / container.scale;
+					let nodeOptions = { x: posX, y: posY };
 
 					if(section === 'nodes'){
 						sketch.createNode(namespace, nodeOptions);

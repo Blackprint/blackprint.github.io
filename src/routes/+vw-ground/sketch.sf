@@ -144,6 +144,7 @@ sf.model('sketch-pages', function(My){
 
 			let {x, y} = container.pos; // Negative value
 			let {x: oX, y: oY} = container.offset; // Negative value
+			let scale = container.scale; // Negative value
 
 			// Reposition the nodes near the pointer or current container
 			for(let key in data){
@@ -152,8 +153,8 @@ sf.model('sketch-pages', function(My){
 				let val = data[key];
 				for(let i=0; i < val.length; i++){
 					let node = val[i];
-					node.x += -x - oX + pointerX;
-					node.y += -y - oY + pointerY;
+					node.x += (-x - oX + pointerX) / scale;
+					node.y += (-y - oY + pointerY) / scale;
 				}
 			}
 
