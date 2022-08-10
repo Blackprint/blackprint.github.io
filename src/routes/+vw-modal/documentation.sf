@@ -86,14 +86,14 @@ sf-m[name="documentation"] {
 			text-decoration: underline;
 		}
 		.active {
-			color: yellow;
-			filter: drop-shadow(0 0 10px yellow);
+			color: #ffff70;
+			filter: drop-shadow(0 0 10px #ffff00bb);
 			border-bottom: 1px dashed;
 		}
 	}
 	.tree-item.active > .title, .right-panel .active {
-		color: yellow;
-		filter: drop-shadow(0 0 10px yellow);
+		color: #ffff70;
+		filter: drop-shadow(0 0 10px #ffff00bb);
 		border-bottom: 1px dashed;
 	}
 	.tree-item {

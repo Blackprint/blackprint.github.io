@@ -34,7 +34,7 @@ For adding library or style, please modify /public/index.html
 		</div>
 		<div class="header-zoom">
 			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
-				<i class="fas fa-search"></i> {{ info.scale }}%
+				<i class="fas fa-search"></i> {{ info.scale | 0 }}%
 			</div>
 		</div>
 	</div>
