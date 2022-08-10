@@ -420,16 +420,23 @@ sf.component('sketch-page', function(My){
 		maxX += W + 50;
 		maxY += H + 50;
 
-		if(maxX < Ref.origSize.w && maxY < Ref.origSize.h){
+		if(maxX <= (Ref.origSize.w - 100) && maxY <= (Ref.origSize.h - 100)){
 			maxX = Ref.origSize.w;
 			maxY = Ref.origSize.h;
 		}
+		else{
+			maxX += 300;
+			maxY += 300;
+		}
 
-		let A = offsetWidth / (maxX + 300);
-		let B = offsetHeight / (maxY + 300);
+		let A = offsetWidth / maxX;
+		let B = offsetHeight / maxY;
 
 		let decidedScale = A < B ? A : B;
-		decidedScale = decidedScale - (decidedScale % 0.05); // round decimal
+		decidedScale = decidedScale*100;
+		decidedScale = decidedScale - (decidedScale % 5); // round decimal
+		decidedScale = decidedScale/100;
+
 		Ref.scale = decidedScale > 1 ? 1 : decidedScale;
 
 		Ref.size.w = offsetWidth / decidedScale;
