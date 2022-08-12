@@ -340,8 +340,8 @@ sf.model('documentation', function(My){
 		let bpdocs = sf.URI.data.bpdocs?.[0];
 		if(bpdocs == null || My.initialized) return;
 		marked.setOptions({
-			highlight(code){
-				return hljs.highlightAuto(code).value;
+			highlight(code, language){
+				return hljs.highlight(code, { language }).value;
 			}
 		});
 
