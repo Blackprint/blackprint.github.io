@@ -8,7 +8,7 @@ This tree list accept: {
 
 ## html
 <tree-list2 class="tree-list-menu {{ hidden ? 'hidden' : '' }}">
-	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key }}">
+	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key.replace(/\W/g, '_') }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if val.branch != null:
 			return new $TreeList2({parentKey: parentKey, key, val: val.branch});
