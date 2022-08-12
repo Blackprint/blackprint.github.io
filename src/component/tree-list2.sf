@@ -16,6 +16,13 @@ This tree list accept: {
 	</div>
 </tree-list2>
 
+## scss-global
+tree-list2{
+	.tree-item{
+		padding-left: 10px;
+	}
+}
+
 ## js-global
 sf.component('tree-list2', {template: #this.path}, function(My, include, $item={}){
 	My.parentKey = $item.parentKey ?? '';
@@ -29,6 +36,8 @@ sf.component('tree-list2', {template: #this.path}, function(My, include, $item={
 	}
 
 	My.collapse = function(el){
+		return; // disable for now
+
 		el = el.nextElementSibling;
 		if(el == null) return;
 
