@@ -20,7 +20,7 @@ In the browser you can easily import from CDN, and just begin writing your code 
 #### Installing the engine
 
 ```sh
-// You can use PNPM or NPM when installing packages
+# You can use PNPM or NPM when installing packages
 $ pnpm i @blackprint/engine
 ```
 
@@ -105,3 +105,31 @@ func main() {
 ```
 
 </div></docs-md-tabs>
+
+## Create Engine Instance
+
+```js
+// If you load from CDN, "Blackprint" is registered in window object
+import Blackprint from '@blackprint/engine';
+
+// If you're running on Node.js and don't want to load modules from URL
+// you need to manually imports the modules before calling 'createNode' or 'importJSON'
+
+// Create Blackprint Engine instance
+var instance = new Blackprint.Engine();
+```
+
+### Create node in instance
+```js
+var iface = instance.createNode('MyModule/Math/Multiply', {/* optional options */});
+```
+
+### Import nodes from JSON
+```js
+instance.importJSON(/* JSON || Object */);
+```
+
+### Clear all nodes in instance
+```js
+instance.clearNodes();
+```

@@ -2,6 +2,11 @@ Currently sketch only available on modern Browser, but it can also being run on 
 
 ## Load Blackprint required files
 
+<docs-md-tabs>
+<div class="tabs"><div sf-each="x in tabs">{{ x }}</div></div>
+
+<div tab="Browser">
+
 You need to put this in the `<head>` tag.
 ```html
 <!-- If you're going to use Sketch, the framework must be loaded before the engine -->
@@ -14,9 +19,9 @@ You need to put this in the `<head>` tag.
 <script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.7/dist/blackprint.sf.js" crossorigin="anonymous"></script>
 ```
 
-## Load for Unit Test
+</div><div tab="Unit Test">
 
-In case if you want to import Blackprint Sketch for unit testing in Node.js, you also need to set the Blackprint to use windowless mode. I recommend for using Jest.
+In case if you want to import Blackprint Sketch for unit testing in Node.js, you also need to set the Blackprint to use `windowless` mode. I also recommend for using Jest.
 ```js
 window.ResizeObserver = class{}; // Polyfill with empty class
 window.sf = require("scarletsframe/dist/scarletsframe.min.js");
@@ -55,4 +60,14 @@ test("Load required modules", async () => {
 });
 ```
 
-## 
+</div></docs-md-tabs>
+
+## Create Instance
+`Blackprint.Sketch` does extends `Blackprint.Engine` class, that's mean it's similar with the Engine instance but with extended functionality like having a User Interface for the nodes, cable, ports and also handling user interaction for managing the instance.
+
+```js
+var instance = new Blackprint.Sketch();
+
+// Get the container and attach it into the DOM
+document.body.appendChild(instance.cloneContainer());
+```
