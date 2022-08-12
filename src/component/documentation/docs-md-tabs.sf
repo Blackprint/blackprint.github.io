@@ -1,0 +1,85 @@
+## html
+<docs-md-tabs>...</docs-md-tabs>
+
+## scss-global
+docs-md-tabs {
+	display: block;
+	background: #0000004d;
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid black;
+	box-shadow: 0 0 17px #00000094;
+	.tabs {
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: space-around;
+		margin-bottom: -10px;
+		padding: 5px;
+		background: #d0e19d59;
+		border-radius: 5px;
+		&> div {
+			cursor: pointer;
+		}
+		.active-tab {
+			color: yellow;
+			text-shadow: 0 0 9px #f1ff1e;
+		}
+	}
+	[tab]{
+		display: none;
+	}
+	.active-tab {
+		display: block;
+	}
+}
+
+## js-global
+sf.component('docs-md-tabs', My => {
+	let components = sf.component('docs-md-tabs');
+	My.tabs = [];
+	My.active = '';
+
+	My.init = function(){
+		let actives = new Set();
+		components.forEach(v => actives.add(v.active));
+
+		let firstTab = true;
+		My.$el('[tab]').each(function(){
+			let tab = $(this).attr('tab');
+			My.tabs.push(tab);
+
+			if(firstTab){
+				firstTab = false;
+				My.changeTab(tab, false);
+			}
+			else if(actives.has(tab)){
+				My.changeTab(tab, false);
+			}
+		});
+
+		My.$el('.tabs').on('click', function(ev){
+			let el = ev.target;
+			if(el.firstElementChild != null) return;
+			My.changeTab($(el).text(), true);
+		});
+	}
+
+	My.changeTab = function(text, syncToAll){
+		My.$el('.active-tab').removeClass('active-tab');
+		My.$el(`[tab="${text}"]`).addClass('active-tab');
+		$(My.tabs.getElement(My.tabs.indexOf(text))).addClass('active-tab');
+
+		My.active = text;
+
+		// Also change the other components
+		if(syncToAll){
+			sf.component('docs-md-tabs').forEach(v => {
+				if(v === My) return; // Skip current component
+
+				if(v.tabs.includes(text)){
+					v.changeTab(text);
+				}
+			});
+		}
+	}
+});
