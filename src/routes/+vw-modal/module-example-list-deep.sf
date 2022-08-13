@@ -2,7 +2,7 @@
 <div style="height: 70vh;">
 	<sf-m name="module-example-list-deep">
 		<div class="description">Examples for: <b>{{ packageName }}</b></div>
-		<div class="refresh-button" @click="refreshCache()">Click here to refresh cache</div>
+		<div class="refresh-button" @click="refreshCache()">Click here to refresh cache ({{ cacheDate ? (new Date(cacheDate)).toLocaleString() : '?' }})</div>
 		<div class="source-menu">
 			<div class="item {{ currentSource === 'gh' ? 'selected' : '' }}" @click="selectSource('gh')" title="Example from repository's main branch"><i class="fab fa-github"></i> GitHub (main)</div>
 			<div class="item {{ currentSource === 'npm' ? 'selected' : '' }}" @click="selectSource('npm')"><i class="fab fa-npm"></i> NPM (v{{ packageVersion }})</div>
@@ -104,6 +104,7 @@ sf.model('module-example-list-deep', function(My){
 	My.npmBaseUrl = '';
 	My.ghBaseUrl = '';
 	My.currentSource = 'gh';
+	My.cacheDate = '?';
 	My.list = [];
 
 	My.openModal = function(pkg){
@@ -118,6 +119,7 @@ sf.model('module-example-list-deep', function(My){
 
 		My.packageURL = pkg.packageURL ?? '';
 		My.githubURL = pkg.githubURL ?? '';
+		My.cacheDate = pkg.cacheDate ?? false;
 		My.packageVersion = pkg.packageURL.match(/(?<=\w@)[\w.\-_]+/)?.[0] ?? '';
 
 		let list = pkg.npmExamples;
@@ -140,11 +142,11 @@ sf.model('module-example-list-deep', function(My){
 
 		My.list = list.slice(0); // copy list
 		My.npmBaseUrl = pkg.packageURL;
-		My.ghBaseUrl = '';
+		My.ghBaseUrl = pkg.ghPackageURL;
 
 		if(!!My.githubURL){
 			let repoName = My.githubURL.match(/(?<=github\.com\/).*?\/.*?($|\?|\/)/m)[0];
-			My.ghBaseUrl = `https://cdn.jsdelivr.net/gh/${repoName}@main`
+			My.ghBaseUrl = `https://cdn.jsdelivr.net/gh/${repoName}@main`;
 		}
 	}
 
@@ -221,26 +223,29 @@ sf.model('module-example-list-deep', function(My){
 
 		let npmExamples = npmData ? getPackageExamples(npmData) : [];
 
-		let ghExamples = [];
+		let ghExamples = [], ghPackageTag;
 		if(!!ghName){
 			SmallNotif.add("Obtaining repository's file list");
 
 			try{
 				var commitHash = await $.getJSON(`https://api.github.com/repos/${ghName}/commits?per_page=1`);
 				var ghData = await $.getJSON(`https://data.jsdelivr.com/v1/package/gh/${ghName}@${commitHash[0].sha}`);
+				ghPackageTag = `${ghName}@${commitHash[0].sha}`;
 			} catch(e){
 				SmallNotif.add("Failed to obtain example from GitHub", 'red');
 				console.error(e);
 			}
+
 			ghExamples = ghData ? getPackageExamples(ghData) : [];
 		}
 
 		if(npmExamples.length === 0 && ghExamples.length === 0)
 			throw new Error("Examples was not found");
 
-		let info = ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples);
+		let info = ModuleExampleList.replacePackageExample(packageJSON, npmExamples, ghExamples, ghPackageTag);
 		My.npmBaseUrl = info.packageURL;
-		My.ghBaseUrl = info.githubURL;
+		My.ghBaseUrl = info.ghPackageURL;
+		My.cacheDate = info.cacheDate;
 
 		if(My.pkg != null && My.packageName === npmName){
 			My.pkg.npmExamples = npmExamples;

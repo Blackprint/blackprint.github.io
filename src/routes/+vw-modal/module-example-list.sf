@@ -123,10 +123,11 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 		localStorage.bpModuleExampleList = JSON.stringify(My.list);
 	}
 
-	My.replacePackageExample = function(packageJSON, npmExample, ghExample){
+	My.replacePackageExample = function(packageJSON, npmExample, ghExample, ghPackageTag){
 		let packageName = packageJSON.name;
 		let packageURL = `https://cdn.jsdelivr.net/npm/${packageName}@${packageJSON.version}`;
 		let githubURL = (packageJSON.repository?.url ?? '').replace(/\.git$/m, '');
+		let ghPackageURL = `https://cdn.jsdelivr.net/gh/${ghPackageTag}`;
 
 		let list = My.list;
 		for (var i = 0; i < list.length; i++) {
@@ -136,6 +137,8 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 				ref.ghExamples = ghExample;
 				ref.packageURL = packageURL;
 				ref.githubURL = githubURL;
+				ref.ghPackageURL = ghPackageURL;
+				ref.cacheDate = Date.now();
 				break;
 			}
 		}
@@ -145,6 +148,8 @@ var ModuleExampleList = sf.model('module-example-list', function(My){
 				packageName,
 				packageURL,
 				githubURL,
+				ghPackageURL,
+				cacheDate: Date.now(),
 				npmExamples: npmExample,
 				ghExamples: ghExample,
 			});
