@@ -169,6 +169,7 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 		async function pageShowed(){
 			// Import from JSON, and also load required modules if exist
 			try{
+				CurrentSketch.scope('container').scale = 1; // Reset scale to fix cable bug
 				await sketch.importJSON(My.pendingLoad);
 			} catch(e) {
 				SmallNotif.add("Failed to import data", 'red');

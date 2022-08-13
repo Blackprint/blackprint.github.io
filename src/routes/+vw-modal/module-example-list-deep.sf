@@ -4,8 +4,8 @@
 		<div class="description">Examples for: <b>{{ packageName }}</b></div>
 		<div class="refresh-button" @click="refreshCache()">Click here to refresh cache</div>
 		<div class="source-menu">
-			<div class="item {{ currentSource === 'npm' ? 'selected' : '' }}" @click="selectSource('npm')"><i class="fab fa-npm"></i> NPM (v{{ packageVersion }})</div>
 			<div class="item {{ currentSource === 'gh' ? 'selected' : '' }}" @click="selectSource('gh')" title="Example from repository's main branch"><i class="fab fa-github"></i> GitHub (main)</div>
+			<div class="item {{ currentSource === 'npm' ? 'selected' : '' }}" @click="selectSource('npm')"><i class="fab fa-npm"></i> NPM (v{{ packageVersion }})</div>
 		</div>
 		<div class="list">
 			<div class="item" sf-each="x in list" @click="openExample(x)">
@@ -103,7 +103,7 @@ sf.model('module-example-list-deep', function(My){
 	My.pkg = null;
 	My.npmBaseUrl = '';
 	My.ghBaseUrl = '';
-	My.currentSource = 'npm';
+	My.currentSource = 'gh';
 	My.list = [];
 
 	My.openModal = function(pkg){
