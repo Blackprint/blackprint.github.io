@@ -181,7 +181,7 @@ sf.model('documentation', function(My){
 	My.sectionPath = '';
 
 	My.init = async function(){
-		___browserSync___.socket.on('bp-editor-docs', function(data){
+		window.___browserSync___?.socket.on('bp-editor-docs', function(data){
 			Object.assign(My.docs, data.contents);
 
 			// Reload the active section
@@ -200,6 +200,7 @@ sf.model('documentation', function(My){
 
 		My.content = $(`<div>Welcome to Blackprint Documentation!</div>`)[0];
 
+		// ToDo: enable this after tutorial has completed
 		if(false && localStorage.firstTimeEditorVisit !== "1"){
 			localStorage.firstTimeEditorVisit = "1";
 
