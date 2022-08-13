@@ -1,6 +1,11 @@
 ## Hello 👋
 Welcome to Blackprint Editor!
 
+This documentation still work in progress 😺<br>
+Please check back later~
+
+---
+
 **Blackprint** is a visual programming interface that can help you experimenting with multiple libraries by connecting cables. No need to write code, just import module, put the nodes, and begin routing the data flow ✨
 
 > The ecosystem is still improving, we're looking for open source contributor like you to create new useful nodes or module that can help the others.

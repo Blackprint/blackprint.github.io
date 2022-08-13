@@ -1,8 +1,10 @@
 Interface event can be listened after the node was initialized.
-To register a callback for an event you need to call iface.on('event.name', function(...Arguments){ })
+To register a callback for an event you need to call `iface.on('event.name', function(...Arguments){ })`
 
 Arguments on the table above with {...} is a single object.
 DropDowns is an array, and you can push a callback or nested menu inside it.
+
+```js
 iface.on('port.menu', function(data){
     data.menu.push({
         title:"With callback",
@@ -40,3 +42,4 @@ iface.on('port.menu', function(data){
         }]
     });
 })
+```
