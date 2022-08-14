@@ -1,4 +1,4 @@
-Blackprint is using ScarletsFrame to help control the element templating system and two-way data binding.
+Blackprint Sketch is using ScarletsFrame for the HTML templating system.
 
 ## Import Blackprint nodes
 If you have exported Blackprint into JSON, then you can easily import it like below:
@@ -23,18 +23,11 @@ var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
 // iface.node == the node handler
 ```
 
-## Get created node list
-Blackprint does expose model and components through sketch.scope('modelName').
+## Get created node and cable list
+Blackprint does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly.
 ```js
-var nodeList = sketch.scope('nodes').list;
-var connectionList = sketch.scope('cables').list;
-```
-
-## Blackprint options
-Currently the available options still limited
-
-```js
-sketch.settings(name, value);
+var ifaceList = sketch.scope('nodes').list;
+var cableList = sketch.scope('cables').list;
 ```
 
 ## Export Blackprint nodes
