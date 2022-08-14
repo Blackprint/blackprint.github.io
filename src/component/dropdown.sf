@@ -1,17 +1,18 @@
 ## comment, This will be used for sf-each for above element
 ## html
-<drop-down class="dropdown-menu {{hidden}}" style="
+<drop-down class="dropdown-menu {{ hidden }}" style="
     display: {{visible ? 'block' : 'none'}};
     transform: translate({{ x | 0 }}px, {{ y | 0 }}px);
   ">
   <div class="first" style="display: {{ !title && 'none' }}">{{ title || '' }}</div>
+  <input>
   <ul>
-    <li sf-each="x in options" :class="{{ x.divider ? 'divider' : '' }} {{ x.disabled ? 'disabled' : '' }}" title="{{ x.info || '' }}">
-      {{@if x.title !== undefined:
+    <li sf-each="x in options" :class="{{ x.divider ? 'divider' : '' }} {{ x.disabled ? 'disabled' : '' }} {{ x.description ? 'has-desc' : '' }}" title="{{ x.info || '' }}">
+      {{@if x.title != null:
       	{[ <a> ]} // Begin
 
       	// Icon on the left
-      	if(x.icon !== void 0){
+      	if(x.icon != null){
       		if(x.icon.includes('//'))
       			{[ <img class="dropdown-icon" :src="{{x.icon}}"> ]};
       		else
@@ -20,10 +21,13 @@
 
       	// Always use { [ enclosed template ]} to avoid vulnerability
       	// like the text being parsed as HTML
-      	{[ <div>{{ x.title }}</div> ]} // Content
+      	{[ <div class="title">{{ x.title }}</div> ]} // Content
+
+		if(x.description != null)
+      		{[ <div class="description">{{ x.description }}</div> ]};
 
       	// Add icon if the has deep menu
-      	if(x.deep !== void 0)
+      	if(x.deep != null)
       		{[ <i class="{{ root.icon.more }} has-deep"></i> ]};
 
       	{[ </a> ]} // End
@@ -54,6 +58,13 @@
 		visibility: hidden;
 		opacity: 0;
     }
+	input{
+		display: none;
+		outline: none;
+		border: none;
+		border-bottom: 1px solid black;
+		width: calc(100% - 4px);
+	}
     ul{
     	overflow-x: hidden;
     	overflow-y: auto;
@@ -68,6 +79,26 @@
 		min-width: 110px;
 		border-bottom: 1px dashed darkgray;
 		font-size: 16px;
+		max-width: 400px;
+
+		&.has-desc {
+			padding: 2px 16px 2px 8px;
+
+			a{
+				display: block;
+			}
+			.title{
+				font-size: 14px;
+			}
+		}
+
+		.description {
+			font-size: 12px;
+			color: gray;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
 
 		> * {
 			pointer-events: none;
@@ -86,6 +117,11 @@
 		position: absolute;
 		right: 5px;
 	}
+}
+
+
+sf-m[name="dropdown"].has-search > drop-down > input{
+	display: block;
 }
 
 drop-down.dropdown-menu drop-down{
@@ -155,6 +191,8 @@ var DropDown = sf.model('dropdown', function(My){
 	My.menus = [];
 	My.onCancel = void 0;
 	My.className = '';
+	My.hasSearch = false;
+	My.searchActive = false;
 	My.pendingDeepOpen = false;
 	My.pendingDeepOpen_ = 0;
 
@@ -163,7 +201,7 @@ var DropDown = sf.model('dropdown', function(My){
 	};
 
 	// menus: [{title, callback}, {title, deep:[{...}]}, ...]
-	My.show = function(menus, { x, y, event, element, title, className }){
+	My.show = function(menus, { x, y, event, element, title, className, hasSearch, searchObject }){
 		My._event = event;
 
 		// Remove last dropdown if haven't been closed
@@ -196,6 +234,90 @@ var DropDown = sf.model('dropdown', function(My){
 
 		My.className = className || '';
 		My.menus.push(menus);
+
+		if(hasSearch){
+			let el = My.$el('input').eq(0);
+			let debounce = 0;
+			let ref = My.menus[0];
+			let menuCopy = My.menus[0].slice(0);
+			My.hasSearch = true;
+
+			function onClick(ev){
+				let item = ev.target.model;
+				item.callback.apply(item.context, item.args);
+
+				My.$el('drop-down > ul').off('click', onClick);
+				My.hide();
+			}
+
+			el.on('keyup', function(ev){
+				clearTimeout(debounce);
+				debounce = setTimeout(()=> {
+					let value = el[0].value;
+					if(!value || !My.hasSearch){
+						My.searchActive = false;
+						el[0].value = '';
+
+						ref.splice(0);
+						ref.push(...menuCopy);
+
+						My.$el('drop-down > ul').off('click', onClick);
+						return;
+					}
+
+					My.searchActive = true;
+					let checks = value.split(' ').map(v => RegExp(v, 'i'));
+
+					let results = [];
+					function deepFindFilter(list, docs, lastPath=''){
+						for(let i=0; i < list.length; i++){
+							let item = list[i];
+							let getDocs = docs?.[item.title];
+							let fullPath = lastPath + item.title+' > ';
+
+							if(item.deep != null){
+								deepFindFilter(item.deep, getDocs, fullPath);
+							}
+							else {
+								let found = true;
+								for(let k=0; k < checks.length; k++){
+									if(!checks[k].test(fullPath)){ found = false; break }
+								}
+
+								let description;
+								if(getDocs != null){
+									;({ description } = getDocs);
+
+									if(found === false){
+										found = true;
+										for(let k=0; k < checks.length; k++){
+											if(!checks[k].test(description)){ found = false; break }
+										}
+									}
+								}
+
+								if(found === false) continue;
+
+								results.push(Object.assign({ description }, item, {title: fullPath.slice(0, -3)}));
+							}
+						}
+					}
+
+					deepFindFilter(menuCopy, searchObject);
+
+					for (var i = 0; i < My.menus.length; i++)
+						My.menus.getElement(i).model.deepRemove();
+
+					ref.splice(0);
+					ref.push(...results);
+
+					My.$el('drop-down > ul').on('click', onClick);
+				}, 300);
+			});
+
+			setTimeout(()=> el.focus(), 200);
+		}
+
 		return My;
 	}
 
@@ -209,6 +331,9 @@ var DropDown = sf.model('dropdown', function(My){
 		removeBackdrop();
 
 		My.className = '';
+		My.hasSearch = false;
+
+		My.$el('input').off('keyup');
 	}
 
 	var backdropCreated = false;

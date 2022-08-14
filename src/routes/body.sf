@@ -47,7 +47,7 @@ For adding library or style, please modify /public/index.html
 <input type="text" id="hidden_text" style="position: fixed; top: 100vh;">
 
 <!-- /src/component/dropdown.sf -->
-<sf-m name="dropdown" class="{{className}}">
+<sf-m name="dropdown" class="{{ className }} {{ hasSearch ? 'has-search':'' }} {{ searchActive ? 'search-active':'' }}">
   <drop-down sf-each="val in menus"></drop-down>
 </sf-m>
 
