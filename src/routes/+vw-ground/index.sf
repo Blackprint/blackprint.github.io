@@ -154,10 +154,8 @@
 ## js-global
 sf.model('welcome-text', function(My){
 	My.toWorkspace = function(){
-		if(SketchList.length === 0){
+		if(SketchList.length === 0)
 			SketchList[0] = new Blackprint.Sketch();
-			return;
-		}
 
 		views.goto('/sketch/1');
 	}
