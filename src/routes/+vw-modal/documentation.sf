@@ -91,11 +91,6 @@ sf-m[name="documentation"] {
 			border-bottom: 1px dashed;
 		}
 	}
-	.tree-item.active > .title, .right-panel .active {
-		color: #ffff70;
-		filter: drop-shadow(0 0 10px #ffff00bb);
-		border-bottom: 1px dashed;
-	}
 	.tree-item {
 		// background: black;
 		margin-top: 1px;
@@ -107,6 +102,15 @@ sf-m[name="documentation"] {
 			box-shadow: none;
 			font-weight: normal;
 		}
+
+		.tree-item .title {
+			color: #adadad;
+		}
+	}
+	.tree-item.active > .title, .right-panel .active {
+		color: #ffff70;
+		filter: drop-shadow(0 0 10px #ffff00bb);
+		border-bottom: 1px dashed;
 	}
 	.right-panel > div > div {
 		color: white;
@@ -164,10 +168,16 @@ sf-m[name="documentation"] {
 		overflow: auto;
 	}
 
-	p code {
-		background: #0000004d;
-		padding: 2px 3px;
-		border-radius: 5px;
+	img {
+		max-width: 100%;
+	}
+
+	p, li {
+		code{
+			background: #0000004d;
+			padding: 2px 3px;
+			border-radius: 5px;
+		}
 	}
 }
 
@@ -198,7 +208,7 @@ sf.model('documentation', function(My){
 			}
 		});
 
-		My.content = $(`<div>Welcome to Blackprint Documentation!</div>`)[0];
+		changeContent(My.docs.Home);
 
 		// ToDo: enable this after tutorial has completed
 		if(false && localStorage.firstTimeEditorVisit !== "1"){
