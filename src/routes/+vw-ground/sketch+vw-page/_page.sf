@@ -440,8 +440,8 @@ sf.component('sketch-page', function(My){
 			maxY = Ref.origSize.h;
 		}
 		else{
-			maxX += 300;
-			maxY += 300;
+			maxX += 200;
+			maxY += 200;
 		}
 
 		let A = offsetWidth / maxX;
