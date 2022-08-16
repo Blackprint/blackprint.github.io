@@ -18,6 +18,11 @@ class extends Blackprint.Node {
 		let { page } = this.instance;
 		page.panels.left.setPreview(this.input.Element);
 	}
+
+	destroy(){
+		if(this.input.Element != null)
+			this.instance.page.panels.left.setPreview(null);
+	}
 });
 
 setTimeout(() => {
