@@ -1,0 +1,20 @@
+This component is for vulnerability testing on documentation's best practices.
+
+## scss-global
+docs-security-test-vuln, docs-security-escape-text {
+	display: block;
+	padding: 10px;
+	border-radius: 10px;
+	background: #000000b0;
+	border: 1px solid #159eff61;
+	box-shadow: 0 0 11px #04a1c5;
+}
+
+## js-global
+sf.component('docs-security-test-vuln', My => {
+	My.contentFromUser = '<script>alert("hello")</script>';
+	My.user = {
+		loggedIn: true,
+		name: 'Alex <script>alert("hello")</script>'
+	};
+});
