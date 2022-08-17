@@ -126,6 +126,10 @@ sf-m[name="documentation"] {
 	.sc-H5{ margin-left: 40px; }
 	.sc-H6{ margin-left: 50px; }
 
+	img {
+		border-radius: 10px;
+	}
+
 	@media(max-width: 800px){
 		.right-panel {
 			display: none;
@@ -143,6 +147,12 @@ sf-m[name="documentation"] {
 		border-radius: 5px;
 		p {
 			margin: 0;
+			code {
+				background: #00000055;
+			}
+			strong {
+				color: black;
+			}
 		}
 	}
 
