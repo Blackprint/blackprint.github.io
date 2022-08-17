@@ -1,12 +1,12 @@
 ## Welcome to Getting Started!
-Let's begin our journey for learning Blackprint by getting familiar with the editor first. This editor also have some in-editor tutorial (ToDo) to help you learn on how to do something.
+Let's begin our journey for learning Blackprint by getting familiar with the editor first. This editor also have some in-editor tutorial to help you learn on how to do something.
 
 In this Blackprint Editor your first journey is importing existing module that was being contributed into NPM registry. If you importing an example, it will also automatically load the required modules into the editor.
 - In case you didn't find any suitable nodes for your requirement, you also can create your custom module for your project and contribute it to open source community if you want to **(Custom Nodes)**.
 - If you want to deploy your project into browserless environment, you can export the diagrams into JSON and import it with Blackprint Engine **(Engine - Installation)**.
 - You can also integrate Blackprint Engine with your React/Vue project by bind the input/output port for the nodes **(Engine - Integration)**.
 
-Well, let's navigate to another section. This documentation covers on how to:
+Well, let's navigate to another documentation. This documentation covers on how to:
 - Using the Blackprint Editor **(Editor - Tutorial)**
 - Embedding sketch container to your project **(Sketch - Installation)**
 - Use Blackprint Engine to run your exported diagrams in different environments **(Engine - Installation)**

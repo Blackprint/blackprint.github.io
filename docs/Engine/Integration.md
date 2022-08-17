@@ -52,7 +52,7 @@ let { hello } = instance.ref;
 hello.Input.Exec();
 ```
 
-For further information please go to **Custom Nodes** section, the engine is designed to be similar for each programming language. It wont be difficult if you already familiar with the documentation for JavaScript.
+For further information please go to **Custom Nodes** documentation, the engine is designed to be similar for each programming language. It wont be difficult if you already familiar with the documentation for JavaScript.
 
 Below is an example that you can try to help you getting familiar with the API:
 <iframe height="300" style="width: 100%;" scrolling="no" title="Blackprint Engine + Event Listener" src="https://codepen.io/stefansarya/embed/dymQpdq?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">

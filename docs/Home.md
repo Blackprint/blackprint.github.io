@@ -18,9 +18,9 @@ Please check back later~
 |1. Engine|A runtime that managing the data flow between nodes|
 |2. Modules|Collection of nodes that was handling external API or libraries|
 |3. Sketch|Single container of nodes/diagrams and the cables|
-|4. Editor|A collection of tools that can help managing Blackprint|
+|4. Editor|A collection of tools that can help you for using Blackprint|
 
-Each of the component have different functionality, so if you want to create an issue please make sure to fill it on the correct repository.
+Each of the component have different functionality, so if you want to create an issue please make sure to fill it on the correct repository. Currently this documentation is written for JavaScript implementation.
 
 ---
 

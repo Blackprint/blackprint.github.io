@@ -1,1 +1,0 @@
-Blackprint Editor does allow you to change it's module server for development purpose.

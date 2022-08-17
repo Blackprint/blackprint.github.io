@@ -98,7 +98,7 @@ var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
 ```
 
 ## Get created node and cable list
-Blackprint does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly.
+Blackprint does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly with `.push, .splice, .pop` or other array manipulation function.
 ```js
 var ifaceList = sketch.scope('nodes').list;
 var cableList = sketch.scope('cables').list;
