@@ -19,7 +19,7 @@ For adding library or style, please modify /public/index.html
 	</div>
 	<div class="header-menu">
 		<div class="item-list">
-			<div class="item inactive" @click="openDocumentation" style="color: #2b2b2b" title="Guide/Docs still work in progress"><i class='fa fa-journal-whills'></i></div>
+			<div class="item" @click="openDocumentation" title="Guide or Documentation"><i class='fa fa-journal-whills'></i></div>
 			<div class="item" @click="Modal.goto('/module-example-list')" title="Module examples">
 				<i class='fa fa-map-signs'></i>
 				<div class="module-counter">{{ _moduleExampleList.length }}</div>

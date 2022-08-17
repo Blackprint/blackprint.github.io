@@ -174,9 +174,10 @@ sf-m[name="documentation"] {
 
 	p, li {
 		code{
-			background: #0000004d;
-			padding: 2px 3px;
+			background: #00000099;
+			padding: 1px 5px 4px 5px;
 			border-radius: 5px;
+			white-space: nowrap;
 		}
 	}
 }

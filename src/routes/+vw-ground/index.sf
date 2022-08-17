@@ -11,7 +11,7 @@
 			<i class='fa fa-map-signs'></i> <span>Open examples</span>
 		</div>
 		<div class="item" onclick="Modal.goto('/documentation')">
-			<i class='fa fa-book-open'></i> <span style="text-decoration: line-through">Documentation</span>
+			<i class='fa fa-book-open'></i> <span>Documentation</span>
 		</div>
 	</div>
 
