@@ -19,82 +19,97 @@ class extends Blackprint.Node {
 
 		// After calling above function, `this.iface` will have an reference to it's interface
 		this.iface === (/* Object reference from .registerInterface() */);
+
+		// You can also change the title from here
+		iface.title = 'My Title';
 	}
 });
 ```
 
-`@blackprint node` is required if you want the compiler to extract the documentation. Single line comment with `// ...` will not be extracted, please use `/** ... */` instead. For information about how to define port for your node, please go to **Custom Nodes -> Port** documentation.
+`@blackprint node` is required if you want the compiler to extract the documentation. Single line comment with `// ...` will not be extracted, please use `/** ... */` instead. For information about how to define port for your node, please go to **Custom Nodes -> Port** documentation. If you searching for how to create node for an instance, please go to **Engine** or **Sketch** documentation.
 
-### Initializing node after creation
-|init|()|Callback function to be run after current handle and all node was initialized|
+### Lifecycle order
+1. `constructor()`: **Required**, called on constructing new node object
+2. `imported()`: called after new node was constructed
+3. `init()`: called after all nodes have been constructed, all data imported, and cables has been connected
+4. Data cycle
+	- `update()`: called when current node receiving an data on input port
+	- `request()`: called when other node is requesting data from current node's output port
+	- `syncIn()`: called when the synchronizing with `node.syncOut()`
+5. `destroy()`: called on node deletion from instance
 
-### Handling data import on creation
-|importing|A boolean indicating if this node is being imported/created|
-|imported|(options)|This is a callback after node was created, imported options should be handled here|
+> Example code for every section below is a simplified version of implementation, you also need to add `constructor` function like example above for registering node. They are also optional, you can skip them if you don't need it.
 
-### Handling data update from input port
-|update|(Cable)|Callback when current input value are updated from the other node's output port|
-
-### Handling data request from output port
-|request|(targetPort, sourceNode)|Callback when other node's input port are requesting current node's output value|
+### Initialize node after creation
+Blackprint will call `init()` function when everything is ready to be used, after all nodes have been constructed, all data imported, and cables has been connected.
 
 ```js
-// Node will be initialized first by Blackprint Engine
-// This should be used for initialize port structure and set the target interface
-Blackprint.registerNode('LibraryName/FeatureName/Template',
-class MyTemplate extends Blackprint.Node {
-	// this == node
-
-	// You can use type data like Number/String or "Blackprint.Port"
-	// use "Blackprint.Port.Trigger" if it's callable port
-	static input = {
-		PortName1: Blackprint.Port.Default(Number, 123)
-	};
-
-	// Output only accept 1 type data
-	// use "Function" if it's callable port
-	static output = {
-		PortName2: Number
-	};
-
-	constructor(instance){
-		super(instance);
-
-		// Interface path
-		// Let it empty if you want to use default built-in interface
-		// You don't need to '.registerInterface()' if using default interface
-		let iface = this.setInterface('BPIC/LibraryName/FeatureName/Template');
-		iface.title = 'My Title';
-		iface.description = 'My Description';
-	}
-
-	// Put logic as minimum as you can in .registerNode
-	// You can also put these function on .registerInterface instead
+class extends Blackprint.Node {
 	init(){
-		// Called before iface.init()
-	}
+		// It's time to add event listener or some other initialization after node creations
 
-	// This is more recomended than using event listener "port.value" or "value"
-	// If you want to trigger this manually, you may also need to trigger route out `this.routes.routeOut();`
+		// ====== Port Shortcut ======
+		const {
+			IInput, IOutput, // Port interface
+			Input, Output, // Port value
+		} = this.ref;
+
+		// Port interface: can be used for registering event listener
+		// Port value: can be used for get/set the port value
+	}
+}
+```
+
+### Handle data import on creation
+When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from `iface.data` or optionally specift data on `options` for `.createNode()`, Blackprint will call `node.imported(data)` to let you process the data after node construction before initialization.
+
+```js
+// Please see Custom Nodes -> Interface instead to see detailed example
+class extends Blackprint.Node {
+	imported(data){
+		// A boolean indicating if this node is being imported/created
+		// This will reset to false after this imported() has been called
+		this.iface.importing === true;
+
+		// This will only exist if we're importing JSON or using options that have `data` field
+		data instanceof Object;
+	}
+}
+```
+
+### Handle data update from input port
+Callback when current input value are updated from the other node's output port. This is more recomended than using event listener `port.value` or `value`. If you trigger `node.update()` manually somewhere on your code, you also need to trigger route out `this.routes.routeOut();`
+
+```js
+class extends Blackprint.Node {
 	update(cable){
 		// Triggered when any output value from other node are updated
 		// And this node's input connected to that output
 	}
+}
+```
 
-	imported(data){
-		// When this node was successfully imported
-		// iface can also has this function feature, please use one only
-	}
+### Handle data request from output port
+Callback when other node's input port are requesting current node's output value
 
+```js
+class extends Blackprint.Node {
 	request(cable){
 		// Triggered when other connected node is requesting
 		// output from this node that have empty output
 	}
+}
+```
 
+### Sync with remote node
+Callback when the node received data sync from remote node
+
+```js
+class extends Blackprint.Node {
 	// Add support for remote sync (this will receive data from .syncOut)
 	syncIn(eventName, value){
 		if(eventName === 'data.value')
 			this.iface.data.value = value;
 	}
-});
+}
 ```

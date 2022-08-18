@@ -107,7 +107,6 @@ func main() {
 </div></docs-md-tabs>
 
 ## Create Engine Instance
-
 ```js
 // If you load from CDN, "Blackprint" is registered in window object
 import Blackprint from '@blackprint/engine';
@@ -122,34 +121,85 @@ var instance = new Blackprint.Engine();
 ### Create node in instance
 ```js
 var iface = instance.createNode('MyModule/Math/Multiply', {/* optional options */});
+
+/**
+ * Create a node from a namespace
+ * @param namespace Node namespace
+ * @param options additional options
+ */
+createNode(namespace: string, options?: {
+	data?: object, // You can access this data in a class with `imported(data){...}`
+	x?: number, // Node X position
+	y?: number, // Node Y position
+	id?: number, // Node ID
+}): Interface;
 ```
 
 ### Import nodes from JSON
+If you have exported Blackprint into JSON, then you can easily import it like below:
 ```js
 instance.importJSON(/* JSON || Object */);
+
+/**
+ * Import nodes structure and connection from JSON
+ * @param json JSON data
+ * @param options additional options for importing JSON data
+ */
+importJSON(json: string | object, options?: {
+	/** Set this to false if you want to clear current instance before importing */
+	appendMode?: Boolean,
+	/** Skip importing environment data if exist on the JSON */
+	noEnv?: Boolean,
+	/** Skip importing module URL (in case if you already imported the nodes from somewhere) */
+	noModuleJS?: Boolean,
+}): Promise<Array<Interface>>;
 ```
 
-### Clear all nodes in instance
+### Delete node from an instance
 ```js
+// Delete a single node
+instance.deleteNode(myIfaceObject);
+// instance.deleteNode(iface: Interface): void;
+
+// To delete all nodes at once
 instance.clearNodes();
 ```
 
 ## Add event listener to the instance
+These event can also be registered for Sketch Instance.
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`node.id.changed`|`{ iface: Interface, from: String, to: String }`|d|
-|`cable.disconnect`|`{ port: Port, target?: Port, cable: Cable }`|d|
-|`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|d|
+|`node.id.changed`|`{ iface: Interface, from: String, to: String }`|Node ID was added/changed/removed|
+|`cable.disconnect`|`{ port: Port, target?: Port, cable: Cable }`|A cable was disconnected or deleted|
+|`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|A cable was connected between two port|
+
+Below is an example on how to register event on the instance:
+```js
+// Optional, but recommended to avoid re-register similar listener
+let EventSlot = {slot: "myLibraryName"};
+let instance = new Blackprint.Engine();
+
+instance.on('node.id.changed', EventSlot, function(event){
+	console.log(`Node ID from "${event.iface.title}" was changed from "${event.from}" into "${event.to}"`);
+});
+```
 
 ### Global event
 |Event Name|Event Object|Description|
 |---|---|---|
-|`module.added`|`{ url: String }`|d|
-|`module.update`|`null`|d|
-|`module.delete`|`{ url: String }`|d|
-|`environment.imported`|`null`|d|
-|`environment.changed`|`{ key: String, value: String }`|d|
-|`environment.added`|`{ key: String, value: String }`|d|
-|`environment.renamed`|`{ old: String, now: String }`|d|
-|`environment.deleted`|`{ key: String }`|d|
+|`module.added`|`{ url: String }`|New module registration and the registered nodes|
+|`module.update`|`null`|Module registration and the registered nodes was update|
+|`module.delete`|`{ url: String }`|Module registration and the registered nodes was deleted|
+|`environment.imported`|`null`|Imported new environment variables|
+|`environment.changed`|`{ key: String, value: String }`|Environment variable data was changed|
+|`environment.added`|`{ key: String, value: String }`|New environment variable was added|
+|`environment.renamed`|`{ old: String, now: String }`|Environment variable data was renamed|
+|`environment.deleted`|`{ key: String }`|Environment variable data was deleted|
+
+Below is an example on how to register event into Blackprint:
+```js
+Blackprint.on('environment.renamed', EventSlot, function(event){
+	console.log(`An environment key was changed from "${event.old}" into "${event.now}"`);
+});
+```

@@ -1,61 +1,18 @@
-Interface event can be listened after the node was initialized.
-To register a callback for an event you need to call `iface.on('event.name', function(...Arguments){ })`
-
-Arguments on the table above with {...} is a single object.
-DropDowns is an array, and you can push a callback or nested menu inside it.
-
-```js
-iface.on('port.menu', function(data){
-    data.menu.push({
-        title:"With callback",
-        callback:function(){...}
-    });
-
-    data.menu.push({
-        title:"Callback with arguments",
-        args:[1, 2],
-        callback:function(one, two){...}
-    });
-
-    data.menu.push({
-        title:"Callback with context",
-        context:data.port,
-        callback:function(one, two){
-            // this === data.port
-        }
-    });
-
-    data.menu.push({
-        title:"When mouse over the dropdown item",
-        hover:function(){...},
-        unhover:function(){...},
-    });
-
-    data.menu.push({
-        title:"Deep level menu",
-        deep:[{
-            title:"Level 1",
-            deep:[{
-                title:"Level 2",
-                deep:[{...}]
-            }]
-        }]
-    });
-})
-```
-
 ## Interface Registration
 We need an interface if you want to provide a function or exposable property for other developer to your node, this allow your application and the node to talk each other.
 
 To register an interface into Blackprint Engine, you need to prepare class that extends `Blackprint.Interface` and register it with `Blackprint.registerInterface(namespace, class)`.
 
-> Every interface must be registered in a namespace started with `BPIC/` and every namespace need to be capitalized. BPIC stands for `Blackprint Interface Component`. Don't use symbol for the namespace except `.`, `_`, `/`. In some programming language, the dot `.` symbol will be converted into underscore `_`.
+> Every interface must be registered in a namespace started with `BPIC/` and every namespace need to be capitalized. Don't use symbol for the namespace except `.`, `_`, `/`. In some programming language, the dot `.` symbol will be converted into underscore `_`.
+
+BPIC stands for `Blackprint Interface Component`, this root namespace will help avoid conflict with internal namespace in the future.
 
 ```js
 let CustomNodeIFace; // You can store the class here in case if you want to export or use it on other script
 
 Blackprint.registerInterface("BPIC/My/Custom/Node",
 CustomNodeIFace = class extends Blackprint.Interface {
+    // 'constructor' here is optional, only for Blackprint.Node that was required to have
 	constructor(node){
 		super(node);
 		this.node === (/* Object reference from .registerNode() */);
@@ -79,50 +36,20 @@ instance.iface["ifaceId"] instanceof Blackprint.Interface
 let { Input, Output, IInput, IOutput } = instance.ref["ifaceId"];
 ```
 
-### Initializing interface after creation
-|init|()|Callback function to be run after current handle and all interface was initialized|
+### Lifecycle order
+1. `constructor()`: called on constructing new node object
+2. `imported()`: called after new node was constructed
+3. `init()`: called after all nodes have been constructed, all data imported, and cables has been connected
+4. `destroy()`: called on node deletion from instance
 
-### Handling data import on creation
-|importing|A boolean indicating if this node is being imported/created|
-|imported|(options)|This is a callback after node was created, imported options should be handled here|
+### Initialize interface after creation
+Blackprint will call `init()` function when everything is ready to be used, after all nodes have been constructed, all data imported, and cables has been connected. This can be overriden when you also registered interface for sketch instance.
 
 ```js
-Blackprint.registerInterface('BPIC/LibraryName/FeatureName/Template',
-Context.IFace.MyTemplate = class IMyTemplate extends Blackprint.Interface {
-	// this == iface
-
-	constructor(node){
-		super(node); // 'node' object from .registerNode
-
-		this.myData = 123;
-		this._log = '...';
-
-		// If the data was stored on this, they will be exported as JSON
-		// (Property name with _ or $ will be ignored)
-		this.data = {
-			_iface: this,
-			get value(){ return this._value },
-			set value(val){
-				this._value = val;
-
-				// Add support for remote sync: .syncOut(eventName, value);
-				// The data will be received in: syncIn(event, value);
-				this._iface.node.syncOut('data.value', val);
-			},
-		};
-
-		// Creating object data with class is more recommended
-		// this.data = new MyDataStructure(this);
-	}
-
-	// When importing nodes from JSON, this function will be called
-	imported(data){
-		// Use object assign to avoid replacing the object reference (that makes our getter/setter gone)
-		Object.assign(this.data, data);
-	}
-
+class extends Blackprint.Interface {
 	init(){
-		// When Engine initializing this scope
+		// It's time to add event listener or some other initialization after node creations
+		// Blackprint will call this function after `node.init()`
 
 		// ====== Port Shortcut ======
 		const {
@@ -130,32 +57,83 @@ Context.IFace.MyTemplate = class IMyTemplate extends Blackprint.Interface {
 			Input, Output, // Port value
 		} = this.ref;
 
-		// Port interface can be used for registering event listener
-		// Port value can be used for get/set the port value
-
-		// this.output === IOutput
-		// this.input === IInput
-		// this.node.output === Output
-		// this.node.input === Input
-
-		// this.output.Test => Port Interface
-		// this.node.output.Test => Number value
-
-		// For some event listener please see on ./Template.sf
+		// Port interface: can be used for registering event listener
+		// Port value: can be used for get/set the port value
 	}
+}
+```
 
-	// Create custom getter and setter
-	get log(){ return this._log }
-	set log(val){
-		this._log = val
+### Handle data import on creation
+When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from `iface.data` or optionally specift data on `options` for `.createNode()`, Blackprint will call `node.imported(data)` to let you process the data after node construction before initialization.
+
+```js
+// This is optional but recommended if you want to store data on your interface
+class MyDataStructure {
+    constructor(iface){
+        this._iface = iface;
+    }
+
+	get value(){ return this._value },
+	set value(val){
+		this._value = val;
+
+		// Add support for remote sync: node.syncOut(eventName, value);
+		// The data will be received in: node.syncIn(event, value);
+		this._iface.node.syncOut('data.value', val);
+	},
+}
+
+class extends Blackprint.Interface {
+    constructor(node){
+        // Create a data storage, this data can be exported with `sketchInstance.exportJSON()`
+        this.data = new MyDataStructure(this);
+    }
+
+	imported(data){
+		// A boolean indicating if this node is being imported/created
+		// This will reset to false after this imported() has been called
+		this.importing === true;
+
+		// This will only exist if 
+		data instanceof Object;
+
+		// Assign saved data into our iface.data
+		// You shouldn't use "this.data = data" or it will replace the object
+		Object.assign(this.data, data);
 	}
-});
+}
+```
+
+### Handle removed interface
+Blackprint will call `destroy()` when the node is being removed. This can be overriden when you also registered interface for sketch instance.
+
+```js
+class extends Blackprint.Interface {
+	destroy(){
+        // You can remove event listener from here and do some clean up
+	}
+}
 ```
 
 ## Add event listener into a interface
-
 |Event Name|Event Object|Description|
 |---|---|---|
-|`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|d|
-|`cable.disconnect`|`{ port: Port, target: Port, cable: Cable }`|d|
-|`port.value`|`{ port: Port, target: Port, cable: Cable }`|d|
+|`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|Two ports were connected with a cable|
+|`cable.disconnect`|`{ port: Port, target: Port, cable: Cable }`|Two ports get disconnected each other|
+|`port.value`|`{ port: Port, target: Port, cable: Cable }`|There's new value update coming from output port|
+
+Below is an example on how to register event on an interface:
+```js
+// Optional, but recommended to avoid re-register similar listener
+let EventSlot = {slot: "myLibraryName"};
+
+class extends Blackprint.Interface {
+	init(){
+        this.on('cable.connect', EventSlot, function(event){
+            event.port // => Port interface reference from this node
+            event.target // => Port interface reference from other node
+            event.cable // => Cable reference that connect two ports
+        });
+	}
+}
+```

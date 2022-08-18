@@ -82,15 +82,39 @@ If you have exported Blackprint into JSON, then you can easily import it like be
 // After imported it will automatically appended into the DOM container
 var nodes = sketch.importJSON('{...}');
 // nodes = [iface, iface, ...]
+
+/**
+ * Import nodes structure and connection from JSON
+ * @param json JSON data
+ * @param options additional options for importing JSON data
+ */
+importJSON(json: string | object, options?: {
+	/** Set this to false if you want to clear current instance before importing */
+	appendMode?: Boolean,
+	/** Skip importing environment data if exist on the JSON */
+	noEnv?: Boolean,
+	/** Skip importing module URL (in case if you already imported the nodes from somewhere) */
+	noModuleJS?: Boolean,
+}): Promise<Array<Interface>>;
 ```
 
 ## Create single Blackprint node
 To create new node and put it on the DOM you can call
 ```js
-sketch.createNode(namespace, options);
-```
+let iface = sketch.createNode('MyModule/Math/Multiply', {/* optional options */});
 
-`options` is optional.
+/**
+ * Create a node from a namespace
+ * @param namespace Node namespace
+ * @param options additional options
+ */
+createNode(namespace: string, options?: {
+	data?: object, // You can access this data in a class with `imported(data){...}`
+	x?: number, // Node X position
+	y?: number, // Node Y position
+	id?: number, // Node ID
+}): Interface;
+```
 
 ```js
 var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
@@ -157,7 +181,7 @@ exportJSON(options?: {
 ```
 
 ## Add event listener to the instance
-Addition for engine events
+You can also register an event that exist on Engine class for your Sketch instance. Below is some event addition for Sketch instance.
 
 |Event Name|Event Object|Description|
 |---|---|---|

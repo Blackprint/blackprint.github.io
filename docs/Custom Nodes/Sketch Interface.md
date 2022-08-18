@@ -9,6 +9,7 @@ To register an interface into Blackprint Engine, you need to prepare class that 
 
 Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node",
 class extends CustomNodeIFace {
+    // 'constructor' here is optional, only for Blackprint.Node that was required to have
 	constructor(node){
 		super(node);
 		this.node === (/* Object reference from .registerNode() */);
@@ -18,24 +19,36 @@ class extends CustomNodeIFace {
 
 > **Sketch Interface** is just like **Interface**, but with extended feature for handling user interface or HTML elements.
 
-### Initializing interface after creation
-|init|()|Callback function to be run after current handle and all interface was initialized|
+### Lifecycle order
+1. `constructor()`: called on constructing new node object
+2. `imported()`: called after new node was constructed
+3. `init()`: called after all nodes have been constructed, all data imported, and cables has been connected
+4. Special lifecycle
+	- `initClone()`: called when new node interface is created but for different HTML element
+	- `hotReload()`: called before Blackprint begin hot reloading the node and iface
+	- `hotReloadedHTML()`: called when was HTML changed/reloaded
+	- `hotReloaded()`: called after hot reload complete, you may want to call init again from here
+	- `destroyClone()`: called when node interface's clone was deleted
+5. `destroy()`: called on node deletion from instance
 
-### Handling data import on creation
-|importing|A boolean indicating if this node is being imported/created|
-|imported|(options)|This is a callback after node was created, imported options should be handled here|
+> `hotReload` feature must use ScarletsFrame in Development Mode (with hot reload feature be enabled manually). When hot reloading, the iface will have `this.hotReloading === true` and reset to false after hot reload was completed.
 
-```jsx
-This file is just reference, you can remove unnecessary lines.
+### HTML template
+When registering interface for sketch instance, it's required to have a HTML template for your node. 
 
-## html
-<div class="node your-class" style="transform: translate({{ x }}px, {{ y }}px)">
+```js
+Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", {
+	html: `...see html template below...`
+}, class extends Blackprint.Interfce {})
+```
+
+Below is full basic template for a node, you're free to customize it to fit your needs and maybe remove some `<sf-template>` if you don't need it. You can add mustache template or apply two way binding on the template.
+```html
+<div class="node" style="transform: translate({{ x }}px, {{ y }}px)">
   <sf-template path="Blackprint/nodes/template/routes.sf"></sf-template>
   <sf-template path="Blackprint/nodes/template/header.sf"></sf-template>
 
   <div class="content">
-    <div class="design-me">You can design me with CSS</div>
-
     <div class="left-port">
       <sf-template path="Blackprint/nodes/template/input-port.sf"></sf-template>
     </div>
@@ -47,167 +60,116 @@ This file is just reference, you can remove unnecessary lines.
 
   <sf-template path="Blackprint/nodes/template/other.sf"></sf-template>
 </div>
+```
 
-## scss-global
-// BPIC/LibraryName is prefix from blackprint.config.js
-
-// Element name based on html path, BPIC/LibraryName/FeatureName/Template.sf
+Styling with SCSS is recommended to make things simpler, but it's depends on your choice.
+```scss
+// Element name is based on interface's namespace, BPIC/LibraryName/FeatureName/Template
 bpic-libraryname-featurename-template {
-  /* Write your scoped SCSS here */
-  .design-me{
-    color: yellow;
-    width: 100%;
-    height: 15px;
-    text-align: center;
-    padding: 5px;
+  .node{
+	font-size: 16px;
+	...
   }
 }
+```
 
-## js-global
-// You can also write JavaScript here
-// All script from .sf will be combined and wrapped depends on the configuration
-console.log("Hello from Template.sf");
+### Initialize interface after creation
+ScarletsFrame will call `init()` function when the node element was attached to DOM tree and you can begin initializing your HTML element.
 
-// Get the reference from Template.js
-let PlaceHolder = Context.PlaceHolder;
-
-// .registerInterface is case sensitive
-// Please also use capitalization on the file name
-
-
-// For Sketch Interface, let ScarletszFrame handle this (HotReload available here)
-// - first parameter is HTML file path
-// - second parameter is optional if using different settings
-// - third parameter can be placed on second parameter
+```js
 Blackprint.Sketch.registerInterface('BPIC/LibraryName/FeatureName/Template',
 class IMyTemplate extends Context.IFace.MyTemplate {
-  // this == iface
+	// Will run once the node element was attached to DOM tree
+	init(){
+		// You can use `$el` to help manipulate your HTML or obtain element by using query selector
+		this.$el('.content').prepend(this.keepMe);
 
-  constructor(node){
-    super(node); // 'node' object from .registerNode
-
-    this.keepMe = $('<div>');
-    this.keepMe.text("Hello world!");
-    this.keepMe.css({
-      width: '100%',
-      textAlign: 'center'
-    });
-
-    // Any property on 'iface' can be binded with the HTML
-    this.log = '123'; // <div attr="{{ log }}">{{ log }}</div>
-  }
-
-  // Will run once the node element was attached to DOM tree
-  init(){
-    // When ScarletsFrame initialized this HTML element
-
-    // Run everytime ScarletsFrame hot reload current scope
-    this.$el('.content').prepend(this.keepMe);
-    var Node = this.node; // 'node' object from .registerNode
-
-    // === Shortcut to get/set node's port value ===
-    var My = this; // Lazy Shortcut :3
-    // My.init = function(){...}
-
-    // This is just a shortcut of "Node.input" and "Node.output"
-    // initialized from Template.js
-    const {
-      IInput, IOutput, // Port interface
-      Input, Output, // Port value
-    } = My.ref; // My.ref === this.ref
-
-    // Update the port value
-    Output.PortName2 = 123; // This will also trigger 'value' event to connected input ports
-    // Output.PortName2 === My.node.output.PortName2
-
-    // Node event listener can only be registered after node init
-    My.on('cable.connect', Context.EventSlot, function({ port, target, cable }){});
-
-    // Can be used for IInput, IOutput
-    // Control the port interface (event listener, add new port, etc)
-    IInput.PortName1
-      // When connected output node have updated the value
-      // Also called after 'connect' event
-      .on('value', Context.EventSlot, function(ev){
-        console.log("PortName1:", ev);
-
-	      // If have changed output port's value inside this listener
-        // you may also need to trigger route out `iface.node.routes.routeOut();`
-      })
-
-      // When connection success
-      .on('connect', Context.EventSlot, function({ port, target, cable }){})
-
-      // When connection closed
-      // not being called if the connection doesn't happen before
-      .on('disconnect', Context.EventSlot, function({ port, target, cable }){});
-
-    function myLongTask(callback){
-      setTimeout(()=> callback(true), 1000);
-    }
-
-    IOutput.PortName2
-      // When this port are trying to connect with other node
-      .on('connecting', Context.EventSlot, function({ port, target, activate }){
-        myLongTask(function(success){
-          if(success)
-            activate(true) // Cable will be activated
-          else activate(false) // Cable will be destroyed
-        });
-
-        // Empty = is like we're not giving the answer now
-        activate() // Mark as async
-
-        // Or destroy it now
-        // activate(false)
-      })
-
-    // ...
-  }
-
-  // Below are optional life cycle, only for Blackprint.Sketch.Interface
-
-  // This must use ScarletsFrame Development mode
-  // Hot reload feature also must be activated
-  hotReload(){
-    console.log("Going to hot reload this object", this);
-    this.hotReloading === true; // this will be true
-  }
-
-  hotReloadedHTML(){
-    console.log("Was HTML changed/reloaded", this);
-  }
-
-  hotReloaded(){
-    console.log("Hot reload active", this);
-
-    // Let's call init again
-    this.init();
-  }
-
-  /*
-  destroy(){
-    this.init();
-  }
-
-  initClone(){
-    this.init();
-  }
-
-  destroyClone(){
-    this.init();
-  }
-  */
+		// ====== Port Shortcut ======
+		const {
+			IInput, IOutput, // Port interface
+			Input, Output, // Port value
+		} = this.ref;
+	}
 });
 ```
 
+### Handle removed interface
+ScarletsFrame will call `destroy()` when the interface elemnet is being removed.
+
+```js
+class extends Blackprint.Interface {
+	destroy(){
+        // You can remove event listener from here and do some clean up
+	}
+}
+```
+
 ## Add event listener into a interface
-Addition for **Interface** events
+Addition for **Interface** events, 
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`node.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|d|
-|`cable.created`|`{ port: Port, cable: Cable }`|d|
-|`port.hover`|`{ event: Event, port: Port }`|d|
-|`port.unhover`|`{ event: Event, port: Port }`|d|
-|`port.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>port: Port,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|Set this to false if you don't want to export custom function|
+|`cable.created`|`{ port: Port, cable: Cable }`|A cable was created from a port|
+|`port.hover`|`{ event: Event, port: Port }`|User hovered/focus on an port element|
+|`port.unhover`|`{ event: Event, port: Port }`|User leaving focus from an port element|
+|`port.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>port: Port,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|User right clicked port element to open a menu|
+|`node.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|User right clicked the node's header to open a menu|
+
+Below is one of example on how to register event on an interface:
+```js
+// Optional, but recommended to avoid re-register similar listener
+let EventSlot = {slot: "myLibraryName"};
+
+class extends Blackprint.Interface {
+	// Interface event can be listened after the node was initialized.
+	init(){
+		let iface = this;
+
+		iface.on('port.menu', function(data){
+			// data.iface === iface
+			let menu = data.menu;
+
+			// Add menu with callback
+			menu.push({
+				title: "With callback",
+				callback(){...}
+			});
+
+			// Add menu with callback with the arguments
+			menu.push({
+				title: "Callback with arguments",
+				args: [1, 2],
+				callback(one, two){...}
+			});
+
+			// Add menu with callback with call context
+			menu.push({
+				title: "Callback with context",
+				context: data.port,
+				callback(one, two){
+					// this === data.port
+				}
+			});
+
+			// Add menu and listen for mouse hover/unhover
+			menu.push({
+				title: "When mouse over the dropdown item",
+				hover(){...},
+				unhover(){...},
+			});
+
+			// Add menu inside of menu
+			menu.push({
+				title: "Deep level menu",
+				deep: [{
+					title: "Level 1",
+					deep: [{
+						title: "Level 2",
+						deep:[{...}]
+					}]
+				}]
+			});
+		});
+	}
+}
+```

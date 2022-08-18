@@ -133,6 +133,8 @@ On splitted form, both of them will looks like below:
 
 ![brave_hr2FissKMU](https://user-images.githubusercontent.com/11073373/185187898-3e9aa909-b02b-4895-8d93-7fac70b0912d.jpg)
 
+`BP-*` name can be changed in the future, so please consider it's name as experimental/internal.
+
 The `Structure` is formatted like below:
 ```js
 Blackprint.Port.StructOf(TypeData, {
@@ -174,8 +176,8 @@ class MyNode extends Blackprint.Node {
 }
 ```
 
-## Adding component on port element
-ToDo: this feature may get changed and will not be documented for now, but in a plan to be documented.
+## Add component on port element
+This feature may get changed and will not be documented for now, but in a plan to be documented.
 
 ## Obtain connected cable list from a port
 Cable list from a port can be obtained by using the port's interface `portInterface.cables`. Below is the example if you want to obtain cable list when:
@@ -218,8 +220,52 @@ iface1.IInput['MyInputPort'].connectPort(iface2.IOutput['MyOutputPort']);
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`value`|Input Port: `{ port: Port, target: Port, cable: Cable }`<br>Output Port: `{ port: Port }`|d|
+|`value`|Input Port:<br>`{ port: Port, target: Port, cable: Cable }`<br>Output Port: `{ port: Port }`|d|
 |`call`|`null`|d|
 |`disconnect`|`{ port: Port, target?: Port, cable: Cable }`|d|
 |`connect`|`{ port: Port, target: Port, cable: Cable }`|d|
 |`connecting`|`{ target: Port, activate: Callback }`|d|
+
+```js
+    // Can be used for IInput, IOutput
+    // Control the port interface (event listener, add new port, etc)
+    IInput.PortName1
+      // When connected output node have updated the value
+      // Also called after 'connect' event
+      .on('value', Context.EventSlot, function(ev){
+        console.log("PortName1:", ev);
+
+	      // If have changed output port's value inside this listener
+        // you may also need to trigger route out `iface.node.routes.routeOut();`
+      })
+
+      // When connection success
+      .on('connect', Context.EventSlot, function({ port, target, cable }){})
+
+      // When connection closed
+      // not being called if the connection doesn't happen before
+      .on('disconnect', Context.EventSlot, function({ port, target, cable }){});
+
+    function myLongTask(callback){
+      setTimeout(()=> callback(true), 1000);
+    }
+
+    IOutput.PortName2
+      // When this port are trying to connect with other node
+      .on('connecting', Context.EventSlot, function({ port, target, activate }){
+        myLongTask(function(success){
+          if(success)
+            activate(true) // Cable will be activated
+          else activate(false) // Cable will be destroyed
+        });
+
+        // Empty = is like we're not giving the answer now
+        activate() // Mark as async
+
+        // Or destroy it now
+        // activate(false)
+      })
+
+    // ...
+  }
+```

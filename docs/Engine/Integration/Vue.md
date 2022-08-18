@@ -33,14 +33,11 @@ instance.importJSON(json_text).then(function(){
   // We need to import the JSON first before obtaining the node's ports
   Vue.createApp({
     data() {
-      // Obtain Interface by ID and get the port references
-      let { slider1, slider2, multiply } = instance.ref;
-      
       // Calling port => Multiply.Exec for activation
-      multiply.Input.Exec();
-      
+      instance.ref.multiply.Input.Exec();
+
       // Put the ports reference to this component scope
-      return { slider1, slider2, multiply };
+      return instance.ref;
     }
   }).mount('#v-model-basic');
 });
