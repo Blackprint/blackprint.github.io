@@ -1,8 +1,6 @@
 ## Hello 👋
-Welcome to Blackprint Editor!
-
-This documentation still work in progress 😺<br>
-Please check back later~
+Welcome to Blackprint Editor!<br>
+This documentation still being improved 😺
 
 ---
 

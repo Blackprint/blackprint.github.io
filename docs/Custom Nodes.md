@@ -4,7 +4,7 @@ Blackprint is designed to be modular and it's structured like below:
 ![brave_kJ1dlxFYQI](https://user-images.githubusercontent.com/11073373/185061030-a0bd75e0-e665-4462-8bdc-463e1945039b.jpg)
 </center>
 
-**Node** is the main component for Blackprint and it should be considered as private or internal. **Node** will have an **Interface** that can help you or other developers interact with your **Node**, just think like an **API**. In the browser environment, especially on nodes editor **(Sketch)** you can customize your node's user interface with **Sketch Interface**. Sketch Interface can also have it's own handler for browser only, like listening to mouse click or other browser event. When the module get imported on non-browser environment the **Sketch Interface** script (`.sf.mjs`) will not be loaded for them.
+**Node** is the main component for Blackprint and any function/properties in it's class should be considered as private or internal. **Node** will have an **Interface** that can help you or other developers interact with your **Node**, just think like an **API**. In the browser environment, especially on nodes editor **(Sketch)** you can customize your node's user interface with **Sketch Interface**. Sketch Interface can also have it's own handler for browser only, like listening to mouse click or other browser event. When the module get imported on non-browser environment the **Sketch Interface** script (`.sf.mjs`) will not be loaded for them.
 
 > In the browser environment, **Sketch Interface** script will not get loaded if you didn't load/import `@blackprint/sketch`
 
@@ -59,10 +59,17 @@ CustomNodeIFace = class extends Blackprint.Interface {
 
 ## Register Sketch Interface
 This is an **optional** registration and **can only be registered for Browser environment**.<br>
-You can also just extends from the class you have registered with `Blackprint.registerInterface()`.
+You can also just extends from the class you have registered with `Blackprint.registerInterface()`. The namespace **must be** similar with the interface you have registered with `Blackprint.registerInterface()`.
 
 ```js
-Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node",
+Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", {
+	// You can define your node's HTML on here
+	html: `<div>...</div>`
+
+	// If you're using .sf file from Blackprint template
+	// You can skip this second parameter and just replace it with class declaration
+	// Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", class extends ...)
+},
 class extends CustomNodeIFace {
 	constructor(node){
 		super(node);

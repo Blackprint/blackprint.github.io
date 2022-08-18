@@ -74,6 +74,8 @@ var instance = new Blackprint.Sketch();
 document.body.appendChild(instance.cloneContainer());
 ```
 
+If you want to create a minimap, you can just call `instance.cloneContainer()` again for the same instance and scale it down.
+
 ## Import Blackprint nodes
 If you have exported Blackprint into JSON, then you can easily import it like below:
 ```js
@@ -88,11 +90,9 @@ To create new node and put it on the DOM you can call
 sketch.createNode(namespace, options);
 ```
 
-Namespace is the registered node handler from sketch.registerNode.
- Options is a value for the registered node element from sketch.registerInterface.
+`options` is optional.
 
 ```js
-// Create the node to the view
 var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
 // iface.node == the node handler
 ```
@@ -104,9 +104,85 @@ var ifaceList = sketch.scope('nodes').list;
 var cableList = sketch.scope('cables').list;
 ```
 
+## Refresh node and cable position
+When some node size was changed usually the cable is not in the right position, in order to fix it you can call:
+```js
+sketch.recalculatePosition();
+```
+
 ## Export Blackprint nodes
 The nodes can be exported as JSON, but it's like the node namespace, position, value, and the connections.
 ```js
 var str = sketch.exportJSON();
-// {"math/multiply":[...], ...}
+// {"Math/Multiply":[...], ...}
+
+/**
+ * Export current instance's nodes structure and connections to JSON
+ * @param options additional options
+ */
+exportJSON(options?: {
+	/** Export selected nodes only */
+	selectedOnly?: Boolean,
+
+	/** Exclude node namespace */
+	exclude?: string[],
+
+	/** JSON's whitespace/tabsize length */
+	space?: Number,
+
+	/** Set this to true if you want to also export Blackprint enviroment variables */
+	environment?: Boolean,
+
+	/** Set this to false if you don't want to include .js module URL in the export */
+	module?: any,
+
+	/** Set this to false if you don't want to export node's (x,y) position */
+	position?: any,
+
+	/** Set this to false if you don't want to export custom function */
+	exportFunctions?: any,
+
+	/** Set this to false if you don't want to export custom variable */
+	exportVariables?: any,
+
+	/** Set this to true if you don't want to serialize the object to JSON */
+	toRawObject?: any,
+
+	/** JSON.stringify's replacer */
+	replacer?: any,
+
+	/** Simplify the exported JSON for use in JavaScript */
+	toJS?: any,
+}): String | object;
 ```
+
+## Add event listener to the instance
+Addition for engine events
+
+|Event Name|Event Object|Description|
+|---|---|---|
+|`node.function.open`|`{ event: Event, iface: Interface, function: BPFunction }`|d|
+|`port.default.changed`|`{ port: Port }`|d|
+|`node.move`|`{ iface: Interface, event: Event }`|d|
+|`node.delete`|`{ iface: Interface, event: Event }`|d|
+|`node.deleted`|`{ iface: Interface, event: Event }`|d|
+|`node.created`|`{ iface: Interface, event: Event }`|d|
+|`error`|`{ iface: Interface, event: Event }`|d|
+|`json.imported`|`{ iface: Interface, event: Event }`|d|
+|`cable.create.branch`|`{ iface: Interface, event: Event }`|d|
+|`cable.dropped`|`{ iface: Interface, event: Event }`|d|
+|`cable.created`|`{ iface: Interface, event: Event }`|d|
+|`cable.drag`|`{ iface: Interface, event: Event }`|d|
+|`cable.deleted`|`{ iface: Interface, event: Event }`|d|
+|`node.click`|`{ iface: Interface, event: Event }`|d|
+|`node.hover`|`{ iface: Interface, event: Event }`|d|
+|`node.unhover`|`{ iface: Interface, event: Event }`|d|
+|`port.hover`|`{ iface: Interface, event: Event }`|d|
+|`port.unhover`|`{ iface: Interface, event: Event }`|d|
+|`container.selection`|`{ iface: Interface, event: Event }`|d|
+|`node.resize`|`{ iface: Interface, event: Event }`|d|
+
+Global event
+|Event Name|Event Object|Description|
+|---|---|---|
+|`menu.create.node`|`{ iface: Interface, event: Event }`|d|

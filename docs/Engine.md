@@ -133,3 +133,23 @@ instance.importJSON(/* JSON || Object */);
 ```js
 instance.clearNodes();
 ```
+
+## Add event listener to the instance
+
+|Event Name|Event Object|Description|
+|---|---|---|
+|`node.id.changed`|`{ iface: Interface, from: String, to: String }`|d|
+|`cable.disconnect`|`{ port: Port, target?: Port, cable: Cable }`|d|
+|`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|d|
+
+### Global event
+|Event Name|Event Object|Description|
+|---|---|---|
+|`module.added`|`{ url: String }`|d|
+|`module.update`|`null`|d|
+|`module.delete`|`{ url: String }`|d|
+|`environment.imported`|`null`|d|
+|`environment.changed`|`{ key: String, value: String }`|d|
+|`environment.added`|`{ key: String, value: String }`|d|
+|`environment.renamed`|`{ old: String, now: String }`|d|
+|`environment.deleted`|`{ key: String }`|d|
