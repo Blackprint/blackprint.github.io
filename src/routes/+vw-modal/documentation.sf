@@ -158,6 +158,7 @@ sf-m[name="documentation"] {
 
 	strong {
 		color: white;
+		white-space: nowrap;
 	}
 
 	table {
@@ -182,12 +183,35 @@ sf-m[name="documentation"] {
 		max-width: 100%;
 	}
 
-	p, li {
+	video {
+		max-width: 100%;
+	    border-radius: 10px;
+	}
+
+	p, li, td {
 		code{
 			background: #00000099;
 			padding: 1px 5px 4px 5px;
 			border-radius: 5px;
 			white-space: nowrap;
+		}
+	}
+
+	table {
+		max-width: 100%;
+		overflow: auto;
+		display: block;
+	}
+
+	x-code2 {
+		background: #00000099;
+		padding: 1px 5px 4px 5px;
+		border-radius: 5px;
+		white-space: nowrap;
+		display: block;
+		x-t {
+			padding-left: 10px;
+			display: block;
 		}
 	}
 }
@@ -318,7 +342,10 @@ sf.model('documentation', function(My){
 		if(el.tagName !== 'DIV' && !el.tagName.startsWith('H'))
 			return;
 
-		My.changeHeaderFocusById(el.textContent);
+		let text = el.textContent;
+		if(!text) return;
+
+		My.changeHeaderFocusById(text);
 	}
 
 	My.changeHeaderFocusById = function(id){
