@@ -293,7 +293,7 @@ let _editorModuleURL = sf.model('module-url', function(My){
 		Blackprint.deleteModuleFromURL(url);
 	}
 
-	Blackprint.on('moduleDelete', { slot: 'bp-editor' }, function({ url }) {
+	Blackprint.on('module.delete', { slot: 'bp-editor' }, function({ url }) {
 		let styles = document.styleSheets;
 		let simplifiedURL = url.replace(/[?#].*?$/m, '').replace(/\.(sf|js|css|min|mjs)\b/g, '');
 

@@ -329,9 +329,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	if(My.isFunctionSketch)
 		funcNodeInstance.on('variable.new', refreshVarsCounter);
 
-	Blackprint.on('moduleAdded', refreshNodesCounter); // ToDo: use dot to separate event scope
-	Blackprint.on('moduleDelete', refreshNodesCounter);
-	Blackprint.on('moduleUpdate', refreshNodesCounter);
+	Blackprint.on('module.added', refreshNodesCounter); // ToDo: use dot to separate event scope
+	Blackprint.on('module.delete', refreshNodesCounter);
+	Blackprint.on('module.update', refreshNodesCounter);
 	Blackprint.on('bp_editorNodeAvailability', refreshNodesCounter);
 	$(refreshNodesCounter); // Run when all script/page is loaded
 	$(refreshVarsCounter); // Run when all script/page is loaded
