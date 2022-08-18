@@ -209,6 +209,7 @@ sf-m[name="documentation"] {
 		border-radius: 5px;
 		white-space: nowrap;
 		display: block;
+		font-family: monospace;
 		x-t {
 			padding-left: 10px;
 			display: block;
@@ -264,7 +265,7 @@ sf.model('documentation', function(My){
 	}
 
 	My.reorderListLv1 = function(){
-		let order = ['Home', 'Getting Started', 'Editor', 'Sketch', 'Engine', 'Custom Nodes'];
+		let order = ['Home', 'Getting Started', 'Editor', 'Engine', 'Sketch', 'Custom Nodes'];
 		let ref = My.docs._list;
 
 		for(let i=0; i < order.length; i++){

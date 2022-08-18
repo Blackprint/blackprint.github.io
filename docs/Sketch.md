@@ -185,28 +185,55 @@ You can also register an event that exist on Engine class for your Sketch instan
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`node.function.open`|`{ event: Event, iface: Interface, function: BPFunction }`|d|
-|`port.default.changed`|`{ port: Port }`|d|
-|`node.move`|`{ iface: Interface, event: Event }`|d|
-|`node.delete`|`{ iface: Interface, event: Event }`|d|
-|`node.deleted`|`{ iface: Interface, event: Event }`|d|
-|`node.created`|`{ iface: Interface, event: Event }`|d|
-|`error`|`{ iface: Interface, event: Event }`|d|
-|`json.imported`|`{ iface: Interface, event: Event }`|d|
-|`cable.create.branch`|`{ iface: Interface, event: Event }`|d|
-|`cable.dropped`|`{ iface: Interface, event: Event }`|d|
-|`cable.created`|`{ iface: Interface, event: Event }`|d|
-|`cable.drag`|`{ iface: Interface, event: Event }`|d|
-|`cable.deleted`|`{ iface: Interface, event: Event }`|d|
-|`node.click`|`{ iface: Interface, event: Event }`|d|
-|`node.hover`|`{ iface: Interface, event: Event }`|d|
-|`node.unhover`|`{ iface: Interface, event: Event }`|d|
-|`port.hover`|`{ iface: Interface, event: Event }`|d|
-|`port.unhover`|`{ iface: Interface, event: Event }`|d|
-|`container.selection`|`{ iface: Interface, event: Event }`|d|
-|`node.resize`|`{ iface: Interface, event: Event }`|d|
+|`container.selection`|`{ cables: Array, nodes: Array }`|User is selecting some nodes and cables|
+|`json.imported`|`{ appendMode: Boolean, nodes: Array, raw: String }`|JSON was imported into the instance|
+|`error`|`{ type: String, data: Object }`|An error happened on the instance|
+|`port.default.changed`|`{ port: Port }`|Default port value was changed|
+|`cable.create.branch`|`{ event: Event, cable: Cable }`|A cable was splitted and a cable branch was created|
+|`cable.created`|`{ port: Port, cable: Cable }`|A cable was created|
+|`cable.dropped`|`{ port: Port, cable: Cable, event: Event }`|A cable that was created by user interaction was dropped by user|
+|`cable.drag`|`{ cable: Cable }`|A cable is being dragged by user|
+|`cable.deleted`|`{ cable: Cable }`|A cable was deleted|
+|`node.move`|`{ iface: Interface, event: Event }`|A node is moved by user interaction|
+|`node.resize`|`{ items: Array }`|Some nodes get resized|
+|`node.delete`|`{ iface: Interface }`|A node is being deleted|
+|`node.deleted`|`{ iface: Interface }`|A node was deleted|
+|`node.created`|`{ iface: Interface }`|A node was created|
+|`node.click`|`{ iface: Interface, event: Event }`|User clicked the node header|
+|`node.hover`|`{ iface: Interface, event: Event }`|User is hovering/focus the node header|
+|`node.unhover`|`{ iface: Interface, event: Event }`|User is leaving focus the node header|
+|`port.hover`|`{ port: Port, event: Event }`|User is hovering/focus the port element|
+|`port.unhover`|`{ port: Port, event: Event }`|User is leaving focus the port element|
+|`node.function.open`|<x-code2>{<x-t>event: Event,</x-t><x-t>iface: Interface,</x-t><x-t>function: BPFunction</x-t>}</x-code2>|User was double clicked a function node to open it|
+
+Below is an example on how to register event on the instance:
+```js
+// Optional, but recommended to avoid re-register similar listener
+let EventSlot = {slot: "myLibraryName"};
+let instance = new Blackprint.Sketch();
+
+instance.on('node.function.open', EventSlot, async function(event){
+	let name = ev.iface.namespace.split('/').join('-');
+	name += '-'+ev.iface.uniqId;
+
+	// Go to a new page for viewing inside of function node
+	await views.goto("/sketch/node-"+name, {
+		bpInstance: ev.iface.bpInstance
+	});
+});
+```
 
 Global event
 |Event Name|Event Object|Description|
 |---|---|---|
-|`menu.create.node`|`{ iface: Interface, event: Event }`|d|
+|`menu.create.node`|<x-code2>{<x-t>list: Object,</x-t><x-t>menu: Array,</x-t><x-t>sketch: Sketch,</x-t><x-t>event: Event,</x-t><x-t>options: Object,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|Internal Blackprint is creating a menu for node suggestion|
+
+Below is an example on how to register event into Blackprint:
+```js
+Blackprint.on('menu.create.node', EventSlot, function(event){
+	let { list, isSuggestion } = event;
+	if(!isSuggestion) return;
+
+	delete list['Example']; // Delete "Example/*" nodes namespace list from node suggestion
+});
+```
