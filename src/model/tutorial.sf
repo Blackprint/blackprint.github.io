@@ -1,5 +1,5 @@
 ## html.append-to-body
-<sf-m name="tutorial" style="display: {{ active ? '' : 'none'}}">
+<sf-m name="tutorial" style="display: {{ active ? 'block' : 'none'}}">
 	<div class="highlighter">
 		<div class="dark-ground"></div>
 
@@ -11,7 +11,7 @@
 	<div class="hinter">
 		<div class="hints" sf-each="val in light" style="transform: translate({{ val.position.x }}px, {{ val.position.y }}px);">
 			<div class="light"></div>
-			<div class="message">{{ val.message }}</div>
+			<div class="message" style="transform: translate({{ -val.overflow.x }}px, {{ -val.overflow.y }}px);">{{ val.message }}</div>
 		</div>
 	</div>
 </sf-m>
@@ -21,6 +21,7 @@ sf-m[name="tutorial"]{
 	$highlightWidth: 500px;
 	$highlightHeight: 500px;
 	z-index: 10;
+	display: none;
  
 	@keyframes pulse-ring {
 		0% { transform: scale(0.1); }
@@ -59,7 +60,9 @@ sf-m[name="tutorial"]{
 		position: fixed;
 		top: 0;
 		left: 0;
+		width: 500px;
 		pointer-events: none;
+		z-index: 10000;
 		.light{
 			position: fixed;
 			width: 10px;
@@ -93,18 +96,20 @@ sf-m[name="tutorial"]{
 		}
 		.message{
 			position: fixed;
-			// pointer-events: all;
-			font-size: 16px;
-			color: white;
-			background: #000000bb;
-			border: 1px solid #48484873;
-			border-radius: 10px;
-			padding: 4px 8px;
-			box-shadow: 0 0 8px black;
-			margin-left: 25px;
-			margin-top: -12px;
+		    font-size: 16px;
+		    color: white;
+		    background: #000000bd;
+		    border: 2px solid #0089ffe3;
+		    border-radius: 10px;
+		    padding: 4px 8px;
+		    box-shadow: 0 0 8px #000000;
+		    margin-left: 25px;
 		}
 	}
+}
+
+.bp-editor-tutorial-active-element {
+    filter: drop-shadow(0 0 12px yellow);
 }
 
 ## js-global
@@ -139,23 +144,27 @@ window.Tutorial = sf.model('tutorial', My => {
 		My.pending.push(...data);
 	}
 
-	My.next = function(){
+	My.next = async function(){
+		// ToDo: optimize code below for multiple highlight
+		let old = My.light[0];
+		if(old != null){
+			old.onLeave?.();
+			unregisterEventListener(old);
+		}
+
 		if(My.pending.length === 0){
 			My.light.splice(0);
 			My.active = false;
 			return;
 		}
 
-		// ToDo: optimize code below for multiple highlight
-		let old = My.light[0];
-		if(old != null){
-			old.onLeave?.();
+		let data = My.pending.shift();
 
-			if(old.listenEvent != null && old.onEvent != null)
-				$(old.element).off(old.listenEvent);
+		if(data.delayShow != null){
+			My.active = false;
+			await new Promise(resolve => setTimeout(resolve, data.delayShow));
 		}
 
-		let data = My.pending.shift();
 		if(data.element != null){
 			let $el = $(data.element);
 			if($el[0] == null){
@@ -185,10 +194,23 @@ window.Tutorial = sf.model('tutorial', My => {
 			else if(origin === 'center-bottom')
 				oX += rect.width/2, oY += rect.height;
 
-			data.position = {x: rect.x + oX, y: rect.y + oY};
+			let position = data.position = {x: rect.x + oX, y: rect.y + oY};
+			let overflow = data.overflow = {x: 0, y: 0};
 
-			if(data.listenEvent != null && data.onEvent != null)
-				$el.once(data.listenEvent);
+			setTimeout(()=>{
+				let rect = My.$el('.hinter .hints .message')[0].getBoundingClientRect();
+
+				let oX = position.x + rect.width + 50 - window.innerWidth;
+				let oY = position.y + rect.height - window.innerHeight;
+
+				if(oY > 0) overflow.y = oY;
+				if(oX > 0){
+					overflow.x = oX;
+					overflow.y = (oY > 0 ? oY : 0) - 20;
+				}
+			}, 300);
+
+			registerEventListener(data);
 		}
 
 		My.light = data.splice != null ? data : [data];
@@ -198,10 +220,16 @@ window.Tutorial = sf.model('tutorial', My => {
 	}
 
 	My.clearTutorial = function(){
-		My.light[0]?.onLeave?.();
+		let old = My.light[0];
+		if(old != null){
+			old.onLeave?.();
+			unregisterEventListener(old);
+		}
 
+		My.active = false;
 		My.light = [];
 		My.pending = [];
+		My._domObserver?.disconnect();
 	}
 
 	My.hotReloaded = function(){
@@ -216,5 +244,45 @@ window.Tutorial = sf.model('tutorial', My => {
 		// ]]);
 
 		// My.next();
+	}
+
+	let eventTest = /^on[A-Z]/m;
+	function registerEventListener(obj){
+		if(obj.element != null)
+			$(obj.element).addClass('bp-editor-tutorial-active-element');
+
+		for(let key in obj){
+			if(!eventTest.test(key)) continue;
+			if(key === 'onShow' || key === 'onLeave') continue;
+
+			let call = obj[key];
+			if(call === 'next') call = My.next;
+			$(obj.element).on(key.slice(2).toLowerCase(), call);
+		}
+	}
+	function unregisterEventListener(obj){
+		if(obj.element != null)
+			$(obj.element).removeClass('bp-editor-tutorial-active-element');
+
+		for(let key in obj){
+			if(!eventTest.test(key)) continue;
+			if(key === 'onShow' || key === 'onLeave') continue;
+
+			let call = obj[key];
+			if(call === 'next') call = My.next;
+			$(obj.element).off(key.slice(2).toLowerCase(), call);
+		}
+	}
+
+	My._domChanged = function(element, callback){
+		My._domObserver?.disconnect();
+
+		My._domObserver = new MutationObserver(function(){
+			callback();
+			My._domObserver.disconnect();
+			My._domObserver = null;
+		});
+
+		My._domObserver.observe(element, { childList:true, subtree:true });
 	}
 });

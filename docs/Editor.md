@@ -7,3 +7,5 @@
 - Teach your friend who are new to programming
 
 > You may see some picture has different background from the original Editor. It's still the same editor but with a custom background that can be changed from the Editor's settings.
+
+If you're new and confused what to do with this editor, please go to **Editor -> Tutorial** topic or **Engine -> Integration**.
