@@ -55,7 +55,14 @@ sf-m.modal{
 var Modal = sf.model('modal', function(My){
 	My.showed = false;
 
-	My.init = My.hotReloaded = function(){
+	My.init = function(){
+		My.hotReloaded();
+
+		$(window).on('keyup', function(){
+			if(My.showed) My.hide();
+		});
+	}
+	My.hotReloaded = function(){
 		My.views = sf.Views.listSelector['vw-modal'];
 	}
 

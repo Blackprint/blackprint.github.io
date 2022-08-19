@@ -256,7 +256,6 @@ var EditorHeader = sf.model('header', function(My, include){
 	}
 
 	My.openDocumentation = function(){
-		SmallNotif.add('Documentation still WIP');
 		Modal.goto('/documentation')
 	}
 
