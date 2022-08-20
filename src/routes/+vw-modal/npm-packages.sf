@@ -89,7 +89,10 @@ sf-m[name="npm-packages"] {
 			}
 			.description{
 				font-weight: normal;
-				padding-right: 80px;
+			    overflow: hidden;
+			    width: calc(100% - 100px);
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
 			}
 			.author{
 				float: right;
@@ -145,6 +148,7 @@ sf.model('npm-packages', function(My){
 		for(let key in temp){
 			for (var i = 0; i < list.length; i++) {
 				let item = list[i];
+				item.description = item.description.replace(/&#39;/g, "'");
 
 				if(key.includes(item.name)){
 					item._active = true;

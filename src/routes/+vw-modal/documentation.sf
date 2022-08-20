@@ -279,20 +279,10 @@ sf.model('documentation', function(My){
 
 		changeContent(My.docs.Home);
 
-		// ToDo: enable this after tutorial has completed
-		if(false && localStorage.firstTimeEditorVisit !== "1"){
-			localStorage.firstTimeEditorVisit = "1";
-
-			let confirm = await Swal.fire({
-				title:"Welcome!",
-				html:"<br>It's seems you're new here 🎉<br>Do you want to see small tutorial to use this editor?",
-				showCancelButton: true,
-			});
-
-			if(confirm.isConfirmed){
-				// ToDo
-			}
-		}
+		Modal.onHide('/documentation', function(){
+			delete sf.URI.data.bpdocs;
+			sf.URI.replace();
+		});
 
 		My.reorderListLv1();
 	}
@@ -445,5 +435,34 @@ sf.model('documentation', function(My){
 		setTimeout(function(){
 			if(section) My.changeHeaderFocusById(section);
 		}, 1000);
+	});
+
+	$(async function(){
+		if(localStorage.firstTimeEditorVisit !== "1"){
+			let noURIData = true;
+			for(let key in sf.URI.data){
+				noURIData = false;
+				break;
+			}
+
+			if(noURIData){
+				localStorage.firstTimeEditorVisit = "1";
+
+				let confirm = await Swal.fire({
+					title:"Welcome!",
+					html:"<br>It's seems you're new here 🎉<br>Do you want to see small tutorial to use this editor?",
+					showCancelButton: true,
+				});
+
+				if(confirm.isConfirmed){
+					Modal.goto('/documentation');
+
+					// Wait first load
+					setTimeout(function(){
+						changeContent(My.docs.Editor.branch.Tutorial);
+					}, 700);
+				}
+			}
+		}
 	});
 });

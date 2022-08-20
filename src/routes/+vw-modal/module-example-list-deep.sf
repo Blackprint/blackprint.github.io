@@ -47,6 +47,7 @@ sf-m[name="module-example-list-deep"] {
 		background: black;
 		font-size: 12px;
 		margin-top: -10px;
+		cursor: pointer;
 	}
 	.description{
 		background: black;

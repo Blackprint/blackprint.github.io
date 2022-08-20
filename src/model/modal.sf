@@ -58,8 +58,10 @@ var Modal = sf.model('modal', function(My){
 	My.init = function(){
 		My.hotReloaded();
 
-		$(window).on('keyup', function(){
-			if(My.showed) My.hide();
+		$(window).on('keyup', function(ev){
+			if(ev.key === "Escape"){
+				if(My.showed) My.hide();
+			}
 		});
 	}
 	My.hotReloaded = function(){
@@ -72,15 +74,20 @@ var Modal = sf.model('modal', function(My){
 		list.push(callback);
 	}
 
-	My.hide = function(){
-		My.showed = false;
-		My.$el('.modal-dialog').off('pointerdown', My.hide, {outside: true});
-
+	My._triggerHide = function(){
 		let list = onHide[My.views.currentPath];
 		list?.forEach(v => v());
 	}
 
+	My.hide = function(){
+		My.showed = false;
+		My.$el('.modal-dialog').off('pointerdown', My.hide, {outside: true});
+		My._triggerHide();
+	}
+
 	My.goto = function(path){
+		My._triggerHide();
+
 		My.views.goto(path);
 		My.showed = true;
 
