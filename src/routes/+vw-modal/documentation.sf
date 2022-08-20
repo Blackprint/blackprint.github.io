@@ -323,6 +323,8 @@ sf.model('documentation', function(My){
 		if(currentContent === obj) return;
 		currentContent = obj;
 
+		My.$el('.content')[0].scrollTop = 0;
+
 		let cache = My.cache.get(obj);
 		if(cache == null){
 			// ToDo: improve security because we're going to use eval to execute <script> from the markdown
