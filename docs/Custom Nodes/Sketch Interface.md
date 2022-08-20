@@ -1,5 +1,5 @@
 ## Sketch Interface Registration
-To register an interface into Blackprint Engine, you need to prepare class that extends from the class you have registered with `Blackprint.registerInterface()` and register it with `Blackprint.Sketch.registerInterface(namespace, class)`.
+This registration is optional but required if you registered `Blackprint.registerInterface()` for your node. To register an interface into Blackprint Engine, your class need to extends from the class that you have registered with `Blackprint.registerInterface()` and then register it with `Blackprint.Sketch.registerInterface(namespace, class)`.
 
 > The namespace **must be** similar with the interface you have registered with `Blackprint.registerInterface()`.
 
@@ -31,10 +31,10 @@ class extends CustomNodeIFace {
 	- `destroyClone()`: called when node interface's clone was deleted
 5. `destroy()`: called on node deletion from instance
 
-> `hotReload` feature must use ScarletsFrame in Development Mode (with hot reload feature be enabled manually). When hot reloading, the iface will have `this.hotReloading === true` and reset to false after hot reload was completed.
+> `hotReload` feature must use ScarletsFrame in Development Mode (hot reload feature need to be enabled manually). When hot reloading, the iface will have `this.hotReloading === true` and reset to false after hot reload was completed.
 
 ### HTML template
-When registering interface for sketch instance, it's required to have a HTML template for your node. 
+When registering interface for sketch instance, it's **required** to have a HTML template for your node. 
 
 ```js
 Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", {
@@ -42,7 +42,7 @@ Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", {
 }, class extends Blackprint.Interfce {})
 ```
 
-Below is full basic template for a node, you're free to customize it to fit your needs and maybe remove some `<sf-template>` if you don't need it. You can add mustache template or apply two way binding on the template.
+Below is full basic template for a node, you're free to customize it to fit your needs and maybe remove some `<sf-template>` if you don't need it. You can add mustache template or apply two way binding on the template with the interface's property or data.
 ```html
 <div class="node" style="transform: translate({{ x }}px, {{ y }}px)">
   <sf-template path="Blackprint/nodes/template/routes.sf"></sf-template>
@@ -62,7 +62,7 @@ Below is full basic template for a node, you're free to customize it to fit your
 </div>
 ```
 
-Styling with SCSS is recommended to make things simpler, but it's depends on your choice.
+For styling the node, you need to specify the tag name. The tag name is a lowercased letters of the interface's name and `/` symbol is converted into `-`.
 ```scss
 // Element name is based on interface's namespace, BPIC/LibraryName/FeatureName/Template
 bpic-libraryname-featurename-template {
@@ -74,7 +74,7 @@ bpic-libraryname-featurename-template {
 ```
 
 ### Initialize interface after creation
-ScarletsFrame will call `init()` function when the node element was attached to DOM tree and you can begin initializing your HTML element.
+ScarletsFrame will call `init()` function once the node element was attached to DOM tree and you can begin initializing your HTML element.
 
 ```js
 Blackprint.Sketch.registerInterface('BPIC/LibraryName/FeatureName/Template',
@@ -94,7 +94,7 @@ class IMyTemplate extends Context.IFace.MyTemplate {
 ```
 
 ### Handle removed interface
-ScarletsFrame will call `destroy()` when the interface elemnet is being removed.
+ScarletsFrame will call `destroy()` when the interface element is being removed.
 
 ```js
 class extends Blackprint.Interface {
@@ -105,7 +105,7 @@ class extends Blackprint.Interface {
 ```
 
 ## Add event listener into a interface
-Addition for **Interface** events, 
+You can also register an event that exist on **Interface** class. Below is some event addition for **Sketch Interface**:
 
 |Event Name|Event Object|Description|
 |---|---|---|

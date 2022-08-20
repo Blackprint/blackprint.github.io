@@ -1,5 +1,5 @@
 ## Defining port for a node
-Port can be defined statically when registering a node with `Blackprint.registerNode()`. Input or output port is optional, you can also skip defining port if you want to create a node that doesn't need any data. Below is the example on how to define port:
+Ports can be defined statically when registering a node with `Blackprint.registerNode()`. Input or output port is optional, you can also skip defining port if you want to create a node that doesn't need any data. Below is the example on how to define port:
 
 ![brave_cLYl8ls0tx](https://user-images.githubusercontent.com/11073373/185162709-29a96350-5a83-42b3-9245-604c15ff8f9b.jpg)
 
@@ -31,9 +31,9 @@ class extends Blackprint.Node {
 ```
 
 ## Port types
-In JavaScript you can easily use the class constructor for the port's data type. Blackprint Engine will validate every cable connection and also output data before the data reaching the input port. But in some scenario where you create a library and didn't expose the class constructor, the other library will can't use the similar constructor and Blackprint will consider it's a different data type even it has a similar name `MyType` <-> `MyType`.
+In JavaScript you can easily use the class constructor for the port's data type, like `String, Number, Object, RegExp`. Blackprint Engine will validate every cable connection and also validate the output data before the data reaching to the input port. But in some scenario where you create a library and didn't expose the class constructor, the other library will can't use the similar constructor and Blackprint will consider it's a different data type even it has a similar name `MyType` <-> `MyType`.
 
-While you can define the port with class constructor `String, Number, Object, RegExp`, you may find JavaScript didn't have a `Any` class constructor who accept anything. So if you want your port to accept any data type, you can use `Blackprint.Types.Any` as the data type.
+While you define the port with class constructor, you may find JavaScript didn't have `Any` class constructor that can accept any data type. So if you want your port to accept any data type, you can use `Blackprint.Types.Any` as the data type.
 
 ```js
 static input = {
@@ -44,14 +44,13 @@ static input = {
 ## Port features
 When defining port type with class constructor, it may only accept a single data type. In some scenario you may need port with extended feature like `Union` that can accept multiple data type or a port that can be called like a function with `Trigger`. Blackprint provides you this power and allow you to define port with `Blackprint.Port.{Feature}`.
 
-> Available only for input port, except `Port.Route` and `Port.StructOf`
-
 ### ArrayOf
 This port feature can contain multiple cable as input and the value will be array of `<type>`. It's only accept one type, not union. For union port please split it to different port to handle it.
 
 ![brave_NUHB0jqZzj](https://user-images.githubusercontent.com/11073373/185188717-5edf8d10-c45e-4f91-92b9-c1a8a766b0f8.jpg)
 
 ```js
+// Available only on Input port
 static input = {
 	MyPort: Blackprint.Port.ArrayOf(Number)
 }
@@ -63,6 +62,7 @@ This port feature can contain default value for your defined data type.
 ![brave_mM8w8bUuLq](https://user-images.githubusercontent.com/11073373/185188895-d35d24c0-0aa5-4297-a665-a3b5bf6bb6ca.jpg)
 
 ```js
+// Available only on Input port
 static input = {
 	MyPort: Blackprint.Port.Default(String, "hello")
 }
@@ -72,6 +72,7 @@ static input = {
 This port feature behaves like a function, other output port can call it like a function. You can also call this function manually from `node.ref.Input.MyPort()`.
 
 ```js
+// Available only on Input port
 static input = {
 	MyPort: Blackprint.Port.Trigger(function(port){
 		console.log('MyPort was called');
@@ -80,7 +81,17 @@ static input = {
 }
 ```
 
-On the other node for the output port, you can define your port type as Function. If `MyPort` is connected with `MyOutput` port and you want to call `MyPort` from the output port with a script, you can do it with `node.ref.Output.MyOutput()`.
+If you want to trigger the Port.Trigger's function manually with a script, you can do it like below:
+```js
+class extends Blackprint.Node {
+	init(){
+		let { Input } = this.ref;
+		Input.MyPort.Exec();
+	}
+}
+```
+
+On the other node for the output port, you can define your port type as Function. If `MyPort` is connected with `MyOutput` port and you want to call `MyPort` from the output port with a script, you can call the output trigger with `node.ref.Output.MyOutput()`.
 
 ```js
 static output = {
@@ -92,6 +103,7 @@ static output = {
 This port feature accept a single cable that compatible with multiple data type.
 
 ```js
+// Available only on Input port
 static input = {
 	MyPort: Blackprint.Port.Union([String, Number, Boolean])
 }
@@ -102,16 +114,18 @@ While usually a node only allow you to use a single route cable output, this por
 
 > This port only available for output port
 ```js
+// Available only on Output port
 static output = {
 	MyPort: Blackprint.Port.Route
 }
 ```
 
 ### StructOf
-When you create a complex node usually you will encounter with many ports definition and often find port name that can conflict with each other. With this port feature you can define a port that can be splitted in a structural form. To split this port you can do it from the Sketch by right clicking the port and choose Split.
+When you create a complex node usually you will encounter with many ports definition and often the port name can conflict each other. With this port feature you can define a port that can be splitted in a structural form. To split this port you can do it from the Sketch by right clicking the port and choose Split.
 
 > This port only available for output port
 ```js
+// Available only on Output port
 static output = {
 	// Port.StructOf(OriginalType, Structure)
 	Speed: Blackprint.Port.StructOf(Object, {
@@ -125,17 +139,7 @@ static output = {
 }
 ```
 
-On unsplitted form, both of them will looks like below:
-
-![brave_eMQMnaxmy6](https://user-images.githubusercontent.com/11073373/185187691-93ee6d06-eab1-4ebd-a79b-9a6923d8031b.jpg)
-
-On splitted form, both of them will looks like below:
-
-![brave_hr2FissKMU](https://user-images.githubusercontent.com/11073373/185187898-3e9aa909-b02b-4895-8d93-7fac70b0912d.jpg)
-
-`BP-*` name can be changed in the future, so please consider it's name as experimental/internal.
-
-The `Structure` is formatted like below:
+The `Structure` for the code example above is formatted like below:
 ```js
 Blackprint.Port.StructOf(TypeData, {
 	PortName: { type: TypeData, [field || handle] },
@@ -159,6 +163,16 @@ node.ref.Output.SpeedY === 20
 node.ref.Output.Velocity === { ... } // Assume this haven't been splitted
 ```
 
+On unsplitted form, both of them will looks like below:
+
+![brave_eMQMnaxmy6](https://user-images.githubusercontent.com/11073373/185187691-93ee6d06-eab1-4ebd-a79b-9a6923d8031b.jpg)
+
+On splitted form, both of them will looks like below:
+
+![brave_hr2FissKMU](https://user-images.githubusercontent.com/11073373/185187898-3e9aa909-b02b-4895-8d93-7fac70b0912d.jpg)
+
+`BP-*` name can be changed in the future, so please consider it's name as experimental/internal.
+
 ---
 
 ## Dynamically add port into node
@@ -180,7 +194,7 @@ class MyNode extends Blackprint.Node {
 This feature may get changed and will not be documented for now, but in a plan to be documented.
 
 ## Obtain connected cable list from a port
-Cable list from a port can be obtained by using the port's interface `portInterface.cables`. Below is the example if you want to obtain cable list when:
+Cable list from a port can be obtained by using the port's interface `portInterface.cables`. Below is the example if you want to obtain cable list:
 
 ```js
 class MyNode extends Blackprint.Node {
@@ -192,7 +206,7 @@ class MyNode extends Blackprint.Node {
 	// Triggered when the input port have a new value
 	update(){
 		let { PortName } = this.ref.IInput;
-		PortName.cables instanceof Array; // [Cable, ...]
+		PortName.cables instanceof Array; // => [Cable, ...]
 	}
 }
 ```
@@ -220,52 +234,53 @@ iface1.IInput['MyInputPort'].connectPort(iface2.IOutput['MyOutputPort']);
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`value`|Input Port:<br>`{ port: Port, target: Port, cable: Cable }`<br>Output Port: `{ port: Port }`|d|
-|`call`|`null`|d|
-|`disconnect`|`{ port: Port, target?: Port, cable: Cable }`|d|
-|`connect`|`{ port: Port, target: Port, cable: Cable }`|d|
-|`connecting`|`{ target: Port, activate: Callback }`|d|
+|`value`|Input Port:<br>`{ port: Port, target: Port, cable: Cable }`<br>Output Port: `{ port: Port }`|There are value update on the port|
+|`call`|`null`|The `Port.Trigger` or port with `Function` type was called|
+|`connecting`|`{ target: Port, activate: Callback }`|A cable is trying to connect for the port|
+|`connect`|`{ port: Port, target: Port, cable: Cable }`|An cable was connected from the port|
+|`disconnect`|`{ port: Port, target?: Port, cable: Cable }`|An cable was disconnected from the port|
 
 ```js
-    // Can be used for IInput, IOutput
-    // Control the port interface (event listener, add new port, etc)
-    IInput.PortName1
-      // When connected output node have updated the value
-      // Also called after 'connect' event
-      .on('value', Context.EventSlot, function(ev){
-        console.log("PortName1:", ev);
+class MyNode extends Blackprint.Node {
+	constructor(instance){ ... }
 
-	      // If have changed output port's value inside this listener
-        // you may also need to trigger route out `iface.node.routes.routeOut();`
-      })
+	// We can listen for event on init()
+	init(){
+		let { IInput, IOutput } = this.ref;
 
-      // When connection success
-      .on('connect', Context.EventSlot, function({ port, target, cable }){})
+		// Event listener can be registered for IInput, IOutput
+		IInput.PortName1.on('value', Context.EventSlot, function(ev){
+			console.log("PortName1:", ev);
 
-      // When connection closed
-      // not being called if the connection doesn't happen before
-      .on('disconnect', Context.EventSlot, function({ port, target, cable }){});
+			// If have changed output port's value inside this listener
+			// you may also need to trigger route out `iface.node.routes.routeOut()`
+		})
 
-    function myLongTask(callback){
-      setTimeout(()=> callback(true), 1000);
-    }
+		// When the port connected with other port
+		.on('connect', Context.EventSlot, function({ port, target, cable }){})
 
-    IOutput.PortName2
-      // When this port are trying to connect with other node
-      .on('connecting', Context.EventSlot, function({ port, target, activate }){
-        myLongTask(function(success){
-          if(success)
-            activate(true) // Cable will be activated
-          else activate(false) // Cable will be destroyed
-        });
+		// When the port disconnected with other port
+		.on('disconnect', Context.EventSlot, function({ port, target, cable }){});
 
-        // Empty = is like we're not giving the answer now
-        activate() // Mark as async
+		function myLongTask(callback){
+			setTimeout(()=> callback(true), 1000);
+		}
 
-        // Or destroy it now
-        // activate(false)
-      })
+		// When this port are trying to connect with other node
+		IOutput.PortName2.on('connecting', Context.EventSlot, function({ port, target, activate }){
+			myLongTask(function(success){
+				if(success) activate(true); // Cable will be activated
+				else activate(false); // Cable will be destroyed
+			});
 
-    // ...
-  }
+			// Empty = is like we're not giving the answer now
+			activate(); // Mark as async
+
+			// Or destroy it now
+			// activate(false)
+		});
+
+		// ...
+	}
+}
 ```

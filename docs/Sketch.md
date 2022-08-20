@@ -1,6 +1,6 @@
 > Blackprint Sketch is using ScarletsFrame for the HTML templating system.
 
-Currently sketch only available on modern Browser, but it can also being run on Node.js for unit testing. Chromium based browser is more recommended, and there will be no support for IE11 or old Safari browser.
+Blackprint Sketch is only available for modern Browser, it can also running on Node.js for unit testing. Chromium based browser is more recommended, and there will be no support for IE11 or old Safari browser.
 
 ## Load Blackprint required files
 
@@ -23,7 +23,7 @@ You need to put this in the `<head>` tag.
 
 </div><div tab="Unit Test">
 
-In case if you want to import Blackprint Sketch for unit testing in Node.js, you also need to set the Blackprint to use `windowless` mode. I also recommend for using Jest.
+If you want to import Blackprint Sketch for unit testing in Node.js, you also need to set the Blackprint to use `windowless` mode. I also recommend for using Jest.
 ```js
 window.ResizeObserver = class{}; // Polyfill with empty class
 window.sf = require("scarletsframe/dist/scarletsframe.min.js");
@@ -65,7 +65,7 @@ test("Load required modules", async () => {
 </div></docs-md-tabs>
 
 ## Create Instance
-`Blackprint.Sketch` does extends `Blackprint.Engine` class, that's mean it's similar with the Engine instance but with extended functionality like having a User Interface for the nodes, cable, ports and also handling user interaction for managing the instance.
+`Blackprint.Sketch` does extends `Blackprint.Engine` class, that's mean the API and functionaily is similar with the Engine instance but with extended feature like having a User Interface for the nodes, cable, ports and also handling user interaction for managing the instance.
 
 ```js
 var instance = new Blackprint.Sketch();
@@ -122,10 +122,10 @@ var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
 ```
 
 ## Get created node and cable list
-Blackprint does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly with `.push, .splice, .pop` or other array manipulation function.
+**Blackprint Sketch** does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly with `.push, .splice, .pop` or other array manipulation function.
 ```js
-var ifaceList = sketch.scope('nodes').list;
-var cableList = sketch.scope('cables').list;
+var ifaceList = sketch.scope('nodes').list; // as Array<Interface>
+var cableList = sketch.scope('cables').list; // as Array<Cable>
 ```
 
 ## Refresh node and cable position
@@ -135,7 +135,7 @@ sketch.recalculatePosition();
 ```
 
 ## Export Blackprint nodes
-The nodes can be exported as JSON, but it's like the node namespace, position, value, and the connections.
+Currently you can export your diagram only with Blackprint Sketch. The nodes can be exported as JSON, but it's like the node namespace, position, value, and the connections.
 ```js
 var str = sketch.exportJSON();
 // {"Math/Multiply":[...], ...}

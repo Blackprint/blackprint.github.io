@@ -1,5 +1,5 @@
 ## Node Registration
-To register a node into Blackprint Engine, you need to prepare class that extends `Blackprint.Node` and register it with `Blackprint.registerNode(namespace, class)`.
+Node registration is required as this is the main part that will process the received data flow from Blackprint Engine. To register a node into Blackprint Engine, you need to prepare class that extends `Blackprint.Node` and register it with `Blackprint.registerNode(namespace, class)`.
 
 > Every node must be registered in a namespace and every namespace need to be capitalized. Don't use symbol for the namespace except `.`, `_`, `/`. In some programming language, the dot `.` symbol will be converted into underscore `_`.
 
@@ -61,7 +61,7 @@ class extends Blackprint.Node {
 ```
 
 ### Handle data import on creation
-When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from `iface.data` or optionally specift data on `options` for `.createNode()`, Blackprint will call `node.imported(data)` to let you process the data after node construction before initialization.
+When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from optionally specify `data` field on `options` for `.createNode()`, Blackprint will call `node.imported(data)` to let you process the data after node construction before initialization.
 
 ```js
 // Please see Custom Nodes -> Interface instead to see detailed example
@@ -78,7 +78,7 @@ class extends Blackprint.Node {
 ```
 
 ### Handle data update from input port
-Callback when current input value are updated from the other node's output port. This is more recomended than using event listener `port.value` or `value`. If you trigger `node.update()` manually somewhere on your code, you also need to trigger route out `this.routes.routeOut();`
+Callback when current input port's value was updated from the other node's output port. Adding `update()` function is more recomended than using event listener `port.value` or `value`. If you trigger `node.update()` manually somewhere on your code, you must trigger route out `node.routes.routeOut()` too.
 
 ```js
 class extends Blackprint.Node {
@@ -90,7 +90,7 @@ class extends Blackprint.Node {
 ```
 
 ### Handle data request from output port
-Callback when other node's input port are requesting current node's output value
+Callback when other node's input port are requesting current node's output value. This function will be useful if the data flow is started from the right side, where input port is asking output data from node on the left side.
 
 ```js
 class extends Blackprint.Node {

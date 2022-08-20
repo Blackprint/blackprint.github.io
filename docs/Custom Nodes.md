@@ -59,7 +59,7 @@ CustomNodeIFace = class extends Blackprint.Interface {
 
 ## Register Sketch Interface
 This is an **optional** registration and **can only be registered for Browser environment**.<br>
-You can also just extends from the class you have registered with `Blackprint.registerInterface()`. The namespace **must be** similar with the interface you have registered with `Blackprint.registerInterface()`.
+You can also just extends from the class you have registered with `Blackprint.registerInterface()`. The namespace also **must be** similar with the interface you have registered: `Blackprint.registerInterface('BPIC/A/B', ...) <-> Blackprint.Sketch.registerInterface('BPIC/A/B', ...)`.
 
 ```js
 Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node", {
@@ -83,4 +83,4 @@ class extends CustomNodeIFace {
 });
 ```
 
-For more information, let's navigate to other sub-documentation. To begin with, you can first navigate to: `Create Module -> Node -> Port -> Interface -> Sketch Interface`.
+For more information, let's navigate to other sub-documentation. To begin with, you can navigate with this order: `Create Module -> Node -> Port -> Interface -> Sketch Interface`.

@@ -4,7 +4,7 @@
 
 <div tab="Browser">
 
-In the browser you can easily import from CDN, and just begin writing your code in `<script>` tag
+In the browser you can easily import the from CDN, and you will have `Blackprint` object on the `window` context.
 
 ```html
 <!-- Put this in <head> -->
@@ -18,9 +18,9 @@ In the browser you can easily import from CDN, and just begin writing your code 
 </div><div tab="Node.js">
 
 #### Installing the engine
+You can use `npm`, `pnpm`, or `yarn` when installing packages. But it's recommended to use `pnpm` to save disk space.
 
 ```sh
-# You can use PNPM or NPM when installing packages
 $ pnpm i @blackprint/engine
 ```
 
@@ -36,7 +36,7 @@ require("...[the required module URL]...");
 ```
 
 #### Run your application
-If you don't load any modules by URL you can use this command:
+If you don't load any modules by URL and prefer to manually `require` the modules, you can use this command:
 
 ```sh
 $ node init.js
@@ -54,7 +54,7 @@ $ node --no-warnings --loader ./node_modules/@blackprint/engine/es6-https-loader
 </div><div tab="Deno">
 
 #### Load the engine from CDN
-In this example we will name the file as `init.js`
+In this example we will name the file as `init.mjs`
 
 ```js
 // Initialize the engine first
@@ -75,7 +75,7 @@ $ deno run --allow-net ./init.mjs
 $ composer install blackprint/engine
 ```
 
-After that you can just import with autoload, or maybe also install another required nodes module.
+After that you can just import with autoload, you also need to install another required nodes module manually.
 
 ```php
 require_once('vendor/autoload.php');
@@ -111,6 +111,9 @@ func main() {
 // If you load from CDN, "Blackprint" is registered in window object
 import Blackprint from '@blackprint/engine';
 
+// Only allow import module from cdn.jsdelivr.net, the first parameter can also be an array
+Blackprint.allowModuleOrigin('cdn.jsdelivr.net');
+
 // If you're running on Node.js and don't want to load modules from URL
 // you need to manually imports the modules before calling 'createNode' or 'importJSON'
 
@@ -118,7 +121,7 @@ import Blackprint from '@blackprint/engine';
 var instance = new Blackprint.Engine();
 ```
 
-### Create node in instance
+### Create node in an instance
 ```js
 var iface = instance.createNode('MyModule/Math/Multiply', {/* optional options */});
 
@@ -166,7 +169,7 @@ instance.clearNodes();
 ```
 
 ## Add event listener to the instance
-These event can also be registered for Sketch Instance.
+These event can also be registered for **Sketch Instance**.
 
 |Event Name|Event Object|Description|
 |---|---|---|
@@ -176,8 +179,7 @@ These event can also be registered for Sketch Instance.
 
 Below is an example on how to register event on the instance:
 ```js
-// Optional, but recommended to avoid re-register similar listener
-let EventSlot = {slot: "myLibraryName"};
+let EventSlot = {slot: "myLibraryName"}; // Optional, but recommended to avoid re-register similar listener
 let instance = new Blackprint.Engine();
 
 instance.on('node.id.changed', EventSlot, function(event){
@@ -188,12 +190,12 @@ instance.on('node.id.changed', EventSlot, function(event){
 ### Global event
 |Event Name|Event Object|Description|
 |---|---|---|
-|`module.added`|`{ url: String }`|New module registration and the registered nodes|
-|`module.update`|`null`|Module registration and the registered nodes was update|
-|`module.delete`|`{ url: String }`|Module registration and the registered nodes was deleted|
+|`module.added`|`{ url: String }`|New module registration|
+|`module.update`|`null`|A registered module was updated|
+|`module.delete`|`{ url: String }`|Module registration was deleted|
 |`environment.imported`|`null`|Imported new environment variables|
-|`environment.changed`|`{ key: String, value: String }`|Environment variable data was changed|
 |`environment.added`|`{ key: String, value: String }`|New environment variable was added|
+|`environment.changed`|`{ key: String, value: String }`|Environment variable data was changed|
 |`environment.renamed`|`{ old: String, now: String }`|Environment variable data was renamed|
 |`environment.deleted`|`{ key: String }`|Environment variable data was deleted|
 

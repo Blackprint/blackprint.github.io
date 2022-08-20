@@ -1,11 +1,11 @@
 ## Interface Registration
-We need an interface if you want to provide a function or exposable property for other developer to your node, this allow your application and the node to talk each other.
+Interface registration is optional but required if you want to provide a function or exposable property for other developer to your node, this allow your application and the node to talk each other.
 
 To register an interface into Blackprint Engine, you need to prepare class that extends `Blackprint.Interface` and register it with `Blackprint.registerInterface(namespace, class)`.
 
 > Every interface must be registered in a namespace started with `BPIC/` and every namespace need to be capitalized. Don't use symbol for the namespace except `.`, `_`, `/`. In some programming language, the dot `.` symbol will be converted into underscore `_`.
 
-BPIC stands for `Blackprint Interface Component`, this root namespace will help avoid conflict with internal namespace in the future.
+BPIC (`Blackprint Interface Component`) is a root namespace will help avoid conflict with internal namespace in the future.
 
 ```js
 let CustomNodeIFace; // You can store the class here in case if you want to export or use it on other script
@@ -27,10 +27,10 @@ let instance = new Blackprint.Engine();
 await instance.importJSON(...);
 
 // If you want to get list of the created iface
-instance.ifaceList // [iface1, iface2, ...]
+instance.ifaceList; // => [iface1, iface2, ...]
 
 // If you want to get iface by node id
-instance.iface["ifaceId"] instanceof Blackprint.Interface
+instance.iface["ifaceId"]; // => instanceof Blackprint.Interface
 
 // If you want to get references object by node id
 let { Input, Output, IInput, IOutput } = instance.ref["ifaceId"];
@@ -43,7 +43,7 @@ let { Input, Output, IInput, IOutput } = instance.ref["ifaceId"];
 4. `destroy()`: called on node deletion from instance
 
 ### Initialize interface after creation
-Blackprint will call `init()` function when everything is ready to be used, after all nodes have been constructed, all data imported, and cables has been connected. This can be overriden when you also registered interface for sketch instance.
+Blackprint will call `init()` function when everything is ready to be used, after all nodes have been constructed, all data imported, and cables has been connected. This `init()` function can be overriden when you registered an interface for sketch instance with `Blackprint.Sketch.registerInterface(...)`.
 
 ```js
 class extends Blackprint.Interface {
@@ -64,7 +64,7 @@ class extends Blackprint.Interface {
 ```
 
 ### Handle data import on creation
-When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from `iface.data` or optionally specift data on `options` for `.createNode()`, Blackprint will call `node.imported(data)` to let you process the data after node construction before initialization.
+When you're creating a node either using `instance.importJSON({...})` or `instance.createNode(namespace, options)` sometime the JSON may contain saved data from optionally specify `data` field on `options` for `.createNode()`, Blackprint will call `iface.imported(data)` to let you process the data after node construction before initialization.
 
 ```js
 // This is optional but recommended if you want to store data on your interface
@@ -105,7 +105,7 @@ class extends Blackprint.Interface {
 ```
 
 ### Handle removed interface
-Blackprint will call `destroy()` when the node is being removed. This can be overriden when you also registered interface for sketch instance.
+Blackprint will call `destroy()` when the node is being removed.
 
 ```js
 class extends Blackprint.Interface {

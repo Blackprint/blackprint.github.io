@@ -31,6 +31,12 @@ For example, to call the `Exec` port you can do it like below:
 ```js
 let { hello } = instance.ref;
 hello.Input.Exec();
+
+// For listening the call event for port Exec
+hello.IInput.Exec.on('call', function(){ ... });
+
+// To obtain value from port A
+let valA = hello.Input.A;
 ```
 
 If you want to modify the input port's value, you must connect it to other output port:
@@ -46,10 +52,16 @@ MyOutput.value = 123; // Assign value for this port
 MyOutput.connectPort(hello.IInput.A); 
 ```
 
-You can also listen to value changes for the `Result`'s port, but these listener must be registered before any event occurs. This method can also be used for Input and Output port.
+You can also listen for value changes for the `Result`'s port, but these listener must be registered before any event occurs.
 ```js
 let { hello } = instance.ref;
-hello.Input.Exec();
+
+// IOutput = output port's interface
+hello.IOutput['Result'].on('value', function(ev){
+  let portValue = ev.port.value;
+
+  // ev.cable.value; // 'ev.cable' and 'ev.target' only exist for Input port
+})
 ```
 
 For further information please go to **Custom Nodes** documentation, the engine is designed to be similar for each programming language. It wont be difficult if you already familiar with the documentation for JavaScript.
