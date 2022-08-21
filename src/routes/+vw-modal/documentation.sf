@@ -411,14 +411,15 @@ sf.model('documentation', function(My){
 		}
 	}
 
+	marked.setOptions({
+		highlight(code, language){
+			return hljs.highlight(code, { language }).value;
+		}
+	});
+
 	$(function(){
 		let bpdocs = sf.URI.data.bpdocs?.[0];
 		if(bpdocs == null || My.initialized) return;
-		marked.setOptions({
-			highlight(code, language){
-				return hljs.highlight(code, { language }).value;
-			}
-		});
 
 		My.initialized = true;
 

@@ -74,7 +74,7 @@ var instance = new Blackprint.Sketch();
 document.body.appendChild(instance.cloneContainer());
 ```
 
-If you want to create a minimap, you can just call `instance.cloneContainer()` again for the same instance and scale it down.
+If you want to create a minimap, you can just call `instance.cloneContainer(true)` for the same instance and scale it down.
 
 ## Import Blackprint nodes
 If you have exported Blackprint into JSON, then you can easily import it like below:
