@@ -1,7 +1,7 @@
 ## html
 <sf-m name="npm-packages">
 	<div class="description">
-		Search package on NPM repository
+		Search package on NPM registry
 		<i class="{{ loading ? 'fa fa-spinner fa-spin' : '' }}"></i>
 	</div>
 	<div class="mini-description" title="Please verify the author trustworthiness before using their module. If you're not a developer, always becareful if someone ask you to do something with Blackprint, like inputting password or private key.">These modules is contributed by the community <a @click="reportClick">(click to report spam/scam)</a></div>
