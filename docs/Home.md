@@ -22,6 +22,6 @@ Each of the component have different functionality, so if you want to create an 
 
 ---
 
-Feel free to create a new discussion on Blackprint repository, or join the Discord server.
+Feel free to create a new [discussion](https://github.com/Blackprint/Blackprint/discussions) on Blackprint repository, or join the Discord server.
 
 <a href='https://discord.gg/cz9rh3a7d6'><img src='https://img.shields.io/discord/915881655921704971.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2' height='20'></a>

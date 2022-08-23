@@ -7,7 +7,10 @@ This registration is optional but required if you registered `Blackprint.registe
 // CustomNodeIFace is a class we have made on "Custom Nodes -> Interface"
 // when we're registering with Blackprint.registerInterface()
 
-Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node",
+Blackprint.Sketch.registerInterface("BPIC/My/Custom/Node",{
+	// If you already write your HTML in .sf file extension, you can skip this field
+	html: `...see html template below...`,
+},
 class extends CustomNodeIFace {
     // 'constructor' here is optional, only for Blackprint.Node that was required to have
 	constructor(node){
