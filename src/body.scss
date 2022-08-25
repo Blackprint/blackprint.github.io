@@ -102,3 +102,33 @@ img{
 img.loading{
 	opacity: 0;
 }
+
+sf-m[name="remote-sketch"] {
+	pointer-events: none;
+	color: white;
+	top: 0;
+	position: absolute;
+
+	.cursor {
+		transition: 0.15s ease-out transform;
+		will-change: transform;
+		backface-visibility: hidden;
+	}
+	span {
+		vertical-align: bottom;
+		background: #37b0219e;
+		padding: 5px 8px;
+		font-size: 12px;
+		border-radius: 10px;
+	}
+	.selection-box {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: #c089ff46;
+		border: 1px solid #c089ff;
+		transform-origin: top left;
+		transition: 0.1s ease-in-out;
+		transition-property: width, height;
+	}
+}

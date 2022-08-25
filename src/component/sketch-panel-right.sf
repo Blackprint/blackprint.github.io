@@ -132,7 +132,10 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 			My.ifaceSelected.node.instance.changeNodeId(My.ifaceSelected, val);
 		},
 		comment:'',
-		v2m$comment(val){ My.ifaceSelected.comment = val },
+		v2m$comment(val){
+			My.ifaceSelected.comment = val;
+			My.ifaceSelected.node.instance.emit('_editor.node.comment', { iface: My.ifaceSelected });
+		},
 	};
 
 	My.init = function(){
