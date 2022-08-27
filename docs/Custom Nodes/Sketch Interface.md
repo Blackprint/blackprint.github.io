@@ -115,7 +115,7 @@ You can also register an event that exist on **Interface** class. Below is some 
 |`cable.created`|`{ port: Port, cable: Cable }`|A cable was created from a port|
 |`port.hover`|`{ event: Event, port: Port }`|User hovered/focus on an port element|
 |`port.unhover`|`{ event: Event, port: Port }`|User leaving focus from an port element|
-|`port.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>port: Port,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|User right clicked port element to open a menu|
+|`port.menu`|<x-code2>{</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>port: Port,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|User right clicked port element to open a menu|
 |`node.menu`|<x-code2>{<x-t>iface: Interface,</x-t><x-t>instance: Engine \| Sketch,</x-t><x-t>menu: Array,</x-t><x-t>event: Event,</x-t><x-t>preventDefault: Callback</x-t>}</x-code2>|User right clicked the node's header to open a menu|
 
 Below is one of example on how to register event on an interface:
