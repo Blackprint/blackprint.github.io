@@ -192,6 +192,36 @@ sf.component('sketch-page', function(My){
 		if(ev.port != null) PortHoverInfo(ev, false);
 		if(ev.iface != null) NodeHoverInfo(ev, false);
 	});
+	sketch.on('port.menu', {slot: 'bp-editor'}, ev => {
+		let iface = ev.port.iface;
+		if(iface.interface === "BPIC/BP/Fn/Main"){
+			ev.menu.push({
+				title: "Rename Port",
+				async callback(){
+					let ref = await Swal.fire({
+						title: "Rename port",
+						text: "Current name: "+ev.port.name,
+						input: "text",
+					});
+
+					if(ref.isConfirmed === false) return;
+
+					let val = ref.value;
+					if(val === ''){
+						iface.node.instance.changeNodeId(iface, val);
+						return;
+					}
+
+					if(iface[ev.port.source][val] != null){
+						SmallNotif.add("Conflicting port name", 'red');
+						return;
+					}
+
+					iface.renamePort(ev.port.source, ev.port.name, val);
+				}
+			});
+		}
+	});
 
 	sketch.on('cable.dropped', {slot: 'bp-editor'}, ev => {
 		let event = ev.event;
