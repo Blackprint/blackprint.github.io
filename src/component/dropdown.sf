@@ -317,7 +317,7 @@ var DropDown = sf.model('dropdown', function(My){
 
 								if(allFound === false) continue;
 
-								results.push(Object.assign({ description }, item, {title: fullPath.slice(0, -3)}));
+								results.push(Object.assign({ description, info: description }, item, {title: fullPath.slice(0, -3)}));
 							}
 						}
 					}
