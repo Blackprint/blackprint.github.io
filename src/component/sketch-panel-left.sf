@@ -12,7 +12,7 @@
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Environment ({{ _envVar.length }})</div>
-				<div class="button" @click="Modal.goto('/environment-variables')"><i class="fa fa-plus-square"></i></div>
+				<div class="button" @click="Modal.goto('/environment-variables')"><i class="fa fa-plus-square" title="Create new environment variable"></i></div>
 
 				<div class="tree-view tree-group" tree-section="environmentVar" @pointerdown="checkDragNode">
 					<div class="tree-item" sf-each="val in _envVar" tree-item-key="{{ val.key }}">
@@ -23,7 +23,7 @@
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Public ({{ variableCount }})</div>
-				<div class="button" @click="createVariable(event, Blackprint.VarScope.Public)"><i class="fa fa-plus-square"></i></div>
+				<div class="button" @click="createVariable(event, Blackprint.VarScope.Public)"><i class="fa fa-plus-square" title="Create new public/global variable"></i></div>
 
 				<!-- /src/component/tree-list.sf -->
 				<div class="tree-view tree-group" tree-section="variables" @pointerdown="checkDragNode">
@@ -66,7 +66,7 @@
 					</div>
 					<div class="tree-view tree-item has-child collapsed">
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Shared ({{ functionSharedVariableLength }}) </div>
-						<div class="button" @click="createVariable(event, 'shared')"><i class="fa fa-plus-square"></i></div>
+						<div class="button" @click="createVariable(event, 'shared')" title="Create new shared function variable"><i class="fa fa-plus-square"></i></div>
 
 						<div class="tree-view tree-group" tree-section="sharedVariables" @pointerdown="checkDragNode">
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcSharedVariable" style="display: {{ val.hidden ? 'none' : '' }}">
@@ -85,7 +85,7 @@
 					</div>
 					<div class="tree-view tree-item has-child collapsed">
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Private ({{ functionVariableLength }}) </div>
-						<div class="button" @click="createVariable(event, 'private')"><i class="fa fa-plus-square"></i></div>
+						<div class="button" @click="createVariable(event, 'private')" title="Create new private function variable"><i class="fa fa-plus-square"></i></div>
 
 						<div class="tree-view tree-group" tree-section="privateVars" @pointerdown="checkDragNode">
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcVariable" style="display: {{ val.hidden ? 'none' : '' }}">
@@ -107,7 +107,7 @@
 		</div>
 		<div class="function-list collapsed">
 			<div class="title" @click="collapseSubPanel(this, true)">Functions ({{ functionCount }})</div>
-			<div class="button" @click="createFunction"><i class="fa fa-plus-square"></i></div>
+			<div class="button" @click="createFunction" title="Create new empty function node"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" tree-section="functions" @pointerdown="checkDragNode">
@@ -128,7 +128,7 @@
 		</div>
 		<div class="node-list">
 			<div class="title" @click="collapseSubPanel(this, true)">Nodes ({{ nodeCount }})</div>
-			<div class="button" @click="createCustomNode"><i class="fa fa-plus-square"></i></div>
+			<div class="button" @click="createCustomNode" title="Create new node by using code editor "><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
 			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode" @pointerover="nodeListHover"  @pointerleave="nodeListLeave">
@@ -304,7 +304,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	const refreshNodesCounter = () => {
 		clearTimeout(pendingRefreshModule);
 
-		pendingRefreshModule = setTimeout(() => {
+		pendingRefreshModule = setTimeout(async () => {
+			await My.recalculateMenu();
 			My.nodeCount = deepCount(Blackprint.availableNode, true);
 		}, 500);
 	}

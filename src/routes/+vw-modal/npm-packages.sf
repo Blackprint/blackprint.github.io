@@ -143,6 +143,9 @@ sf.model('npm-packages', function(My){
 		})
 		My.loading = false;
 
+		// Decode "'" symbol
+		list.forEach(v => v.description = v.description.replace(/&#39;/g, "'"))
+
 		// ToDo: check if version was different with current loaded module
 		let temp = Blackprint.modulesURL;
 		for(let key in temp){

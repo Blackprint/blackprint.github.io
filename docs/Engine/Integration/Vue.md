@@ -33,8 +33,14 @@ instance.importJSON(json_text).then(function(){
   // We need to import the JSON first before obtaining the node's ports
   Vue.createApp({
     data() {
+	  let { multiply } = instance.ref;
+
       // Calling port => Multiply.Exec for activation
-      instance.ref.multiply.Input.Exec();
+      multiply.Input.Exec();
+
+      // Vue 3 is using Proxy for their reactivity
+      // You may need to use event listener and update Vue element's value manually like:
+      multiply.IOutput.Result.on('value', ({ port })=> this.myProp = port.value);
 
       // Put the ports reference to this component scope
       return instance.ref;
