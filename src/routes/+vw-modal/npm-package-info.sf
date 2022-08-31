@@ -117,16 +117,16 @@ sf.model('npm-package-info', function(My){
 		My.title = pkg.name;
 		My.description = pkg.description || '';
 		My.version = pkg.version;
-		My.date = (new Date(pkg.modified)).toDateString().slice(4);
-		My.author = pkg.lastPublisher.name || '';
-		My.repository = pkg.repository?.url || '';
+		My.date = pkg.date.split('T')[0];
+		My.author = pkg.publisher.username || '';
+		My.repository = pkg.links.repository || '';
 
 		My.packageURL = `https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}`;
 
 		let temp = Blackprint.modulesURL;
 		let list = My.list;
 		for (var i = list.length-1; i >= 0; i--) {
-			if(list[i].url.endsWith('.json')){
+			if(list[i].url.endsWith('.json')){ // remove .docs.json or other .json
 				list.splice(i, 1);
 				continue;
 			}
