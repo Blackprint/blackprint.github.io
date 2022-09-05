@@ -60,6 +60,7 @@ sf.model('custom-node-editor', function(My){
 	My.init = async function(){
 		if(window.monaco === void 0){
 			await sf.loader.js(['https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.2.0/lib/umd/monaco-loader.min.js']);
+			await sf.loader.task;
 			await monaco_loader.init();
 		}
 
