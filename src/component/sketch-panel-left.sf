@@ -66,7 +66,7 @@
 					</div>
 					<div class="tree-view tree-item has-child collapsed">
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Shared ({{ functionSharedVariableLength }}) </div>
-						<div class="button" @click="createVariable(event, 'shared')" title="Create new shared function variable"><i class="fa fa-plus-square"></i></div>
+						<div class="button" @click="createVariable(event, Blackprint.VarScope.Shared)" title="Create new shared function variable"><i class="fa fa-plus-square"></i></div>
 
 						<div class="tree-view tree-group" tree-section="sharedVariables" @pointerdown="checkDragNode">
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcSharedVariable" style="display: {{ val.hidden ? 'none' : '' }}">
@@ -85,7 +85,7 @@
 					</div>
 					<div class="tree-view tree-item has-child collapsed">
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Private ({{ functionVariableLength }}) </div>
-						<div class="button" @click="createVariable(event, 'private')" title="Create new private function variable"><i class="fa fa-plus-square"></i></div>
+						<div class="button" @click="createVariable(event, Blackprint.VarScope.Private)" title="Create new private function variable"><i class="fa fa-plus-square"></i></div>
 
 						<div class="tree-view tree-group" tree-section="privateVars" @pointerdown="checkDragNode">
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcVariable" style="display: {{ val.hidden ? 'none' : '' }}">
