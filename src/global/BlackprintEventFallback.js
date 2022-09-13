@@ -5,13 +5,18 @@ var BlackprintEventFallback = {
 		BlackprintEventFallback.error.types[error.type](error.data || error);
 	},
 	'cable.wrong_pair'({ port, cable }){
-		SmallNotif.add(`The cable is not suitable (${cable.source}, ${port.source})`, 'yellow');
+		SmallNotif.add(`The cable is not suitable (${cable.source}, ${port.source})`, 'red');
 	},
 	'cable.wrong_type'({ cable, iface, port, target }){
-		SmallNotif.add(iface.title+"> Port from '"+port.iface.title + " - " + port.name+"' was not an "+(target.type._name || target.type.name), 'yellow');
+		SmallNotif.add(iface.title+"> Port from '"+port.iface.title + " - " + port.name+"' was not an "+(target.type._name || target.type.name), 'red');
 	},
-	'cable.wrong_type_pair'({ cable, port, target }){
-		SmallNotif.add(`The cable type is not suitable (${target.type.name}, ${port.type.name})`, 'yellow');
+	'cable.wrong_type_pair'({ port, target }){
+		SmallNotif.add(`The cable type is not suitable (${target.type.name} != ${port.type.name})`, 'red');
+	},
+	'cable.virtual_type_mismatch'({ port, target }){
+		let A = port.virtualType.map(v => v.name).join("|");
+		let B = target.virtualType.map(v => v.name).join("|");
+		SmallNotif.add(`No virtual type that matched each other (${A} != ${B})`, 'yellow');
 	},
 	'cable.duplicate_removed'({ cable, port }){
 		SmallNotif.add("Duplicated cable removed", 'yellow');
@@ -20,7 +25,7 @@ var BlackprintEventFallback = {
 		SmallNotif.add("Cable was replaced because input doesn't support array", 'yellow');
 	},
 	'cable.unsupported_dynamic_port'({ cable, port }){
-		SmallNotif.add("Connecting cable between dynamically generated port is not supported", 'yellow');
+		SmallNotif.add("Connecting cable between dynamically generated port is not supported", 'red');
 	}
 };
 

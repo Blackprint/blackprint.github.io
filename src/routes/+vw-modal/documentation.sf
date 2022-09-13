@@ -99,7 +99,7 @@ sf-m[name="documentation"] {
 		}
 		.active {
 			color: #ffff70;
-			filter: drop-shadow(0 0 10px #ffff00bb);
+			// filter: drop-shadow(0 0 10px #ffff00bb);
 			border-bottom: 1px dashed;
 		}
 	}
