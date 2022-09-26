@@ -36,6 +36,10 @@
 				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/go/go-original-wordmark.svg">
 				<div class="name">Golang</div>
 			</a>
+			<a class="item" href="https://github.com/Blackprint/engine-python" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/python/python-plain.svg" style="max-width: 45px;margin-bottom: 2px;">
+				<div class="name">Python</div>
+			</a>
 		</div>
 	</div>
 </sf-m>
