@@ -90,10 +90,10 @@ sf.model('modal-dev-mode', function(My){
 		if(!url) url = My.placeholder;
 		// url = 'http://localhost:6791';
 
-		let _url = url;
-
 		if(url.slice(-1) === '/')
 			url = url.slice(0, -1);
+
+		let _url = url;
 		url += '/browser-sync';
 
 		if(window.___browserSync___ === void 0){

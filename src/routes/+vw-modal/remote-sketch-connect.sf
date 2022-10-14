@@ -131,7 +131,8 @@ sf.model('modal-remote-sketch-connect', function(My){
 			localStorage.BPSketchRelayServer = url;
 		});
 
-		if(Modal.showed) Modal.hide();
+		if(Modal.showed && Modal.views.currentPath === '/remote-sketch-connect')
+			Modal.hide();
 	}
 
 	if(My.url !== '' && Blackprint.RemoteSketch != null){

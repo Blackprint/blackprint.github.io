@@ -133,7 +133,8 @@ sf.model('modal-remote-engine-connect', function(My){
 		socket.on('relay', v => client.onSyncIn(v));
 		client.onSyncOut = v => socket.emit('relay', v);
 
-		if(Modal.showed) Modal.hide();
+		if(Modal.showed && Modal.views.currentPath === '/remote-engine-connect')
+			Modal.hide();
 
 		setTimeout(()=> {
 			if(socket.connected) return;
