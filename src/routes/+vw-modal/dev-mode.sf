@@ -169,7 +169,7 @@ sf.model('modal-dev-mode', function(My){
 				console.log("Pending resources:", sf.loader.pendingResources);
 		}, 10000);
 
-		if(Modal.showed)
+		if(Modal.showed && Modal.views.currentPath === '/dev-mode')
 			Modal.hide();
 	}
 
