@@ -429,6 +429,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let functionMenu = My.$el('.function-list');
 		let nodeMenu = My.$el('.node-list');
 
+		if(variableMenu[0] == null) return;
+
 		let menuContainer = variableMenu.parent();
 		let maxContainerHeight = menuContainer[0].offsetHeight;
 		let maxMenuHeight = Math.round(maxContainerHeight/3);
