@@ -4,6 +4,9 @@ var BlackprintEventFallback = {
 	error(error){
 		BlackprintEventFallback.error.types[error.type](error.data || error);
 	},
+	'cable.rule.disallowed'({ port, cable, target }){
+		SmallNotif.add(`Cable connection is disallowed for (${port.iface.namespace} <-> ${target.iface.namespace})`, 'red');
+	},
 	'cable.wrong_pair'({ port, cable }){
 		SmallNotif.add(`The cable is not suitable (${cable.source}, ${port.source})`, 'red');
 	},
