@@ -13,6 +13,10 @@
 			<div class="title">Background:</div>
 			<input type="text" sf-bind="background" placeholder="https://...">
 		</div>
+		<div class="item" style="display: {{ isDevMode ? 'block' : 'none' }}">
+			<div class="title">Custom script:</div>
+			<input type="text" sf-bind="customScript" placeholder="https://...">
+		</div>
 		<div class="item">
 			<div class="title">Hide unused port</div>
 			<input type="checkbox" sf-bind="hideUnusedPort">
@@ -63,6 +67,8 @@ sf-m[name="sketch-settings"] {
 ## js-global
 var SketchSettings = sf.model('sketch-settings', function(My){
 	My.theme = 'default';
+	My.isDevMode = sf.hotReload !== void 0;
+
 	My.on$theme = function(now){
 		$('body')
 			.removeClass('node-ui-'+My.theme)
@@ -77,6 +83,7 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 
 		localStorage.bpBackgroundURL = now;
 	}
+	if(My.background) My.on$background(My.background);
 
 	My.hideUnusedPort = localStorage.bpHideUnusedPort == 'true' || false;
 	My.on$hideUnusedPort = function(now){
@@ -128,5 +135,22 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 		localStorage.bpShowSketchMinimap = now;
 	}
 
-	if(My.background) My.on$background(My.background);
+	// Custom script is only available on development mode
+	let _customScript; 
+	My.customScript = localStorage.bpCustomScript || '';
+	My.on$customScript = function(now, isInit){
+		if(!sf.hotReload) return;
+		if(!/^http.*?js$/m.test(now)){
+			SmallNotif.add("Invalid custom script URL");
+			return;
+		}
+
+		clearTimeout(_customScript);
+		_customScript = setTimeout(async ()=> {
+			await sf.loader.js([localStorage.bpCustomScript], {ordered: true});
+			if(!isInit) SmallNotif.add("Custom script URL was saved");
+			localStorage.bpCustomScript = now;
+		}, 1000);
+	}
+	if(My.customScript) My.on$customScript(My.customScript, true);
 });

@@ -16,7 +16,7 @@
 		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
 		<li>If you're using remote control or remote module, Socket.io may store cookies.</li>
 	</ul>
-	<h3>When you're using external modules:</h3>
+	<h3>When you're using external modules or custom script:</h3>
 	<ul>
 		<li>Depends on which CDN you use, the CDN may record the downloaded module for their analytics purpose (like JSDelivr).</li>
 		<li>Depends on what module you loaded, the module may can collect information and send to third party, depends on their purposes (like Telegram or Discord module that connect to their datacenter server to send message in their services).</li>
