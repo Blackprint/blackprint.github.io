@@ -84,6 +84,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 	My.allowDataOutSync = true;
 	My.client = null;
 	My.socket = null;
+	My.event = new Blackprint.Engine.CustomEvent();
 
 	My.connectDefault = function(){
 		localStorage.BPSketchRelayServer = My.url = "";
@@ -108,6 +109,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
 
 		My.socket?.destroy();
+		My.event.emit('init');
 		let socket = My.socket = io(url);
 
 		socket.on('relay', v => client.onSyncIn(v));
@@ -119,6 +121,8 @@ sf.model('modal-remote-sketch-connect', function(My){
 			SmallNotif.add("Failed to connect to sketch's relay server", "red");
 			socket.destroy();
 
+			My.event.emit('disconnected');
+
 			// Unset the value if this was failing on startup time
 			if(clearOnFail)
 				localStorage.BPSketchRelayServer = '';
@@ -129,6 +133,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 			console.log("Connected to sketch's relay server:", url);
 			SmallNotif.add("Connected to sketch's relay server", "green");
 			localStorage.BPSketchRelayServer = url;
+			My.event.emit('connected');
 		});
 
 		if(Modal.showed && Modal.views.currentPath === '/remote-sketch-connect')
