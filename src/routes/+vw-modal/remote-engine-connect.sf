@@ -96,16 +96,21 @@ sf.model('modal-remote-engine-connect', function(My){
 		if(!url) url = My.placeholder;
 
 		if(window.io == null){
-			await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
+			await sf.loader.js(['https://cdn.socket.io/4.5.3/socket.io.min.js']);
 			await sf.loader.task;
 		}
 
 		let instance = window.SketchList[0];
 		let client = My.client ??= new Blackprint.RemoteControl(instance);
 		My.client.enable?.();
-
 		My.socket?.destroy();
-		let socket = My.socket = io(url);
+
+		let parsedURL = new URL(url);
+		let socket = My.socket = io(parsedURL.origin, {
+			transports: ['websocket'],
+			path: parsedURL.pathname === "/" ? '/socket.io' : parsedURL.pathname,
+			parser: window._SocketIOParser,
+		});
 
 		socket.on('startup-time', time => {
 			if((Date.now() - time) < 10e3) // younger than 10 sec

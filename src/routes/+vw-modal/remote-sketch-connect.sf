@@ -95,7 +95,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		let url = My.url;
 
 		if(window.io == null){
-			await sf.loader.js(['https://cdn.socket.io/4.4.1/socket.io.min.js']);
+			await sf.loader.js(['https://cdn.socket.io/4.5.3/socket.io.min.js']);
 			await sf.loader.task;
 		}
 
@@ -109,12 +109,18 @@ sf.model('modal-remote-sketch-connect', function(My){
 		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
 
 		My.socket?.destroy();
-		My.event.emit('init');
-		let socket = My.socket = io(url);
+
+		let parsedURL = new URL(url);
+		let socket = My.socket = io(parsedURL.origin, {
+			transports: ['websocket'],
+			path: parsedURL.pathname === "/" ? '/socket.io' : parsedURL.pathname,
+			parser: window._SocketIOParser,
+		});
 
 		socket.on('relay', v => client.onSyncIn(v));
 		client.onSyncOut = v => socket.emit('relay', v);
 
+		My.event.emit('init');
 		setTimeout(()=> {
 			if(socket.connected) return;
 			console.log("Failed to connect to sketch's relay server:", url);
