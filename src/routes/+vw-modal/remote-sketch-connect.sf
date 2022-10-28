@@ -123,6 +123,8 @@ sf.model('modal-remote-sketch-connect', function(My){
 
 		My.event.emit('init');
 		setTimeout(()=> {
+			let socket = My.socket; // Re-obtain the reference, in case it get changed
+
 			if(socket.connected) return;
 			console.log("Failed to connect to sketch's relay server:", url);
 			SmallNotif.add("Failed to connect to sketch's relay server", "red");
