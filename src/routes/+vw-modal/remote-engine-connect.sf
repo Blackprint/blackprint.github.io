@@ -112,6 +112,7 @@ sf.model('modal-remote-engine-connect', function(My){
 			parser: window._SocketIOParser,
 		});
 
+		SmallNotif.add("Connecting to remote engine");
 		socket.on('startup-time', time => {
 			if((Date.now() - time) < 10e3) // younger than 10 sec
 				client.sendSketchToRemote();
