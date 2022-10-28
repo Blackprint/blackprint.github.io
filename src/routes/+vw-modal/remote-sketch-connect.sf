@@ -117,7 +117,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 			parser: window._SocketIOParser,
 		});
 
-		SmallNotif.add("Connecting to remote engine");
+		SmallNotif.add("Connecting to remote sketch");
 		socket.on('relay', v => client.onSyncIn(v));
 		client.onSyncOut = v => socket.emit('relay', v);
 
