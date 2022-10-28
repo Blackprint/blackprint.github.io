@@ -10,7 +10,7 @@
 	<div class="small-note">Adapted from: SQLite's License</div>
 	<h3>When you're using this editor:</h3>
 	<ul>
-		<li>There are no information collected and transmitted from this editor to the maintainer of this editor. There are no telemetry, user registration, or ads.</li>
+		<li>There are no information collected and transmitted from this editor to the maintainer of this editor. There are no telemetry, user registration, or ads created/served by the maintainer.</li>
 		<li>This editor is using some third party like GitHub, Algolia, JSDelivr which serve the editor's assets. These services may count the traffic for analytics purposes.</li>
 		<li>This editor may store information in your browser's storage like IndexedDB or LocalStorage.</li>
 		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
@@ -29,11 +29,11 @@
 		<li>Becareful if you're using this feature with someone you're not recognize and trust, as this is a remote control. You will need to control which data that can be synced to increase security.</li>
 	</ul>
 
-	If you think some information was misleading or need clarification, feel free to contact the maintainer or do pull request.
+	If you think some information was misleading/outdated or need clarification, feel free to contact the maintainer or do pull request.
 
 	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. We're looking forward for your awesome contribution someday 😆
 
-	Last updated: 2 August 2022
+	Last updated: 28 October 2022
 </sf-m>
 
 ## scss-global
