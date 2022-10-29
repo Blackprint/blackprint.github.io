@@ -141,6 +141,7 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 	My.on$customScript = function(now, isInit){
 		if(!sf.hotReload) return;
 		if(!/^http.*?js$/m.test(now)){
+			localStorage.bpCustomScript = '';
 			SmallNotif.add("Invalid custom script URL");
 			return;
 		}
