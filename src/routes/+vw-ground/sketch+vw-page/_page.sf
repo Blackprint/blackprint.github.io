@@ -349,7 +349,7 @@ sf.component('sketch-page', function(My){
 			suggest: true,
 		});
 	});
-	
+
 	let skipMenuHandler = false;
 	Blackprint.on('menu.create.node', function({ menu, position, options, preventDefault }){
 		if(skipMenuHandler) return;
@@ -365,7 +365,19 @@ sf.component('sketch-page', function(My){
 		let name = ev.iface.namespace.split('/').join('-');
 		name += '-'+ev.iface.uniqId;
 
-		await views.goto("/sketch/node-"+name, {
+		let pages = $('vw-page > sf-page-view', views.rootDOM);
+		let routePath = "/sketch/node-"+name;
+
+		// Remove old page if the instance was different
+		for (let i=0; i < pages.length; i++) {
+			let page = pages[i];
+			if(page.routePath === routePath && page.querySelector('sketch-page').model.sketch !== ev.iface.bpInstance){
+				page.remove();
+				return;
+			}
+		}
+
+		await views.goto(routePath, {
 			bpInstance: ev.iface.bpInstance
 		});
 	});
@@ -481,6 +493,11 @@ sf.component('sketch-page', function(My){
 		decidedScale = decidedScale*100;
 		decidedScale = decidedScale - (decidedScale % 5); // round decimal
 		decidedScale = decidedScale/100;
+
+		if(decidedScale === 0) {
+			console.log("Unexpected: scaling the container to zero");
+			decidedScale = 1;
+		}
 
 		Ref.scale = decidedScale > 1 ? 1 : decidedScale;
 
