@@ -371,10 +371,8 @@ sf.component('sketch-page', function(My){
 		// Remove old page if the instance was different
 		for (let i=0; i < pages.length; i++) {
 			let page = pages[i];
-			if(page.routePath === routePath && page.querySelector('sketch-page').model.sketch !== ev.iface.bpInstance){
+			if(page.routePath === routePath && page.querySelector('sketch-page').model.sketch !== ev.iface.bpInstance)
 				page.remove();
-				return;
-			}
 		}
 
 		await views.goto(routePath, {
