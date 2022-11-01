@@ -26,29 +26,36 @@ utils.openNodeSource = async function(node){
 		if(nodes.isGenerated)
 			throw new Error("Can't view source of node that was dynamically generated");
 
+		// For JSDelivr
 		if(utils._nodeGitHub[nodes._scopeURL] == null){
 			let url = nodes._scopeURL;
-			if(!url.includes('/dist/')) throw new Error("'/dist/' was not found on the URL: "+url);
+			let ghName;
 
-			toast.message = 'Obtaining "package.json"';
+			if(url.includes('@dist/') && url.includes('/gh/'))
+				ghName = url.match(/\/\/cdn.jsdelivr.net\/gh\/(.*?)@dist\//)[1];
+			else {
+				if(!url.includes('/dist/')) throw new Error("'/dist/' was not found on the URL: "+url);
 
-			url = url.split('/dist/')[0];
+				toast.message = 'Obtaining "package.json"';
+				url = url.split('/dist/')[0];
+	
+				try {
+					var packageInfo = await $.getJSON(`${url}/package.json`);
+				} catch(e){
+					throw new Error("Failed to fetch '/package.json'");
+				}
+	
+				if(packageInfo.repository == null)
+					throw new Error("'repository' field was not found on package.json file");
 
-			try {
-				var packageInfo = await $.getJSON(`${url}/package.json`);
-			} catch(e){
-				throw new Error("Failed to fetch '/package.json'");
+				ghName = packageInfo.repository.url
+					.replace(/\.git$/m, '')
+					.replace(/https?:\/\/.*?\//, '')
+					.replace(/@/, '');
 			}
 
-			if(packageInfo.repository == null)
-				throw new Error("'repository' field was not found on package.json file");
-
-			url = packageInfo.repository.url
-				.replace(/\.git$/m, '')
-				.replace(/https?:\/\/.*?\//, '')
-				.replace(/@/, '');
-
-			utils._nodeGitHub[nodes._scopeURL] = `https://cdn.jsdelivr.net/gh/${url}@latest`;
+			// var commitHash = await $.getJSON(`https://api.github.com/repos/${ghName}/commits?per_page=1`);
+			utils._nodeGitHub[nodes._scopeURL] = `https://cdn.jsdelivr.net/gh/${ghName}@latest`;
 
 			let sourceAlias = packageInfo.blackprint?.source;
 			if(sourceAlias != null){
