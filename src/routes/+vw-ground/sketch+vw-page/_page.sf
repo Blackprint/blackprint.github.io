@@ -519,6 +519,21 @@ sf.component('sketch-page', function(My){
 	}
 
 	sketch.on('node.menu', function({ iface, menu }){
+		if(!iface.namespace.startsWith('BPI/F/') && !iface.namespace.startsWith('BP/')){
+			menu.unshift({
+				title: "View source code",
+				async callback(){
+					let code = await utils.openNodeSource(iface);
+					if(!code) return;
+
+					let editor = sf.model('custom-node-editor');
+					editor.setValue(code);
+
+					Modal.goto('/custom-node-editor');
+				}
+			});
+		}
+
 		menu.unshift({
 			title: !iface.id ? "Add ID" : "Modify ID",
 			async callback(){
@@ -542,17 +557,6 @@ sf.component('sketch-page', function(My){
 					throw new Error("ID already exist");
 
 				iface.node.instance.changeNodeId(iface, val);
-			}
-		}, {
-			title: "View source code",
-			async callback(){
-				let code = await utils.openNodeSource(iface);
-				if(!code) return;
-
-				let editor = sf.model('custom-node-editor');
-				editor.setValue(code);
-
-				Modal.goto('/custom-node-editor');
 			}
 		});
 	});
