@@ -4,6 +4,7 @@
 	<div class="{{ type === 'basic' ? '' : 'hide-this' }} basic desc">{{ desc }}</div>
 	<div class="{{ type === 'port' ? '' : 'hide-this' }} port">
 		<div class="type">Type: <span style="color: {{ port.color }}">{{ port.type }}</span></div>
+		<div class="feature" style="display: {{ port.feature ? '' : 'none' }}">Feature: <span>{{ port.feature }}</span></div>
 		<div class="desc">{{ port.desc }}</div>
 	</div>
 	<div class="{{ type === 'node' ? '' : 'hide-this' }} node">
@@ -33,12 +34,16 @@ sf-m[name="tooltip"]{
 		font-size: 16px;
 	}
 
-	.type {
+	.type, .feature {
 		color: gray;
 		span{
 			font-weight: bold;
 			letter-spacing: 1px;
 		}
+	}
+
+	.feature span{
+		color: white;
 	}
 
 	.hide-this {
@@ -101,7 +106,37 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.node.desc = data.docs?.description || '';
 		}
 		else if(type === 'port'){
-			My.port.type = (data.classAdd || '') + data.type.name;
+			let typeName = data.type.name;
+			let feature = '';
+			if(typeName.includes('BP-Union')){
+				typeName = typeName.replace(/BP\-.*? /g, '');
+				typeName = `<${typeName.split(' ').join(' | ')}>`;
+				feature = "Union";
+			}
+			else if(data.classAdd.includes('BP-StructOf')){
+				typeName = `${typeName}{...}`;
+				feature = "Structure";
+			}
+			else if(data.classAdd.includes('BP-StructSplit')){
+				typeName = typeName.replace(/BP\-(Open|Last) /g, '');
+				feature = "StructureAccess";
+			}
+			else {
+				if(typeName.startsWith('BP-')){
+					let temp = /(BP\-.*?) (.*)/g.exec(typeName);
+					typeName = temp[2];
+					feature = temp[1].replace('BP-', '');
+				}
+				else feature = data.classAdd;
+			}
+
+			if(data.virtualType != null){
+				let vtype = data.virtualType?.map(v => v.name).join(' | ');
+				typeName += (vtype ? ` as Virtual<${vtype}>` : '');
+			}
+
+			My.port.type = typeName;
+			My.port.feature = feature;
 			My.port.desc = data.docs?.description || '';
 
 			let portElement = data.iface[data.source]._portList.getElement(data).querySelector('.port');
