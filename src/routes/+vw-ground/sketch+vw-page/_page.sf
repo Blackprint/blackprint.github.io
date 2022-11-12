@@ -168,6 +168,16 @@ sf.component('sketch-page', function(My){
 		setTimeout(() => My.fitToView(), 200);
 	}
 
+	sketch.on('destroy', function(){
+		let pageEl = $(sketch.scope.domList[0].closest('sketch-page').parentNode);
+
+		if(pageEl.hasClass('page-current')){
+			views.goto('/sketch/1');
+			setTimeout(() => pageEl.remove(), 700);
+		}
+		else pageEl.remove();
+	});
+
 	window.CurrentSketch = sketch;
 	sketch.page = My;
 
