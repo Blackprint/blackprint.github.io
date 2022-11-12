@@ -1,4 +1,8 @@
 $(function(){
+	window.BPEditor = {
+		Dialog: Swal.fire.bind(Swal),
+	};
+
 	// Fix for Telegram who encode the URL after the hashtag
 	if((location.hash.includes('%23'))){
 		location.hash = decodeURIComponent(location.hash)
