@@ -123,9 +123,14 @@ var ToolTip = sf.model('tooltip', function(My){
 			}
 			else {
 				if(typeName.startsWith('BP-')){
-					let temp = /(BP\-.*?) (.*)/g.exec(typeName);
-					typeName = temp[2];
-					feature = temp[1].replace('BP-', '');
+					let temp = /(BP\-.*?) ?(.*)?/g.exec(typeName);
+					if(temp == null){
+						typeName = feature = typeName.replace('BP-', '');
+					}
+					else{
+						typeName = temp[2];
+						feature = temp[1].replace('BP-', '');
+					}
 				}
 				else feature = data.classAdd;
 			}
