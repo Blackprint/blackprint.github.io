@@ -67,7 +67,7 @@ sf-m[name="npm-packages"] {
 	}
 	.list{
 		padding: 5px;
-		max-height: 80vh;
+		max-height: 60vh;
 		overflow: hidden scroll;
 		.item{
 			color: #fff;
