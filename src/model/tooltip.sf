@@ -142,7 +142,9 @@ var ToolTip = sf.model('tooltip', function(My){
 
 			My.port.type = typeName;
 			My.port.feature = feature;
-			My.port.desc = data.docs?.description || '';
+			
+			let desc = data.docs?.description || '';
+			My.port.desc = desc.replace(/@menu\b.*?$/s, '').trim();
 
 			let portElement = data.iface[data.source]._portList.getElement(data).querySelector('.port');
 			let color = window.getComputedStyle(portElement).getPropertyValue('background-color');

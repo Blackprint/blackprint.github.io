@@ -456,6 +456,29 @@ sf.component('sketch-page', function(My){
 				else temp.off('pointermove', pmEvent);
 			}
 		});
+
+		My.$el('sf-m[name="nodes"]').on('click', function(ev){
+			let textEl = ev.target;
+			if(textEl.tagName !== 'TEXTAREA') return;
+
+			let portEl = textEl.closest('.ports');
+			if(portEl == null) return;
+
+			let description = portEl.model.docs.description;
+			if(!/@menu\b/.test(description)) return;
+
+			let list = [];
+			description.replace(/-\s+\[(.*?)\]:\((.*?)\)\s+=\s+(.*?)$/gm, function(full, val, title, description){
+				list.push({
+					title, description, callback(){
+						$(textEl).val(val);
+						$(textEl).trigger('input');
+					},
+				});
+			});
+
+			DropDown.show(list, {element: textEl});
+		});
 	}
 
 	My.fitToView = async function(){

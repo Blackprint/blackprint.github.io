@@ -9,7 +9,7 @@
 		<input type="text" sf-bind="search" @keyup.Enter="refreshList" placeholder="Search...">
 	</div>
 	<div class="list">
-		<div class="item {{ x.package._active && 'active' }} {{ x.package._update && 'update' }}" sf-each="x in list" @click="open(x.package)">
+		<div class="item {{ x.package._active ? 'active' : '' }} {{ x.package._update ? 'update' : '' }}" sf-each="x in list" @click="open(x.package)">
 			<div>
 				<div class="title">{{ x.package.name }} <span>(v{{ x.package.version }})</span></div>
 				<div class="author">{{ x.package.publisher.username }}</div>
@@ -67,6 +67,8 @@ sf-m[name="npm-packages"] {
 	}
 	.list{
 		padding: 5px;
+		max-height: 80vh;
+		overflow: hidden scroll;
 		.item{
 			color: #fff;
 			background: #0000009e;
