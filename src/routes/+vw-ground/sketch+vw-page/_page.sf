@@ -464,7 +464,8 @@ sf.component('sketch-page', function(My){
 			let portEl = textEl.closest('.ports');
 			if(portEl == null) return;
 
-			let description = portEl.model.docs.description;
+			let description = portEl.model.docs?.description;
+			if(description == null) return;
 			if(!/@menu\b/.test(description)) return;
 
 			let list = [];
