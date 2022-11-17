@@ -30,6 +30,7 @@ utils.openNodeSource = async function(node){
 		if(utils._nodeGitHub[nodes._scopeURL] == null){
 			let url = nodes._scopeURL;
 			let ghName;
+			let packageInfo;
 
 			if(url.includes('@dist/') && url.includes('/gh/'))
 				ghName = url.match(/\/\/cdn.jsdelivr.net\/gh\/(.*?)@dist\//)[1];
@@ -40,7 +41,7 @@ utils.openNodeSource = async function(node){
 				url = url.split('/dist/')[0];
 	
 				try {
-					var packageInfo = await $.getJSON(`${url}/package.json`);
+					packageInfo = await $.getJSON(`${url}/package.json`);
 				} catch(e){
 					throw new Error("Failed to fetch '/package.json'");
 				}
@@ -57,7 +58,7 @@ utils.openNodeSource = async function(node){
 			// var commitHash = await $.getJSON(`https://api.github.com/repos/${ghName}/commits?per_page=1`);
 			utils._nodeGitHub[nodes._scopeURL] = `https://cdn.jsdelivr.net/gh/${ghName}@latest`;
 
-			let sourceAlias = packageInfo.blackprint?.source;
+			let sourceAlias = packageInfo?.blackprint?.source;
 			if(sourceAlias != null){
 				for(let key in sourceAlias){
 					if(nodes._scopeURL.includes('/'+key)){
