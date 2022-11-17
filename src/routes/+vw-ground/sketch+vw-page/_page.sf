@@ -557,11 +557,16 @@ sf.component('sketch-page', function(My){
 			menu.unshift({
 				title: "View source code",
 				async callback(){
-					let code = await utils.openNodeSource(iface);
+					let { code, githubURL, scopeURL } = await utils.openNodeSource(iface);
 					if(!code) return;
 
 					let editor = sf.model('custom-node-editor');
 					editor.setValue(code);
+
+					let githubRepoName = githubURL.match(/\/\/cdn.jsdelivr.net\/gh\/(.*?)@/)?.[1];
+					if(githubRepoName)
+						editor.githubURL = `https://github.com/${githubRepoName}/blob/-/src/${iface.namespace}.js`;
+					else editor.githubURL = '';
 
 					Modal.goto('/custom-node-editor');
 				}

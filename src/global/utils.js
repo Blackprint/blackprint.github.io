@@ -91,5 +91,5 @@ utils.openNodeSource = async function(node){
 
 	if(ii !== -1) list.splice(ii, 1);
 
-	return result;
+	return { code: result, githubURL, scopeURL: nodes._scopeURL };
 }
