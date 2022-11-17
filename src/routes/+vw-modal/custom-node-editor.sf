@@ -88,8 +88,16 @@ sf.model('custom-node-editor', function(My){
 		}, 1000);
 	}
 
+	// This only runnable on development mode editor
 	My.run = function(){
-		eval(My.editor.getValue());
+		if(sf.hotReload == null || location.pathname !== '/dev.html')
+			return; // Return if not in development mode as eval is dangerous
+
+		let code = My.editor.getValue();
+		let Context = code.match(/\bregisterNode\(['"](\w+)\//)?.[1];
+		let begin = `var Context = Blackprint.getContext._context['${Context}']`, ends = ``;
+
+		eval(`${begin}\n${code}\n${ends}`);
 
 		Blackprint.emit('bp_editorNodeAvailability');
 	}
