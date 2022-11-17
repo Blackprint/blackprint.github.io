@@ -13,6 +13,7 @@ utils.openNodeSource = async function(node){
 
 	let toast = SmallNotif.add("Obtaining path", 'yellow', false);
 	let result = false;
+	let githubURL;
 
 	try{
 		for (var i = 0; i < objPath.length; i++) {
@@ -70,7 +71,7 @@ utils.openNodeSource = async function(node){
 			else utils._nodeGitHub[nodes._scopeURL] += '/src';
 		}
 
-		let githubURL = utils._nodeGitHub[nodes._scopeURL];
+		githubURL = utils._nodeGitHub[nodes._scopeURL];
 		namespace = namespace.replace(/^.*?\//m, '');
 		// return githubURL + '/' + namespace + '.js';
 
