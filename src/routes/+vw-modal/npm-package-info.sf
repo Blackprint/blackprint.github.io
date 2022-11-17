@@ -21,7 +21,6 @@ sf-m[name="npm-package-info"] {
 	border-radius: 10px;
 	border: 2px solid black;
 	position: relative;
-	width: 420px;
 	box-shadow: 0 0 20px 0px white;
 	> .info{
 		padding: 10px;
