@@ -17,6 +17,7 @@
 		</div>
 		<div class="content" @click="changeHeaderFocus">
 			<sf-slot for="content"></sf-slot>
+			<div class="edit-button" title="Edit this documentation on GitHub" @click="editDocs"><i class="fa fa-pen"></i></div>
 		</div>
 		<div class="right-panel" @click="changeHeaderFocus">
 			<sf-slot for="section"></sf-slot>
@@ -72,6 +73,7 @@ sf-m[name="documentation"] {
 		box-shadow: 0 0 7px black;
 	}
 	.content{
+		position: relative;
 		padding: 5px 20px;
 		width: 70%;
 		color: #d7d7d7;
@@ -101,6 +103,15 @@ sf-m[name="documentation"] {
 			color: #ffff70;
 			// filter: drop-shadow(0 0 10px #ffff00bb);
 			border-bottom: 1px dashed;
+		}
+		.edit-button {
+			position: absolute;
+			top: 15px;
+			right: 15px;
+			background: #583c47;
+			padding: 5px 8px;
+			border-radius: 30px;
+			cursor: pointer;
 		}
 	}
 	.tree-item {
@@ -323,6 +334,9 @@ sf.model('documentation', function(My){
 		if(currentContent === obj) return;
 		currentContent = obj;
 
+		// obj is object content from window.bpEditorDocs which is loaded from auto generated docs from
+		// https://github.com/Blackprint/blackprint.github.io/tree/master/docs
+
 		My.$el('.content')[0].scrollTop = 0;
 
 		let cache = My.cache.get(obj);
@@ -383,6 +397,11 @@ sf.model('documentation', function(My){
 
 		My.$el('.content')[0].scrollTop = target.offsetTop - 40;
 		refreshURL();
+	}
+
+	My.editDocs = function(){
+		let url = `https://github.com/Blackprint/blackprint.github.io/tree/master/docs/${My.treePath}.md`;
+		window.open(url, '_blank');
 	}
 
 	function refreshURL(){
