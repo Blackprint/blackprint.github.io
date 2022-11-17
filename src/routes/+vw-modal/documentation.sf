@@ -400,7 +400,8 @@ sf.model('documentation', function(My){
 	}
 
 	My.editDocs = function(){
-		let url = `https://github.com/Blackprint/blackprint.github.io/tree/master/docs/${My.treePath}.md`;
+		let path = (My.treePath || 'Home').split('_').join(' ');
+		let url = `https://github.com/Blackprint/blackprint.github.io/tree/master/docs/${path}.md`;
 		window.open(url, '_blank');
 	}
 
