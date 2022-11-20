@@ -9,6 +9,7 @@
 	</div>
 	<div class="{{ type === 'node' ? '' : 'hide-this' }} node">
 		<div class="path">Path: <span>{{ node.path }}</span></div>
+		<div class="id" style="display: {{ node.id ? '' : 'none' }}">ID: <span>{{ node.id }}</span></div>
 		<div class="desc">{{ node.desc }}</div>
 	</div>
 </sf-m>
@@ -34,7 +35,7 @@ sf-m[name="tooltip"]{
 		font-size: 16px;
 	}
 
-	.type, .feature {
+	.type, .feature, .id {
 		color: gray;
 		span{
 			font-weight: bold;
@@ -42,7 +43,7 @@ sf-m[name="tooltip"]{
 		}
 	}
 
-	.feature span{
+	.feature span, .id span{
 		color: white;
 	}
 
@@ -104,6 +105,7 @@ var ToolTip = sf.model('tooltip', function(My){
 		else if(type === 'node'){
 			My.node.path = data.namespace;
 			My.node.desc = data.docs?.description || '';
+			My.node.id = data.id;
 		}
 		else if(type === 'port'){
 			let typeName = data.type.name;
