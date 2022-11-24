@@ -176,7 +176,12 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 
 				await sketch.importJSON(My.pendingLoad);
 			} catch(e) {
-				SmallNotif.add("Failed to import data", 'red');
+				SmallNotif.add("Failed to import instance from JSON, please do a clean import again", 'red');
+
+				// Clear toast
+				let list = SmallNotif.list;
+				list.splice(list.indexOf(progressToast), 1);
+
 				throw e;
 			} finally {
 				delete sketch.__importing;

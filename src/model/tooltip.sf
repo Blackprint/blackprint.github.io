@@ -108,7 +108,7 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.node.id = data.id;
 		}
 		else if(type === 'port'){
-			let typeName = data.type.name;
+			let typeName = data.type.name || '';
 			let feature = '';
 			if(typeName.includes('BP-Union')){
 				typeName = typeName.replace(/BP\-.*? /g, '');
