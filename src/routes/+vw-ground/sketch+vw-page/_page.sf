@@ -403,8 +403,10 @@ sf.component('sketch-page', function(My){
 			.removeClass('debug-cable')
 			.removeClass('debug-next');
 
-		let bottomPanel = My.panels.bottom;
+		// Remove all port value display element from the last pause session
+		My.$el('editor-display-port-value').remove();
 
+		let bottomPanel = My.panels.bottom;
 		if(cable != null){
 			let el = sketch.scope('cables').list.getElement(cable);
 			$('path', el).addClass('debug-cable');
@@ -441,7 +443,38 @@ sf.component('sketch-page', function(My){
 			bottomPanel.noteTitle = `Updating: `;
 			bottomPanel.note = `${beforeNode.iface.title}`;
 		}
+
+		// Display every port value
+		if(beforeNode != null) showPortValue(beforeNode);
+		if(afterNode != null) showPortValue(afterNode);
 	});
+
+	function showPortValue(node){
+		let { input, output } = node.iface;
+		for(let key in input){
+			let port = input[key];
+
+			if(port.type === Function
+				|| port.type === Blackprint.Types.Route
+				|| port.type === Blackprint.Types.Slot) continue;
+
+			port.insertComponent(null, 'editor-display-port-value', {
+				value: port._oldCache ?? port._cache ?? port.value ?? port.default,
+			});
+		}
+
+		for(let key in output){
+			let port = output[key];
+
+			if(port.type === Function
+				|| port.type === Blackprint.Types.Route
+				|| port.type === Blackprint.Types.Slot) continue;
+
+			port.insertComponent('.name', 'editor-display-port-value', {
+				value: port.value ?? port.default,
+			});
+		}
+	}
 
 	Blackprint.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();

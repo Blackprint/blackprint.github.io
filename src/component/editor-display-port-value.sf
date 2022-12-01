@@ -1,0 +1,57 @@
+## html
+<editor-display-port-value  style="display: {{ visible ? '' : 'none' }}">
+	{{ _value }}
+</editor-display-port-value>
+
+## scss-global
+editor-display-port-value {
+	background: black;
+	padding: 1px 5px;
+	border: 2px solid #bd8352;
+	box-shadow: inset 0 0 8px #ff9f4c;
+	border-radius: 20px;
+	position: absolute;
+	max-width: 50px;
+	overflow: hidden;
+	font-size: 12px;
+	text-overflow: ellipsis;
+	min-width: 60%;
+    min-height: 12px;
+
+	&:hover{
+		max-width: 50vw;
+		font-size: 14px;
+		padding: 5px 10px;
+		margin-top: -5px;
+		box-shadow: 0 0 8px #ff9f4c;
+	}
+}
+
+.output editor-display-port-value {
+	right: 20px;
+}
+
+.input editor-display-port-value {
+	left: 20px;
+}
+
+## js-global
+Blackprint.space.component('editor-display-port-value', {
+	template: #this.path
+}, (My, root, item) => {
+	My._value = '';
+	My.visible = true;
+
+	My.setValue = function(val){
+		if(val == null) return My._value = '';
+
+		if(val instanceof Function){
+			My.visible = false;
+			return;
+		}
+
+		My._value = JSON.stringify(val);
+	}
+
+	if(item != null) My.setValue(item.value);
+});
