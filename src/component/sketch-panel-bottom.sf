@@ -1,12 +1,25 @@
 ## html
-<sketch-panel-bottom class="panel {{ opened ? 'opened' : ''}}" @contextmenu="SmallNotif.add('Some panels still WIP')">
+<sketch-panel-bottom class="panel {{ opened ? 'opened' : '' }}" @contextmenu="SmallNotif.add('Some panels still WIP')">
 	<div class="opener" @click="opened ? closePanel(event) : openPanel()">
 		<i class="fas fa-chevron-{{ opened ? 'down' : 'up' }}"></i>
 	</div>
 	<div class="content">
-		This editor still in development (≧▽≦)／<br>
-		I want to make it better and easier to use.<br>
-		Please use right click to open drop down menu for the cable, node, container, or port.
+		<div class="buttons">
+			<div @click="executionPauseSwitch" class="button {{
+				execOrder.pause && execOrder.length === 0 && !execOrder._hasStepPending ? 'inactive' : ''
+			}}"><i class="fa fa-{{ execOrder.pause ? 'play' : 'pause' }}"></i> {{
+				execOrder.pause ? 'Next' : 'Pause'
+			}}</div>
+			<div class="button {{ execOrder.stepMode ? 'active' : '' }}" @click="executionStepMode">
+				<i class="fa fa-shoe-prints"></i> Step Mode
+			</div>
+			<div class="button" @click="sketchRefresh"><i class="fa fa-sitemap"></i> Refresh</div>
+			<div class="button debug-desc">{{ noteTitle }} <span>{{ note }}</span></div>
+		</div>
+		<div class="description">
+			This editor still in development (≧▽≦)／<br>
+			I want to make it better and easier to use.<br>
+		</div>
 	</div>
 </sketch-panel-bottom>
 
@@ -35,6 +48,67 @@ sketch-page > .panels sketch-panel-bottom {
 		width: 100%;
 		padding: 10px;
 		color: #ffffff8a;
+
+		.buttons {
+			background: #0000004a;
+			border: 1px solid #747474;
+			border-radius: 50px;
+			height: 24px;
+			text-align: left;
+			margin-top: 5px;
+			padding: 0 10px;
+			display: flex;
+			user-select: none;
+
+			.button {
+				color: white;
+				font-size: 16px;
+				line-height: 26px;
+				padding: 0 10px;
+				min-width: 70px;
+				cursor: pointer;
+
+				&.inactive{
+					color: grey;
+
+					&:hover{
+						text-shadow: unset;
+					}
+				}
+
+				&:hover{
+					text-shadow: 0 0 5px white;
+				}
+
+				& + .button{
+					border-left: 1px dashed white;
+				}
+
+				&.active {
+					color: yellow;
+				}
+
+				&.debug-desc {
+					padding-left: 50px;
+					cursor: unset;
+					color: grey;
+
+					span{
+						color: white;
+					}
+
+					&:hover{
+						text-shadow: unset;
+					}
+				}
+			}
+		}
+
+		.description{
+			bottom: 10px;
+			position: absolute;
+			width: 100%;
+		}
 	}
 	.opener{
 		cursor: pointer;
@@ -66,15 +140,52 @@ sketch-page > .panels sketch-panel-bottom {
 ## js-global
 sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 	My.opened = false;
+	My.sketchPage = null;
+	My.instance = null;
+	My.execOrder = null;
+	My.noteTitle = '';
+	My.note = '';
 
-	My.init = function(){
-		let sketchPage = My.$el.parent('sketch-page')[0].model;
-		sketchPage.panels.bottom = My;
+	My.beforeInit = async function(){
+		await new Promise(resolve => {
+			$(()=> setTimeout(resolve, 500));
+		});
+
+		My.sketchPage = $('vw-page > .page-current > sketch-page')[0].model;
+		My.sketchPage.panels.bottom = My;
+		My.instance = My.sketchPage.sketch;
+		My.execOrder = My.instance.executionOrder;
 	}
 
 	function removeBlur(){
 		My.$el.css('backdrop-filter', 'none');
 		setTimeout(()=> My.$el.css('backdrop-filter', ''), 300);
+	}
+
+	My.executionPauseSwitch = function(){
+		let executionOrder = My.instance.executionOrder;
+
+		if(executionOrder.pause){
+			My.sketchPage.$el('.debug-after-node, .debug-next, .debug-cable')
+				.removeClass('debug-after-node')
+				.removeClass('debug-cable')
+				.removeClass('debug-next');
+
+			My.noteTitle = My.note = '';
+			executionOrder.next(true);
+		}
+		else executionOrder.pause = true;
+	}
+
+	My.executionStepMode = function(){
+		let executionOrder = My.instance.executionOrder;
+		executionOrder.stepMode = !executionOrder.stepMode;
+
+		if(executionOrder.stepMode) executionOrder.pause = true;
+	}
+
+	My.sketchRefresh = function(){
+		CurrentSketch.recalculatePosition();
 	}
 
 	My.openPanel = function(){

@@ -397,6 +397,52 @@ sf.component('sketch-page', function(My){
 		NodeHoverInfo(ev, false);
 	});
 
+	sketch.on('execution.paused', {slot: 'bp-editor'}, ({ cable, cables, afterNode, beforeNode, triggerSource }) => {
+		My.$el('.debug-after-node, .debug-next, .debug-cable')
+			.removeClass('debug-after-node')
+			.removeClass('debug-cable')
+			.removeClass('debug-next');
+
+		let bottomPanel = My.panels.bottom;
+
+		if(cable != null){
+			let el = sketch.scope('cables').list.getElement(cable);
+			$('path', el).addClass('debug-cable');
+
+			beforeNode?.iface.$el.addClass('debug-next');
+			afterNode?.iface.$el.addClass('debug-after-node');
+
+			let { input, output } = cable;
+
+			// 0 = execution order, 1 = route, 2 = trigger port, 3 (ToDo) = request
+			if(triggerSource === 1){ // route
+				bottomPanel.noteTitle = `Routing: `;
+				bottomPanel.note = `${output.iface.title} -> ${input?.iface.title || "Stop"}`;
+			}
+			else if(triggerSource === 2){ // trigger port
+				bottomPanel.noteTitle = `Calling Trigger: `;
+				bottomPanel.note = `${output.iface.title} -> ${input.iface.title}`;
+			}
+			else if(triggerSource === 3){ // request
+				bottomPanel.noteTitle = `Request Value: `;
+				bottomPanel.note = `${input.iface.title} -> ${output.iface.title}`;
+			}
+		}
+		else if(beforeNode != null){ // triggerSource == 0 (execution order)
+			if(cables != null){
+				let cableList = sketch.scope('cables').list;
+				for(let i=0; i < cables.length; i++){
+					let el = cableList.getElement(cables[i]);
+					$('path', el).addClass('debug-cable');
+				}
+			}
+
+			beforeNode.iface.$el.addClass('debug-next');
+			bottomPanel.noteTitle = `Updating: `;
+			bottomPanel.note = `${beforeNode.iface.title}`;
+		}
+	});
+
 	Blackprint.settings('visualizeFlow', true);
 	My.space ??= sketch.cloneContainer();
 
