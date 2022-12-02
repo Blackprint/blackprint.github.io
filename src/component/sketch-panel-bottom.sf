@@ -145,6 +145,7 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 	My.execOrder = null;
 	My.noteTitle = '';
 	My.note = '';
+	My.stepModeIsRequesting = '';
 
 	My.beforeInit = async function(){
 		await new Promise(resolve => {
@@ -164,14 +165,19 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 
 	My.executionPauseSwitch = function(){
 		let executionOrder = My.instance.executionOrder;
+		My.sketchPage.$el('.debug-after-node, .debug-next, .debug-cable')
+			.removeClass('debug-after-node')
+			.removeClass('debug-cable')
+			.removeClass('debug-next');
+
+		if(!My.stepModeIsRequesting){
+			// Remove all port value display element from the last pause session
+			My.sketchPage.$el('editor-display-port-value').remove();
+		}
 
 		if(executionOrder.pause){
-			My.sketchPage.$el('.debug-after-node, .debug-next, .debug-cable')
-				.removeClass('debug-after-node')
-				.removeClass('debug-cable')
-				.removeClass('debug-next');
-
 			My.noteTitle = My.note = '';
+			executionOrder.pause = false;
 			executionOrder.next(true);
 		}
 		else executionOrder.pause = true;

@@ -398,15 +398,15 @@ sf.component('sketch-page', function(My){
 	});
 
 	sketch.on('execution.paused', {slot: 'bp-editor'}, ({ cable, cables, afterNode, beforeNode, triggerSource }) => {
+		let bottomPanel = My.panels.bottom;
+		let portValueDisplay = My.$el('editor-display-port-value');
+		bottomPanel.stepModeIsRequesting = false;
+
 		My.$el('.debug-after-node, .debug-next, .debug-cable')
 			.removeClass('debug-after-node')
 			.removeClass('debug-cable')
 			.removeClass('debug-next');
 
-		// Remove all port value display element from the last pause session
-		My.$el('editor-display-port-value').remove();
-
-		let bottomPanel = My.panels.bottom;
 		if(cable != null){
 			let el = sketch.scope('cables').list.getElement(cable);
 			$('path', el).addClass('debug-cable');
@@ -428,6 +428,7 @@ sf.component('sketch-page', function(My){
 			else if(triggerSource === 3){ // request
 				bottomPanel.noteTitle = `Request Value: `;
 				bottomPanel.note = `${input.iface.title} -> ${output.iface.title}`;
+				bottomPanel.stepModeIsRequesting = true;
 			}
 		}
 		else if(beforeNode != null){ // triggerSource == 0 (execution order)
@@ -444,9 +445,26 @@ sf.component('sketch-page', function(My){
 			bottomPanel.note = `${beforeNode.iface.title}`;
 		}
 
+		if(!bottomPanel.stepModeIsRequesting){
+			// Remove all port value display element from the last pause session
+			My.$el('editor-display-port-value').remove();
+		}
+		else { // Update output port value 
+			for(let i=0; i < portValueDisplay.length; i++){
+				let display = portValueDisplay[i];
+				let port = display.parentNode.model;
+				display.model.setValue(port._cache ?? port.value ?? port.default);
+			}
+		}
+
 		// Display every port value
 		if(beforeNode != null) showPortValue(beforeNode);
-		if(afterNode != null) showPortValue(afterNode);
+		if(afterNode != null && triggerSource !== 0) showPortValue(afterNode);
+		else if(cables != null){
+			for(let i=0; i < cables.length; i++){
+				showPortValue(cables[i].output.iface.node);
+			}
+		}
 	});
 
 	function showPortValue(node){
