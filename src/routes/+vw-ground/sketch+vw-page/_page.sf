@@ -483,14 +483,12 @@ sf.component('sketch-page', function(My){
 
 		for(let key in output){
 			let port = output[key];
+			let value = port.value ?? port.default;
 
-			if(port.type === Function
-				|| port.type === Blackprint.Types.Route
-				|| port.type === Blackprint.Types.Slot) continue;
+			// Only show value from primitive type and null/empty
+			if(value != null && port.type instanceof Object) continue;
 
-			port.insertComponent('.name', 'editor-display-port-value', {
-				value: port.value ?? port.default,
-			});
+			port.insertComponent('.name', 'editor-display-port-value', { value });
 		}
 	}
 
