@@ -471,22 +471,26 @@ sf.component('sketch-page', function(My){
 		let { input, output } = node.iface;
 		for(let key in input){
 			let port = input[key];
+			let value = port._oldCache ?? port._cache ?? port.value ?? port.default;
 
-			if(port.type === Function
-				|| port.type === Blackprint.Types.Route
-				|| port.type === Blackprint.Types.Slot) continue;
+			// Only show value from primitive type and null/empty and no port feature
+			if(port.feature != null || value != null
+				&& port.type !== String
+				&& port.type !== Boolean
+				&& port.type !== Number) continue;
 
-			port.insertComponent(null, 'editor-display-port-value', {
-				value: port._oldCache ?? port._cache ?? port.value ?? port.default,
-			});
+			port.insertComponent(null, 'editor-display-port-value', { value });
 		}
 
 		for(let key in output){
 			let port = output[key];
 			let value = port.value ?? port.default;
 
-			// Only show value from primitive type and null/empty
-			if(value != null && port.type instanceof Object) continue;
+			// Only show value from primitive type and null/empty and no port feature
+			if(port.feature != null || port.type === Function || value != null
+				&& port.type !== String
+				&& port.type !== Boolean
+				&& port.type !== Number) continue;
 
 			port.insertComponent('.name', 'editor-display-port-value', { value });
 		}
