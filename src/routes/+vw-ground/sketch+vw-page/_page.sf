@@ -471,7 +471,7 @@ sf.component('sketch-page', function(My){
 		let { input, output } = node.iface;
 		for(let key in input){
 			let port = input[key];
-			let value = port._oldCache ?? port._cache ?? port.value ?? port.default;
+			let value = port._cache ?? port._oldCache ?? port.value ?? port.default;
 
 			// Only show value from primitive type and null/empty and no port feature
 			if(port.feature != null || value != null
