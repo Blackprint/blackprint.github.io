@@ -82,6 +82,4 @@ $(function(){
 
 		delete list.Example; // Delete example nodes from suggestion
 	});
-
-	Blackprint.nodes.BP.hidden = true;
 });
