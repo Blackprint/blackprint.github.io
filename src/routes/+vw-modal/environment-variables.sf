@@ -9,7 +9,7 @@
 		<div>
 			<div class="row" sf-each="x in list" @keyup="itemChanged(x, event)">
 				<input class="column key" type="text" @input="renameEnv(x, this)" value="{{ x.key }}" placeholder="...">
-				<input class="column bpe-value" type="text" value="{{ x.value }}" placeholder="...">
+				<input class="column bpe-value" type="{{ showValue ? 'text' : 'password' }}" value="{{ x.value }}" placeholder="...">
 			</div>
 		</div>
 		<div class="row">
@@ -104,10 +104,6 @@ sf.model('environment-variables', function(My){
 	My.newValue = '';
 	My.newKey = '';
 	My.showValue = false;
-
-	My.on$showValue = function(now){
-		My.$el('.bpe-value').attr('type', now ? 'text' : 'password');
-	}
 
 	My.v2m$newKey = function(now){
 		now = My.validateKey(now);
