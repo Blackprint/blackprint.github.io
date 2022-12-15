@@ -83,3 +83,8 @@ $(function(){
 		delete list.Example; // Delete example nodes from suggestion
 	});
 });
+
+$(function(){
+	if(window.SmallNotif == null)
+		alert("This editor doesn't seems supported for your browser, please try using Chromium based browser instead");
+});
