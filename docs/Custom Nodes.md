@@ -1,5 +1,5 @@
 <center>
-Blackprint is designed to be modular and it's structured like below:
+Blackprint is designed to be modular and it has relation like below:
 
 ![brave_kJ1dlxFYQI](https://user-images.githubusercontent.com/11073373/185061030-a0bd75e0-e665-4462-8bdc-463e1945039b.jpg)
 </center>
