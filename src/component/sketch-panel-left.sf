@@ -294,10 +294,13 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			}
 		}
 
+		reSort(obj);
+		return len;
+	}
+
+	function reSort(obj){
 		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b));
 		obj.refresh?.();
-
-		return len;
 	}
 
 	let pendingRefreshModule;
@@ -414,7 +417,10 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 		if(hidden)
 			parent.addClass("collapsed");
-		else parent.removeClass("collapsed");
+		else {
+			if(el.model != null) reSort(el.parentNode.model);
+			parent.removeClass("collapsed");
+		}
 	}
 
 	My.collapseSubPanel = (el, isMain) => {
