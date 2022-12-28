@@ -8,7 +8,7 @@ $(()=>{
 		SmallNotif.add("Loading required nodes", 'yellow', 500);
 
 		// Load nodes for data manipulation
-		Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.6/dist/nodes-data.mjs', {
+		Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.7/dist/nodes-data.mjs', {
 			loadBrowserInterface: true
 		});
 	}, 3000);
