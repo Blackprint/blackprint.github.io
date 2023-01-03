@@ -75,6 +75,7 @@ sf.model('custom-node-editor', function(My){
 		if(My.editor) return;
 
 		My.editor && My.editor.dispose();
+		refreshTypes();
 
 		setTimeout(()=> {
 			let statusEl = My.container.find('.bp-loading-status');
@@ -88,6 +89,38 @@ sf.model('custom-node-editor', function(My){
 
 			statusEl.css('display', 'none');
 		}, 1000);
+	}
+
+	let typeRefreshed = false;
+	async function refreshTypes(){
+		if(typeRefreshed) return;
+		typeRefreshed = true;
+
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(
+			"declare module 'scarletsframe' { " + await $.get('https://cdn.jsdelivr.net/gh/ScarletsFiction/ScarletsFrame@b3c4a8cf3a8036558a7bc96eeaede2f4f84feb49/src/index.d.ts')+' }',
+			'file:///node_modules/scarletsframe/index.d.ts'
+		);
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(
+			"declare module '@blackprint/engine' { " + await $.get('https://cdn.jsdelivr.net/gh/Blackprint/engine-js@7a4d820a58019a4c256276d4841723cd35a3660c/src/index.d.ts')+' }',
+			'file:///node_modules/@blackprint/engine/index.d.ts'
+		);
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(
+			"declare module '@blackprint/engine/skeleton' { " + await $.get('https://cdn.jsdelivr.net/gh/Blackprint/engine-js@7a4d820a58019a4c256276d4841723cd35a3660c/src/skeleton/index.d.ts')+' }',
+			'file:///node_modules/@blackprint/engine/skeleton/index.d.ts'
+		);
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(
+			"declare module '@blackprint/sketch' { " + await $.get('https://cdn.jsdelivr.net/gh/Blackprint/Blackprint@db21218ba05533ff1d5e2f2d6ea8075fd31c1f8a/src/index.d.ts')+' }',
+			'file:///node_modules/@blackprint/sketch/index.d.ts'
+		);
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(`
+			import * as BP from "@blackprint/sketch";
+			import * as SF from "scarletsframe";
+			declare global {
+				const Blackprint = BP;
+				const sf = SF;
+				const Context = {};
+			}
+		`, 'global.d.ts');
 	}
 
 	// This only runnable on development mode editor
