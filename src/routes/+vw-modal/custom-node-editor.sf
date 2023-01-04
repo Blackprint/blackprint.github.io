@@ -118,6 +118,8 @@ sf.model('custom-node-editor', function(My){
 			declare global {
 				const Blackprint = BP;
 				const sf = SF;
+
+				/** This can be obtained with Blackprint.getContext("YourModuleContext") */
 				const Context = {};
 			}
 		`, 'global.d.ts');
