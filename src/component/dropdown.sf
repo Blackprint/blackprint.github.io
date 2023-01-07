@@ -121,6 +121,10 @@
 		position: absolute;
 		right: 5px;
 	}
+
+	li > a > span {
+		padding-right: 6px;
+	}
 }
 
 
