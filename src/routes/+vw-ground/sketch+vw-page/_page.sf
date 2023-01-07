@@ -233,6 +233,32 @@ sf.component('sketch-page', function(My){
 		}
 	});
 
+	function simplifyNamespacePath(list, _deep=0){
+		let len = 0, val = null;
+		for(let key in list) len++;
+		for(var key in list) {
+			val = list[key];
+			if(val.constructor === Object){
+				let {
+					len: _len,
+					key: _key,
+					list: _list,
+					val: _val
+				} = simplifyNamespacePath(val, _deep+1);
+
+				if(_deep !== 0 && len === 1 && _len === 1){
+					delete list[key];
+					key = key+'/'+_key;
+					list[key] = _val;
+					val = _val;
+				}
+			}
+		}
+
+		if(_deep === 0) return list;
+		return { len, key, list, val };
+	}
+
 	sketch.on('cable.dropped', {slot: 'bp-editor'}, ev => {
 		let event = ev.event;
 
@@ -332,7 +358,7 @@ sf.component('sketch-page', function(My){
 			if(funcList.length !== 0) menu.push({title: "Functions", deep: funcList});
 		});
 
-		let suggestedNode = Blackprint.Sketch.suggestNodeForPort(ev.port);
+		let suggestedNode = simplifyNamespacePath(Blackprint.Sketch.suggestNodeForPort(ev.port));
 		container.nodeScope.menu(event, suggestedNode, {
 			onCreated(iface){
 				let owner = ev.cable.owner;
