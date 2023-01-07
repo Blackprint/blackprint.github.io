@@ -394,6 +394,15 @@ sf.component('sketch-page', function(My){
 		position.hasSearch = true;
 		position.searchObject = Blackprint._docs;
 		position.title = "Create Node";
+
+		sort(menu);
+		function sort(obj){
+			obj.sort((a, b) => a.title.localeCompare(b.title));
+			for (let i=0; i < obj.length; i++) {
+				if(obj.deep != null) sort(obj.deep);
+			}
+		}
+
 		DropDown.show(menu, position);
 	});
 
