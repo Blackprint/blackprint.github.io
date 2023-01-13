@@ -78,22 +78,6 @@ function SuggestNodeTypeCaster(ev){
 			}
 		});
 	}
-	else if(!SuggestNodeTypeCaster.primitive.has(output.type) && SuggestNodeTypeCaster.primitive.has(input.type)){
-		if(output.feature != null || input.feature != null) return;
-
-		handler(() => {
-			let iface = SuggestNodeTypeCaster.createNode('Data/Object/GetValue', ev, input);
-
-			if(cable.owner === output){
-				iface.input.Object.connectCable(cable);
-				iface.output.Value.connectPort(input);
-			}
-			else {
-				iface.input.Object.connectPort(output);
-				iface.output.Value.connectCable(cable);
-			}
-		});
-	}
 }
 
 SuggestNodeTypeCaster.primitive = new Set([String, Number, Boolean, BigInt]);
