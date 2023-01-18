@@ -175,7 +175,7 @@ sketch-page > .panels sketch-panel-left {
 			// border-bottom: 1px dashed white;
 			max-width: 200px;
 			max-height: 200px;
-			overflow: hidden;
+			// overflow: hidden;
 			.zoom{
 	    		transform-origin: left top;
 			}
