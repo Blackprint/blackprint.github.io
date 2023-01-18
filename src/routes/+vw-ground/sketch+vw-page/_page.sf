@@ -141,6 +141,9 @@ sf.component('sketch-page', function(My){
 		}
 	};
 
+	// To avoid duplicated event registration on hot reload
+	let EventSlot = {slot: 'bp-editor'};
+
 	// URL: #page/sketch/{data.page}
 	let sketch;
 	if(views.data.bpInstance == null){
@@ -189,20 +192,20 @@ sf.component('sketch-page', function(My){
 	sketch._event.$_fallback = BlackprintEventFallback;
 
 	// path: /src/global/SuggestNodeTypeCaster.js
-	sketch.on('port.cable.test', {slot: 'bp-editor'}, SuggestNodeTypeCaster);
-	sketch.on('port.hover node.hover', {slot: 'bp-editor'}, ev => {
+	sketch.on('port.cable.test', EventSlot, SuggestNodeTypeCaster);
+	sketch.on('port.hover node.hover', EventSlot, ev => {
 		ev.instance = sketch;
 
 		if(ev.port != null) PortHoverInfo(ev, true);
 		if(ev.iface != null) NodeHoverInfo(ev, true);
 	});
-	sketch.on('port.unhover node.unhover', {slot: 'bp-editor'}, ev => {
+	sketch.on('port.unhover node.unhover', EventSlot, ev => {
 		ev.instance = sketch;
 
 		if(ev.port != null) PortHoverInfo(ev, false);
 		if(ev.iface != null) NodeHoverInfo(ev, false);
 	});
-	sketch.on('port.menu', {slot: 'bp-editor'}, ev => {
+	sketch.on('port.menu', EventSlot, ev => {
 		let iface = ev.port.iface;
 		if(iface.interface === "BPIC/BP/Fn/Main"){
 			ev.menu.push({
@@ -233,6 +236,37 @@ sf.component('sketch-page', function(My){
 		}
 	});
 
+	sketch.on('cable.created cable.drag', EventSlot, ({ event, cable }) => {
+		if(event == null)
+			return; // Skip if cable is not created manually by user
+
+		sketch.once('cable.dropped cable.connect cable.deleted', listen);
+		function listen(){
+			sketch.off('cable.dropped cable.connect cable.deleted', listen);
+
+			let nodesContainer = CurrentSketch.scope('nodes');
+			nodesContainer.$el('.bp-suggest-light').removeClass('bp-suggest-light');
+		}
+
+		let port = cable.owner;
+		let type = port.virtualType || port.type;
+		let target = port.source === 'input' ? 'output' : 'input';
+
+		let list = sketch.ifaceList;
+		for (let i=0; i < list.length; i++) {
+			let temp = list[i];
+			let ports = temp[target];
+			if(ports == null) continue;
+
+			for (let key in ports) {
+				let port = ports[key];
+				if(type === (port.virtualType || port.type)){
+					port.iface.$el.addClass('bp-suggest-light');
+				}
+			}
+		}
+	});
+
 	function simplifyNamespacePath(list, _deep=0){
 		let len = 0, val = null;
 		for(let key in list) len++;
@@ -259,7 +293,7 @@ sf.component('sketch-page', function(My){
 		return { len, key, list, val };
 	}
 
-	sketch.on('cable.dropped', {slot: 'bp-editor'}, ev => {
+	sketch.on('cable.dropped', EventSlot, ev => {
 		let event = ev.event;
 
 		if(event.ctrlKey || !ev.afterCreated || ev.cable.isRoute) return;
@@ -359,6 +393,18 @@ sf.component('sketch-page', function(My){
 		});
 
 		let suggestedNode = simplifyNamespacePath(Blackprint.Sketch.suggestNodeForPort(ev.port));
+
+		// Suggest for object deconstruction node
+		if(ev.port.type instanceof Object){
+			let refA = suggestedNode;
+			let refB = Blackprint.nodes;
+
+			refA.Data ??= {};
+			refA.Data.Object ??= {};
+			refA.Data.Object.Get = refB.Data.Object.Get;
+			refA.Data.Object.Deconstructor = refB.Data.Object.Deconstructor;
+		}
+
 		container.nodeScope.menu(event, suggestedNode, {
 			onCreated(iface){
 				let owner = ev.cable.owner;
@@ -406,7 +452,7 @@ sf.component('sketch-page', function(My){
 		DropDown.show(menu, position);
 	});
 
-	sketch.on('node.function.open', {slot: 'bp-editor'}, async ev => {
+	sketch.on('node.function.open', EventSlot, async ev => {
 		let name = ev.iface.namespace.split('/').join('-');
 		name += '-'+ev.iface.uniqId;
 
@@ -427,12 +473,12 @@ sf.component('sketch-page', function(My){
 
 	// This may cause one memory leak because this will never being cleared
 	// But will only be replaced if the user is clicked other nodes
-	sketch.on('node.click', {slot: 'bp-editor'}, ev => {
+	sketch.on('node.click', EventSlot, ev => {
 		My.panels.right.selectNode(ev.iface);
 		NodeHoverInfo(ev, false);
 	});
 
-	sketch.on('execution.paused', {slot: 'bp-editor'}, ({ cable, cables, afterNode, beforeNode, triggerSource }) => {
+	sketch.on('execution.paused', EventSlot, ({ cable, cables, afterNode, beforeNode, triggerSource }) => {
 		let bottomPanel = My.panels.bottom;
 		let portValueDisplay = My.$el('editor-display-port-value');
 		bottomPanel.stepModeIsRequesting = false;
