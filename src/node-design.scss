@@ -71,6 +71,11 @@ sf-space[blackprint]{
 			outline: 2px solid #27ff00;
 			box-shadow: 0 0 10px 3px #62ff00;
 		}
+
+		.bp-suggest-light .node {
+			outline: 1px solid #ffe000;
+    		box-shadow: 0 0 10px 3px yellow;
+		}
 	}
 
 	.cables {
