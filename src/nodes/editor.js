@@ -16,12 +16,37 @@ class extends Blackprint.Node {
 
 	update(){
 		let { page } = this.instance;
-		page.panels.left.setPreview(this.input.Element);
+
+		let el = this.input.Element;
+
+		// Remove first from preview if the input is null
+		if(el == null)
+			page.panels.left.setPreview(el);
+
+		this._returnOldEl();
+
+		let left = this.instance.page.panels.left;
+		if(el != null){
+			left._oldEl = el;
+			left._oldParentEl = el.parentNode;
+			left._oldNextEl = el.nextSibling;
+		}
+		else left._oldEl = left._oldParentEl = left._oldNextEl = null;
+		page.panels.left.setPreview(el);
+	}
+
+	_returnOldEl(){
+		let left = this.instance.page.panels.left;
+
+		if(left._oldEl != null && left._oldParentEl != null)
+			left._oldParentEl.insertBefore(left._oldEl, left._oldNextEl);
 	}
 
 	destroy(){
-		if(this.input.Element != null)
+		if(this.input.Element != null){
 			this.instance.page.panels.left.setPreview(null);
+			this._returnOldEl();
+		}
 	}
 });
 
