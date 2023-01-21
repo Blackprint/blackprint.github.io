@@ -40,14 +40,18 @@
 				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/python/python-plain.svg" style="max-width: 45px;margin-bottom: 2px;">
 				<div class="name">Python</div>
 			</a>
+			<!--a class="item" href="https://github.com/Blackprint/engine-csharp" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/csharp/csharp-plain.svg">
+				<div class="name">C#</div>
+			</a-->
 		</div>
 	</div>
 </sf-m>
 
 <div class="welcome-left">
-	<a target="_blank" href="https://ko-fi.com/stefansarya">
+	<!--a target="_blank" href="https://ko-fi.com/stefansarya">
 		<i class="fas fa-mug-hot"></i> Ko-fi
-	</a>
+	</a-->
 	<a target="_blank" href="https://github.com/Blackprint/Blackprint">
 		<i class="fab fa-github"></i> GitHub
 	</a>
@@ -104,9 +108,7 @@
 		width: 100vw;
 		left: 0;
 		position: absolute;
-		.title{
-
-		}
+		// .title{ }
 		.list .item{
 			width: 50px;
 			img{
