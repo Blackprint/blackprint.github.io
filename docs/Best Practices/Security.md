@@ -4,6 +4,7 @@ For your information, **Blackprint Engine** and **Sketch** didn't use any `eval`
   - This documentation is made and open sourced on GitHub [repository](https://github.com/Blackprint/blackprint.github.io/tree/master/docs)
 - Creating a custom node with Monaco code editor (triggered when you click the execute button)
   - It's a facilities from <a onclick="Modal.goto('/custom-node-editor')">this editor</a>
+- ScarletsFrame's framework does use `Function(...)` when compiling HTML templates.
 
 ### Creating HTML Template
 When you want to create a user interface template for Blackprint Sketch, it will use ScarletsFrame to help rendering your template into HTML elements. ScarletsFrame will automatically escape contents that being outputted from the mustache template, for the example:
@@ -144,3 +145,17 @@ Below is an evaluated example inside this editor, try inspect it with DevTools a
 
 ## Secure your application with Content Security Policy
 It's recommended to have CSP enable for your site. Even you're 100% sure about your library or backend security, if you didn't enable this security then your client network or browser can still be vulnerable to script injection. You should only allow (whitelist) any network request into your trusted domain only and resource from unknown domain will be restricted by default. CSP can also help you mitigate any `eval` or `Function` usage in your application. It's very **not recommended** to use `eval` if the **string content is dynamic** and can coming from other source like user input, you should find alternative way instead and remove `eval`.
+
+If you're disabling eval, **Blackprint Engine** must be used on production as **Blackprint Sketch** is using **ScarletsFrame** to help compiling HTML templates on the fly. Compiling HTML templates dynamically may use `Function(...)`.
+
+As long the templates can't be manipulated or created dynamically by user input, doesn't execute user input, and the output is sanitized, it still safe.
+
+### CSP Example
+For example and information please visit https://content-security-policy.com/<br>
+Ultimately just make default to none and just enable/allow source that you recognize.
+
+```html
+<head>
+	<meta http-equiv="Content-Security-Policy" content="default-src none;">
+</head>
+```
