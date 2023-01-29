@@ -8,7 +8,7 @@ But the choice is still yours depends on your application's cases, Blackprint wi
 ---
 
 ### Hint
-Below is few hint to help avoid performance impact for your application:
+Below is few hint to help reduce performance impact for your application:
 1. Less node is better than many nodes
     - Try to simplify multiple node into a single node with native code if possible
     - Convert some of your function node to native code if possible
@@ -25,3 +25,6 @@ Below is few hint to help avoid performance impact for your application:
 7. When you're creating a module, try to compare your code with some alternative code and benchmark it and use the fastest one if possible
     - For JavaScript you can use JSBench for benchmarking
     - Example: `.forEach(...)` is slower than `for(let i=0; ...)`
+8. Lock the engine instance with `instance.lock()` on production
+    - This will disabling instance modification like createNode, deleteNode, dynamic cable connection, or port creation/deletion
+    - The engine will do some optimization, and the instance can't be unlocked after being locked
