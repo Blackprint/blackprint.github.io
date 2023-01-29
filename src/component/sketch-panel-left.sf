@@ -27,14 +27,12 @@
 
 				<!-- /src/component/tree-list.sf -->
 				<div class="tree-view tree-group" tree-section="variables" @pointerdown="checkDragNode">
-					<div class="tree-item collapsed" tree-item-key="{{ val.id }}" sf-each="val in variables" style="display: {{ val.hidden ? 'none' : '' }}">
-						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ val.id }}</div>
+					<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in variables" style="display: {{ val.hidden ? 'none' : '' }}">
+						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-						{{@if val.childs != null:
+						{{@if val.constructor === Object:
 							return new $TreeList({
-								parentKey: '',
-								key: val.id,
-								val: val.childs,
+								parentKey: '', key, val,
 								hasChild: varFuncChildCheck
 							});
 						}}
@@ -115,11 +113,9 @@
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-					{{@if val.childs != null:
+					{{@if val.constructor === Object:
 						return new $TreeList({
-							parentKey: '',
-							key,
-							val: val.childs,
+							parentKey: '', key, val,
 							hasChild: varFuncChildCheck
 						});
 					}}
@@ -551,13 +547,13 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 						else if(section === 'privateVars') scope = 1;
 
 						DropDown.show([{
-							title: "Get " + key, callback(){
-								nodeOptions.data = { name: key, scope };
+							title: "Get " + namespace, callback(){
+								nodeOptions.data = { name: namespace, scope };
 								sketch.createNode('BP/Var/Get', nodeOptions);
 							}
 						}, {
-							title: "Set " + key, callback(){
-								nodeOptions.data = { name: key, scope };
+							title: "Set " + namespace, callback(){
+								nodeOptions.data = { name: namespace, scope };
 								sketch.createNode('BP/Var/Set', nodeOptions);
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
