@@ -207,23 +207,23 @@ sf.component('sketch-page', function(My){
 	});
 	sketch.on('port.menu', EventSlot, ev => {
 		let iface = ev.port.iface;
+
+		let cancel = {cancel: true};
+		async function getInput(title, text){
+			let ref = await Swal.fire({
+				title, text, input: "text",
+			});
+
+			if(ref.isConfirmed === false) return cancel;
+			return ref.value;
+		}
+
 		if(iface.interface === "BPIC/BP/Fn/Main"){
 			ev.menu.push({
 				title: "Rename Port",
 				async callback(){
-					let ref = await Swal.fire({
-						title: "Rename port",
-						text: "Current name: "+ev.port.name,
-						input: "text",
-					});
-
-					if(ref.isConfirmed === false) return;
-
-					let val = ref.value;
-					if(val === ''){
-						iface.node.instance.changeNodeId(iface, val);
-						return;
-					}
+					let val = await getInput("Rename port", "Current name: "+ev.port.name);
+					if(val === cancel || !val) return;
 
 					if(iface[ev.port.source][val] != null){
 						SmallNotif.add("Conflicting port name", 'red');
@@ -233,6 +233,48 @@ sf.component('sketch-page', function(My){
 					iface.renamePort(ev.port.source, ev.port.name, val);
 				}
 			});
+		}
+		else if(iface.interface === "BPIC/BP/Event/Emit"
+			|| iface.interface === "BPIC/BP/Event/Listen"
+		){
+			let portSource = iface.interface === "BPIC/BP/Event/Emit" ? 'input' : 'output';
+			ev.menu.push({
+				title: "Add Field",
+				async callback(){
+					let val = await getInput("Add event data's field");
+					if(val === cancel || !val) return;
+
+					if(iface[portSource][val] != null){
+						SmallNotif.add("Conflicting event field name", 'red');
+						return;
+					}
+
+					iface.createField(val);
+				}
+			});
+
+			if(ev.port.type !== Function){
+				ev.menu.push({
+					title: "Rename Field",
+					async callback(){
+						let val = await getInput("Add event data's field", "Current name: "+ev.port.name);
+						if(val === cancel || !val) return;
+
+						if(iface[portSource][val] != null){
+							SmallNotif.add("Conflicting event field name", 'red');
+							return;
+						}
+
+						iface.renameField(ev.port.name, val);
+					}
+				});
+				ev.menu.push({
+					title: "Delete Field",
+					async callback(){
+						iface.deleteField(ev.port.name);
+					}
+				});
+			}
 		}
 	});
 
@@ -433,13 +475,14 @@ sf.component('sketch-page', function(My){
 	});
 
 	let skipMenuHandler = false;
-	Blackprint.on('menu.create.node', function({ menu, position, options, preventDefault }){
+	Blackprint.on('menu.create.node', function({ menu, position, options, event, preventDefault }){
 		if(skipMenuHandler) return;
 		preventDefault();
 
 		position.hasSearch = true;
 		position.searchObject = Blackprint._docs;
 		position.title = "Create Node";
+		position.event = event;
 
 		sort(menu);
 		function sort(obj){
