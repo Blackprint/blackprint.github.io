@@ -9,7 +9,9 @@ This tree list accept: {
 	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if hasChild(val):
-			return new $TreeList({parentKey: parentKey, key, val});
+			return new $TreeList({
+				parentKey: parentKey, key, val, hasChild: hasChild,
+			});
 		}}
 	</div>
 </tree-list>

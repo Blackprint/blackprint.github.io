@@ -31,10 +31,7 @@
 						<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 						{{@if val.constructor === Object:
-							return new $TreeList({
-								parentKey: '', key, val,
-								hasChild: varFuncChildCheck
-							});
+							return new $TreeList({ parentKey: '', key, val });
 						}}
 					</div>
 				</div>
@@ -70,12 +67,11 @@
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcSharedVariable" style="display: {{ val.hidden ? 'none' : '' }}">
 								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-								{{@if val.childs != null:
+								{{@if val.constructor === Object:
 									return new $TreeList({
 										parentKey: '',
 										key,
-										val: val.childs,
-										hasChild: varFuncChildCheck
+										val,
 									});
 								}}
 							</div>
@@ -89,12 +85,11 @@
 							<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in funcVariable" style="display: {{ val.hidden ? 'none' : '' }}">
 								<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
-								{{@if val.childs != null:
+								{{@if val.constructor === Object:
 									return new $TreeList({
 										parentKey: '',
 										key,
-										val: val.childs,
-										hasChild: varFuncChildCheck
+										val,
 									});
 								}}
 							</div>
@@ -115,9 +110,24 @@
 
 					{{@if val.constructor === Object:
 						return new $TreeList({
-							parentKey: '', key, val,
-							hasChild: varFuncChildCheck
+							parentKey: '', key, val
 						});
+					}}
+				</div>
+			</div>
+		</div>
+		<div class="event-list collapsed">
+			<div class="title" @click="collapseSubPanel(this, true)">Events ({{ events.totalEvent }})</div>
+			<div class="button" @click="createEvent" title="Create new empty event node"><i class="fa fa-plus-square"></i></div>
+
+			<!-- /src/component/tree-list.sf -->
+			<div class="tree-view" tree-section="events" @pointerdown="checkDragNode">
+				<div class="tree-item collapsed" tree-item-key="{{ key }}" sf-each="key, val in events.treeList"
+					style="display: {{ val.hidden ? 'none' : '' }}">
+					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+					{{@if val.constructor === Object:
+						return new $TreeList({ parentKey: '', key, val });
 					}}
 				</div>
 			</div>
@@ -133,7 +143,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						return new $TreeList({parentKey: '', key, val});
+						return new $TreeList({ parentKey: '', key, val });
 					}}
 				</div>
 			</div>
@@ -177,7 +187,7 @@ sketch-page > .panels sketch-panel-left {
 			}
 		}
 	}
-	.variable-list, .function-list, .node-list {
+	.variable-list, .function-list, .event-list, .node-list {
 		color: white;
 		position: relative;
 		width: 190px;
@@ -255,6 +265,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	else My.variables = sketch.variables;
 
 	My.functions = sketch.functions;
+	My.events = sketch.events || ({totalEvent: 0, treeList: {}});
 	My.nodes = Blackprint.nodes;
 
 	My.isFunctionSketch = sketch._funcMain != null;
@@ -268,6 +279,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.functionVariableLength = 0;
 	My.variableCount = 0;
 	My.functionCount = 0;
+	My.eventCount = 0;
 	My.nodeCount = 0;
 
 	function deepCount(obj, isNodes){
@@ -284,9 +296,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 				else len += deepCount(temp, isNodes);
 			}
 			else {
-				if(temp.childs == null)
+				if(temp.constructor !== Object)
 					len++;
-				else len += deepCount(temp.childs, isNodes);
+				else len += deepCount(temp, isNodes);
 			}
 		}
 
@@ -315,6 +327,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		pendingRefreshVars = setTimeout(() => {
 			My.variableCount = deepCount(My.variables);
 			My.functionCount = deepCount(My.functions);
+			My.eventCount = deepCount(My.events);
 
 			if(My.isFunctionSketch){
 				My.functionSharedVariableLength = deepCount(My.funcSharedVariable);
@@ -546,27 +559,25 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 						else if(section === 'sharedVariables') scope = 2;
 						else if(section === 'privateVars') scope = 1;
 
+						nodeOptions.data = { name: namespace, scope };
 						DropDown.show([{
 							title: "Get " + namespace, callback(){
-								nodeOptions.data = { name: namespace, scope };
 								sketch.createNode('BP/Var/Get', nodeOptions);
 							}
 						}, {
 							title: "Set " + namespace, callback(){
-								nodeOptions.data = { name: namespace, scope };
 								sketch.createNode('BP/Var/Set', nodeOptions);
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
 					}
 					else if(section === 'environmentVar'){
+						nodeOptions.data = { name: key };
 						DropDown.show([{
 							title: "Get " + key, callback(){
-								nodeOptions.data = { name: key };
 								sketch.createNode('BP/Env/Get', nodeOptions);
 							}
 						}, {
 							title: "Set " + key, callback(){
-								nodeOptions.data = { name: key };
 								sketch.createNode('BP/Env/Set', nodeOptions);
 							}
 						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
@@ -578,6 +589,18 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 					else if(section === 'functionOutputs'){
 						nodeOptions.data = { name: key };
 						sketch.createNode('BP/FnVar/Output', nodeOptions);
+					}
+					else if(section === 'events'){
+						nodeOptions.data = { namespace: namespace };
+						DropDown.show([{
+							title: "Listen " + key, callback(){
+								sketch.createNode('BP/Event/Listen', nodeOptions);
+							}
+						}, {
+							title: "Emit " + key, callback(){
+								sketch.createNode('BP/Event/Emit', nodeOptions);
+							}
+						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
 					}
 					else console.error("Unhandled side panel section:", section);
 				});
@@ -617,9 +640,21 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		rootInstance.createFunction(val, {description: "No description"});
 	}
 
+	My.createEvent = async ev => {
+		let val = await Swal.fire({
+			title: "Event Namespace:",
+			placeholder: "MyApp/Custom/Event",
+			input: "text",
+		});
+
+		val = val.value;
+		if(!val) return;
+
+		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
+		rootInstance.events.createEvent(val);
+	}
+
 	My.createCustomNode = ev => {
 		Modal.goto('/custom-node-editor');
 	}
-
-	My.varFuncChildCheck = obj => obj.childs != null;
 });
