@@ -253,7 +253,7 @@ sf.component('sketch-page', function(My){
 				}
 			});
 
-			if(ev.port.type !== Function){
+			if(ev.port.type !== Function && !(ev.port.source === 'input' && ev.port.name === 'Limit')){
 				ev.menu.push({
 					title: "Rename Field",
 					async callback(){
