@@ -611,6 +611,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.createVariable = async (ev, scope) => {
 		let val = await Swal.fire({
 			title: "Variable Name:",
+			inputPlaceholder: scope === Blackprint.VarScope.Public
+				? "MyApp/Custom/Variable" : "MyApp_Custom_Variable",
 			input: "text",
 		});
 
@@ -630,6 +632,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.createFunction = async ev => {
 		let val = await Swal.fire({
 			title: "Function Name:",
+			inputPlaceholder: "MyApp/Custom/Function",
 			input: "text",
 		});
 
@@ -643,7 +646,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.createEvent = async ev => {
 		let val = await Swal.fire({
 			title: "Event Namespace:",
-			placeholder: "MyApp/Custom/Event",
+			inputPlaceholder: "MyApp/Custom/Event",
 			input: "text",
 		});
 
