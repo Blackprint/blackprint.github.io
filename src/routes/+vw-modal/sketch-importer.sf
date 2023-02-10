@@ -138,15 +138,14 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 			json = JSON.parse(json);
 
 		My.pendingLoad = json;
-
-		let metadata = json._;
-		My.modules = (metadata && metadata.moduleJS) || [];
+		My.modules = json.moduleJS || [];
 
 		My.nodes = [];
-		for(let key in json){
+		let instance = json.instance;
+		for(let key in instance){
 			if(key === '_') continue;
 
-			My.nodes.push({name: key, count: json[key].length});
+			My.nodes.push({name: key, count: instance[key].length});
 		}
 
 		My.checkSavedData();
