@@ -498,7 +498,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let keys = parentKey.split('/');
 		keys.push(key);
 
-		let docs = Blackprint._utils.deepProperty(Blackprint._docs, keys);
+		let docs = Blackprint._utils.getDeepProperty(Blackprint._docs, keys);
 		if(docs == null)
 			return ToolTip.set(false);
 
