@@ -104,11 +104,10 @@ sf.model('sketch-pages', function(My){
 			data = JSON.parse(data);
 
 			// Find lowest position value
+			let instance = data.instance;
 			let x = Infinity, y = Infinity;
-			for(let key in data){
-				if(key === '_') continue;
-
-				let val = data[key];
+			for(let key in instance){
+				let val = instance[key];
 				for(let i=0; i < val.length; i++){
 					let node = val[i];
 					if(node.x < x) x = node.x;
@@ -120,10 +119,8 @@ sf.model('sketch-pages', function(My){
 			if(y === Infinity) y = 0;
 
 			// Reduce nodes positions
-			for(let key in data){
-				if(key === '_') continue;
-
-				let val = data[key];
+			for(let key in instance){
+				let val = instance[key];
 				for(let i=0; i < val.length; i++){
 					let node = val[i];
 					node.x -= x;
@@ -147,10 +144,9 @@ sf.model('sketch-pages', function(My){
 			let scale = container.scale; // Negative value
 
 			// Reposition the nodes near the pointer or current container
-			for(let key in data){
-				if(key === '_') continue;
-
-				let val = data[key];
+			let instance = data.instance;
+			for(let key in instance){
+				let val = instance[key];
 				for(let i=0; i < val.length; i++){
 					let node = val[i];
 					node.x += (-x - oX + pointerX) / scale;
