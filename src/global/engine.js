@@ -21,7 +21,7 @@ window.engineTest = async function(){
 	SketchList.forEach(sketch => sketch.clearNodes());
 
 	// For the editor (sketch page)
-	SketchList[0].importJSON(sampleList["Random Multiply"]);
+	await SketchList[0].importJSON(sampleList["Random Multiply"]);
 
 	// For console (on DevTools)
 	await engine.importJSON(sampleList['Random Multiply']);
@@ -38,6 +38,6 @@ var logger = engine.iface.myLogger;
 `, "color: gray");
 	console.log("To click on invisible button: %cbutton.clicked()", "color: gray");
 	console.log("To set the invisible input: %cinput.data.value = 'hello'", "color: gray");
-	console.log("Or send the input to the handle output directly: %cinput.const.Output.Value = 'hello'", "color: gray");
-	console.log("To get the logger value: %clogger.const.Input.Any", "color: gray");
+	console.log("Or send the input to the handle output directly: %cinput.ref.Output.Value = 'hello'", "color: gray");
+	console.log("To get the logger value: %clogger.ref.Input.Any", "color: gray");
 }
