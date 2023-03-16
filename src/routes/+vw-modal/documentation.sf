@@ -72,6 +72,10 @@ sf-m[name="documentation"] {
 		background: #161616;
 		box-shadow: 0 0 7px black;
 	}
+	.left-panel{
+		overflow: hidden auto;
+    	height: calc(95vh - 33px);
+	}
 	.content{
 		position: relative;
 		padding: 5px 20px;
@@ -181,7 +185,7 @@ sf-m[name="documentation"] {
 
 	strong {
 		color: white;
-		white-space: nowrap;
+		white-space: break-spaces;
 	}
 
 	table {

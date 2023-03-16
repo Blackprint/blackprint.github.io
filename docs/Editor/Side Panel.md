@@ -1,6 +1,12 @@
 ## Left side panel
 On the left side panel you can find list of Variables, Function, and Node. These list can be drag and dropped into the container to create a new nodes. From this editor you can easily create variable and function node by using `+` button, this editor also allows you to create a custom node by using a code editor. But if you're looking for how import nodes/modules for this editor, please go to **Editor -> Tutorial** instead.
 
+For more information about the panel, please go to the menu:
+1. Variables **(Engine -> Internal Nodes -> Variables)**
+2. Functions **(Engine -> Internal Nodes -> Functions)**
+3. Events **(Engine -> Internal Nodes -> Events)**
+4. Nodes **(Custom Nodes)**
+
 ## Right side panel
 This panel is used for changing or adding an internal node data. You can also add ID or comments for your node and it can be exported as JSON. Registering a custom panel for your nodes is also possible when using Blackprint Sketch:
 
