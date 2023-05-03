@@ -95,7 +95,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		let url = My.url;
 
 		if(window.io == null){
-			await sf.loader.js(['https://cdn.socket.io/4.5.3/socket.io.min.js']);
+			await sf.loader.js(['https://cdn.socket.io/4.6.1/socket.io.min.js']);
 			await sf.loader.task;
 		}
 
@@ -143,6 +143,10 @@ sf.model('modal-remote-sketch-connect', function(My){
 			SmallNotif.add("Connected to sketch's relay server", "green");
 			localStorage.BPSketchRelayServer = url;
 			My.event.emit('connected');
+		});
+
+		socket.on('puppetnode.answer', (data)=> {
+			Blackprint.PuppetNode.setRegisteredNodes(data);
 		});
 
 		if(Modal.showed && Modal.views.currentPath === '/remote-sketch-connect')

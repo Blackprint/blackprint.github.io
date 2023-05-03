@@ -96,7 +96,7 @@ sf.model('modal-remote-engine-connect', function(My){
 		if(!url) url = My.placeholder;
 
 		if(window.io == null){
-			await sf.loader.js(['https://cdn.socket.io/4.5.3/socket.io.min.js']);
+			await sf.loader.js(['https://cdn.socket.io/4.6.1/socket.io.min.js']);
 			await sf.loader.task;
 		}
 
@@ -122,6 +122,10 @@ sf.model('modal-remote-engine-connect', function(My){
 					client.sendSketchToRemote();
 				});
 			}
+		});
+
+		socket.on('puppetnode.answer', (data)=> {
+			Blackprint.PuppetNode.setRegisteredNodes(data);
 		});
 
 		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
