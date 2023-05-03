@@ -118,7 +118,7 @@ var EditorHeader = sf.model('header', function(My, include){
 					title: 'To URL',
 					callback(){
 						var opt = {environment: false};
-						var compress = pako.deflateRaw(sketch.exportJSON(opt));
+						var compress = pako.deflateRaw(sketch.exportJSON(opt), {level: 9});
 						var temp = Base64.fromUint8Array(compress, true);
 
 						sf.URI.data.importSketch = [temp];
@@ -223,6 +223,20 @@ var EditorHeader = sf.model('header', function(My, include){
 
 					Modal.goto('/dev-mode');
 				}
+			}, {
+				title: 'Sync',
+				icon: 'fa fa-plug',
+				hide: !(sf.model('modal-remote-sketch-connect').socket?.connected || sf.model('modal-remote-engine-connect').socket?.connected),
+				deep: [{
+					title: 'Puppet Node List',
+					// icon: 'fa fa-plug',
+					callback(){
+						let socket = sf.model('modal-remote-sketch-connect').socket;
+						socket ??= sf.model('modal-remote-engine-connect').socket;
+
+						socket.emit('puppetnode.ask');
+					}
+				}],
 			}]
 		}, {
 			title: 'Development Mode',
