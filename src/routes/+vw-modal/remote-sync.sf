@@ -1,0 +1,138 @@
+## html
+<sf-m name="remote-sync">
+	<div class="description">Sync this Editor with Remote Blackprint</div>
+	<div class="list">
+		<div class="item" @click="puppetNodeList()" title="Use this if the remote module doesn't have nodes for Browser, or if you don't want to execute external module into this editor">
+			<div class="icon"><i class="fa fa-sync-alt"></i></div>
+			<div class="content">
+				<div class="title">Puppet Node List</div>
+				<div class="description">Replace this editor's node list with remote puppet node</div>
+			</div>
+		</div>
+		<div class="item" @click="sendModuleList()" title="Use this if the remote is also using JavaScript, and the modules have support for target environment">
+			<div class="icon"><i class="fa fa-upload"></i></div>
+			<div class="content">
+				<div class="title">Send loaded module list to remote</div>
+				<div class="description">Ask remote Blackprint to load module from this editor's loaded module list</div>
+			</div>
+		</div>
+		<div class="item" @click="receiveInstance()" title="Your current schema will be cleared and replaced with remote schema, in case the remote module can't be loaded in this browser you will need to import nodes with Puppet Nodes">
+			<div class="icon"><i class="fa fa-download"></i></div>
+			<div class="content">
+				<div class="title">Receive remote instance schema</div>
+				<div class="description">Import Blackprint schema from remote</div>
+			</div>
+		</div>
+		<div class="item" @click="sendInstance()" title="Remote instance will import the schema from this editor">
+			<div class="icon"><i class="fa fa-upload"></i></div>
+			<div class="content">
+				<div class="title">Send remote instance schema</div>
+				<div class="description">Export Blackprint schema to remote</div>
+			</div>
+		</div>
+		<div class="item" @click="saveSchemaToRemote()" title="Remote instance will store the JSON schema from this editor">
+			<div class="icon"><i class="fa fa-upload"></i></div>
+			<div class="content">
+				<div class="title">Save schema to remote instance</div>
+				<div class="description">Export Blackprint schema and ask remote instance to save it</div>
+			</div>
+		</div>
+		<div class="item" @click="disconnect()">
+			<div class="icon"><i class="fa fa-power-off"></i></div>
+			<div class="content">
+				<div class="title">Disconnect</div>
+				<div class="description">Disconnect this editor with remote instance</div>
+			</div>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="remote-sync"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	& > .description{
+		padding: 10px;
+		color: white;
+		a{
+			color: skyblue;
+		}
+	}
+	.list{
+		padding: 5px;
+		.item{
+			color: #fff;
+			background: #0000009e;
+			cursor: pointer;
+			border-radius: 4px;
+			padding: 5px;
+			margin: 5px;
+			border: 1px solid #000;
+			&:hover{
+				background: #000000de;
+			}
+
+			.icon{
+				float: left;
+			    margin: 10px 10px 0 5px;
+			}
+			.content{
+				display: inline-block;
+			}
+
+			.description{
+				font-size: 12px;
+   				color: #999999;
+			}
+		}
+	}
+}
+
+## js-global
+sf.model('remote-sync', function(My){
+	function getHandler(){
+		let socket = sf.model('modal-remote-sketch-connect').socket;
+		if(socket) return sf.model('modal-remote-sketch-connect');
+
+		socket = sf.model('modal-remote-engine-connect').socket;
+		if(socket) return sf.model('modal-remote-engine-connect');
+	}
+
+	My.puppetNodeList = function(){
+		let socket = getHandler().socket;
+		socket.emit('puppetnode.ask');
+
+		socket.once('puppetnode.answer', async (data) => {
+			let temp = CurrentSketch.exportJSON({environment: false});
+			CurrentSketch.clearNodes();
+			await CurrentSketch.importJSON(temp);
+		});
+	};
+
+	My.sendModuleList = function(){
+		getHandler().client.syncModuleList();
+	};
+
+	My.receiveInstance = function(){
+		getHandler().client.importRemoteJSON();
+	};
+
+	My.sendInstance = function(){
+		getHandler().client.sendSketchToRemote();
+	};
+
+	My.saveSchemaToRemote = function(){
+		getHandler().client.saveSketchToRemote(true);
+	};
+
+	My.disconnect = function(){
+		let handler = getHandler();
+		handler.socket.disconnect();
+
+		if(handler.which === 'sketch') Modal.goto('/remote-sketch-connect');
+		if(handler.which === 'engine') Modal.goto('/remote-engine-connect');
+	};
+});
