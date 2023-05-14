@@ -1,0 +1,197 @@
+## html
+<sf-m name="code-generator">
+	<div class="title">Code Generator <div title="This feature may have many changes in the future">(<i class="fa fa-flask"></i> Experimental)</div></div>
+	<div class="section">Target language: <i class="fa fa-question-circle" title="Nodes need to register their code generation for using this feature, and some nodes may not support the target languages."></i></div>
+	<select class="list" sf-bind="target">
+		<option class="item" :value="{{ x.languageId }}" sf-each="x in list">
+			{{ x.languageName }}
+		</option>
+	</select>
+
+	<div class="button" @click="refresh()">Generate</div>
+
+	<div class="section {{ !error.length && 'hide' }}">Error:</div>
+	<div class="error-list {{ !error.length && 'hide' }}">
+		<div class="item {{ x.type }}" sf-each="x in error" title="{{ x.help || '' }}">
+			{{ x.message }}
+		</div>
+	</div>
+
+	<div class="section">Code Result:</div>
+	<div style="display: {{ target !== 'js' ? 'none' : ''}}" class="code-result-minify" title="Minify code" @click="minifyCode()">
+		<i class="fa fa-compress-arrows-alt"></i>
+	</div>
+	<div class="code-result-copy" title="Copy to clipboard" @click="copyToClipboard()">
+		<i class="fa fa-copy"></i>
+	</div>
+	<div class="code-result"><pre><code>...</code></pre></div>
+</sf-m>
+
+## scss-global
+sf-m[name="code-generator"] {
+	background: #292929;
+	border-radius: 10px;
+	border: 2px solid black;
+	position: relative;
+	box-shadow: 0 0 20px 0px white;
+	width: 500px;
+	.hide{
+		display: none;
+	}
+	.title{
+		padding: 10px;
+		color: white;
+		background: #121212;
+   		box-shadow: 0 0 4px black;
+		div {
+			font-size: 12px;
+			color: #bf7a7a;
+			font-weight: bold;
+			display: inline-block;
+			letter-spacing: 1px;
+		}
+	}
+	.section{
+		padding: 10px 0 0 10px;
+		color: #b5b5b5;
+		font-size: 14px;
+	}
+	textarea{
+		margin: 5px 10px;
+		width: calc(100% - 40px);
+		height: 100px;
+		color: white;
+		background: #121212;
+		border: none;
+		outline: none;
+		border-radius: 5px;
+		padding: 10px;
+		tab-size: 4;
+		white-space: nowrap;
+	}
+	.error-list{
+		padding: 10px;
+		.item{
+			background: black;
+			padding: 3px 7px;
+			border-radius: 10px;
+			color: white;
+			&.error {
+				box-shadow: 0 0 6px #8f4141;
+			}
+		}
+	}
+	select.list {
+		background: black;
+		color: white;
+		padding: 5px;
+		margin-left: 10px;
+		border: 1px solid #444444;
+		outline: none;
+	}
+	.code-result pre {
+		margin-top: 3px;
+		background: #000000a1;
+		padding: 10px;
+		overflow: auto;
+		max-width: 100%;
+		max-height: 200px;
+	}
+	.code-result-copy, .code-result-minify {
+		position: absolute;
+		right: 20px;
+		padding: 6px 9px 4px 9px;
+		background: #1e1e1e;
+		border-radius: 35px;
+		border: 1px solid #000000;
+		cursor: pointer;
+		box-shadow: 0 0 2px white;
+		&:hover {
+			background: #323232;
+		}
+	}
+	.code-result-minify {
+		right: 62px;
+	}
+
+	.button{
+		display: inline-block;
+		color: #fff;
+		background: #0000009e;
+		cursor: pointer;
+		border-radius: 4px;
+		padding: 5px;
+		margin: 5px;
+		border: 1px solid #000;
+		&:hover{
+			background: #2c2b229e;
+			box-shadow: 0 0 7px #cbaf25;
+		}
+	}
+}
+
+## js-global
+sf.model('code-generator', function(My){
+	My.list = Blackprint.Code.handlers;
+
+	My.target = localStorage.codeGeneratorLanguage || 'js';
+	My.error = [];
+	My.code = '';
+
+	My.init = function(){
+		let el = My.$el(`.list option[value="${My.target}"]`);
+		el.attr('selected', '');
+
+		// If the last handler is not registered, let's use first language as default
+		if(el[0] == null){
+			let first;
+			for (let key in My.list) {
+				first = My.list[key];
+				break;
+			}
+
+			My.target = localStorage.codeGeneratorLanguage = first.languageId;
+		}
+	}
+
+	My.refresh = function(){
+		My.code = '';
+		My.error.splice(0);
+
+		localStorage.codeGeneratorLanguage = My.target;
+
+		try{
+			My.code = Blackprint.Code.generateFrom(CurrentSketch, My.target, 'MyApp');
+			My.refreshCodeResult();
+		} catch(e) {
+			My.error.push({type: 'error', message: e.message});
+			console.error(e);
+		}
+	}
+
+	My.refreshCodeResult = function(){
+		let html = hljs.highlight(My.code, {language: My.target}).value;
+		let el = $('<pre><code></code></pre>');
+		el.find('code').append(html);
+		$('.code-result').text('').append(el);
+	}
+
+	My.copyToClipboard = function(){
+		navigator.clipboard.writeText(My.code);
+		SmallNotif.add("Copied to clipboard!", 'green');
+	}
+
+	My.minifyCode = async function(){
+		if(!window.Terser){
+			await sf.loader.js(['https://cdn.jsdelivr.net/npm/terser@5.17.3/dist/bundle.min.min.js'], {ordered: true});
+		}
+
+		// Keep comment
+		let temp = My.code;
+		let comment = temp.slice(0, temp.indexOf('*/') + 2);
+		let code = temp.slice(temp.indexOf('*/') + 2);
+
+		My.code = comment + '\n\n' + (await Terser.minify(code, { mangle: true })).code;
+		My.refreshCodeResult();
+	}
+});
