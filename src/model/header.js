@@ -13,6 +13,8 @@ var EditorHeader = sf.model('header', function(My, include){
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
 		let sketch = window.CurrentSketch;
+		let sketchSocket = sf.model('modal-remote-sketch-connect').socket;
+		let engineSocket = sf.model('modal-remote-engine-connect').socket;
 
 		include('dropdown').show([{
 			title: 'Sketch',
@@ -134,6 +136,12 @@ var EditorHeader = sf.model('header', function(My, include){
 					}
 				}]
 			}, {
+				title: 'Code Generation',
+				icon: 'fa fa-save',
+				callback(){
+					Modal.goto('/code-generator');
+				}
+			}, {
 				title: 'Examples',
 				icon: 'fa fa-layer-group',
 				callback(){
@@ -182,23 +190,35 @@ var EditorHeader = sf.model('header', function(My, include){
 			icon: 'fa fa-plug',
 			hide: sf.hotReload === void 0,
 			deep:[{
-				title: 'Sketch' + (sf.model('modal-remote-sketch-connect').socket?.connected ? ' ✔️' : ''),
+				title: 'Sketch' + (sketchSocket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
-				async callback(){
-					let socket = sf.model('modal-remote-sketch-connect').socket;
-					if(socket?.connected) socket.disconnect();
-
+				deep: sketchSocket?.connected ? [{
+					title: 'Control Panel',
+					icon: 'fa fa-grip-horizontal',
+					callback(){ Modal.goto('/remote-sync') },
+				}, {
+					title: 'Disconnect',
+					icon: 'fa fa-power-off',
+					callback(){ sketchSocket.disconnect() },
+				}] : undefined,
+				callback: !sketchSocket?.connected && (() => {
 					Modal.goto('/remote-sketch-connect');
-				}
+				})
 			}, {
-				title: 'Engine' + (sf.model('modal-remote-engine-connect').socket?.connected ? ' ✔️' : ''),
+				title: 'Engine' + (engineSocket?.connected ? ' ✔️' : ''),
 				icon: 'fa fa-plug',
-				async callback(){
-					let socket = sf.model('modal-remote-engine-connect').socket;
-					if(socket?.connected) socket.disconnect();
-
+				deep: engineSocket?.connected ? [{
+					title: 'Control Panel',
+					icon: 'fa fa-grip-horizontal',
+					callback(){ Modal.goto('/remote-sync') },
+				}, {
+					title: 'Disconnect',
+					icon: 'fa fa-power-off',
+					callback(){ engineSocket.disconnect() },
+				}] : undefined,
+				callback: !engineSocket?.connected && (() => {
 					Modal.goto('/remote-engine-connect');
-				}
+				})
 			}, {
 				title: (function(){
 					if(window.___browserSync___ === void 0)
@@ -223,20 +243,6 @@ var EditorHeader = sf.model('header', function(My, include){
 
 					Modal.goto('/dev-mode');
 				}
-			}, {
-				title: 'Sync',
-				icon: 'fa fa-plug',
-				hide: !(sf.model('modal-remote-sketch-connect').socket?.connected || sf.model('modal-remote-engine-connect').socket?.connected),
-				deep: [{
-					title: 'Puppet Node List',
-					// icon: 'fa fa-plug',
-					callback(){
-						let socket = sf.model('modal-remote-sketch-connect').socket;
-						socket ??= sf.model('modal-remote-engine-connect').socket;
-
-						socket.emit('puppetnode.ask');
-					}
-				}],
 			}]
 		}, {
 			title: 'Development Mode',

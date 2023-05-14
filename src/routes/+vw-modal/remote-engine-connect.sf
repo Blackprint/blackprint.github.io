@@ -3,9 +3,9 @@
 	<div class="description">Please set the remote engine URL</div>
 	<div class="note" style="display: {{ url === '' || url === placeholder ? 'none':'' }}" @click="connectDefault">(Click here to connect to default localhost server)</div>
 	<div class="text-input">
-		<input placeholder="{{ placeholder }}" type="text" sf-bind="url" @keyup.Enter="changeServer">
+		<input placeholder="{{ placeholder }}" type="text" sf-bind="url" @keyup.Enter="changeServer(false, true)">
 	</div>
-	<div class="button-import" @click="changeServer">Connect</div>
+	<div class="button-import" @click="changeServer(false, true)">Connect</div>
 </sf-m>
 
 ## scss-global
@@ -77,6 +77,7 @@ sf-m[name="modal-remote-engine-connect"] {
 
 ## js-global
 sf.model('modal-remote-engine-connect', function(My){
+	My.which = 'engine'; // constant
 	My.url = localStorage.BPRemoteEngine ??= "";
 	My.placeholder = 'http://localhost:2345';
 	My.allowModuleSync = true;
@@ -91,7 +92,7 @@ sf.model('modal-remote-engine-connect', function(My){
 	}
 
 	let isConnectOnStartup = false;
-	My.changeServer = async function(clearOnFail){
+	My.changeServer = async function(clearOnFail, isStartupConnect){
 		let url = My.url;
 		if(!url) url = My.placeholder;
 
@@ -126,6 +127,7 @@ sf.model('modal-remote-engine-connect', function(My){
 
 		socket.on('puppetnode.answer', (data)=> {
 			Blackprint.PuppetNode.setRegisteredNodes(data);
+			Blackprint.emit('bp_editorNodeAvailability');
 		});
 
 		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
@@ -162,10 +164,15 @@ sf.model('modal-remote-engine-connect', function(My){
 			console.log("Connected to remote engine:", url);
 			SmallNotif.add("Connected to remote engine", "green");
 			localStorage.BPRemoteEngine = url;
+
+			if(isStartupConnect === true){
+				isStartupConnect = false;
+				Modal.goto('/remote-sync');
+			}
 		});
 	}
 
 	if(My.url !== '' && Blackprint.RemoteControl != null){
-		$(() => setTimeout(()=> My.changeServer(true), 200));
+		$(() => setTimeout(()=> My.changeServer(true, true), 200));
 	}
 });
