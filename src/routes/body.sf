@@ -240,3 +240,7 @@ body > .header {
 		min-width: 170px;
 	}
 }
+
+textarea, code {
+	tab-size: 4;
+}
