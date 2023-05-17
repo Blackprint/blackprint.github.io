@@ -90,7 +90,7 @@ sketch-page{
 ## js-global.router
 ={
 	on:{
-		coming(data){ // data === views.data
+		async coming(data){ // data === views.data
 			console.log("Sketch page data:", data);
 			let sketch = data.bpInstance ?? SketchList[data.page - 1];
 
@@ -112,6 +112,22 @@ sketch-page{
 			}
 
 			sf.model('header').info.scale = sketch.scope('container').scale*100;
+
+			// Check if Data nodes already exist
+			// Load nodes for data manipulation
+			if(Blackprint.nodes.Data == null && !this._dataNodeChecked){
+				await sf.loader.task;
+				this._dataNodeChecked = true;
+
+				// Only load if not connected to remote Blackprint instance
+				if(CurrentSketch?._remote == null){
+					SmallNotif.add("Loading required nodes", 'yellow', 500);
+
+					Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.7/dist/nodes-data.mjs', {
+						loadBrowserInterface: true
+					});
+				}
+			}
 		},
 		leaving(targetURL){
 			console.log("Leaving from sketch page data:", arguments);
