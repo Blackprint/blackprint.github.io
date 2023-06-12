@@ -20,6 +20,7 @@ function isConnectablePort(clazz, target){
 	}
 
 	if(target.any || clazz.any) return true;
+	if(target.constructor === Object || clazz.constructor === Object) return false;
 	if(target.prototype instanceof clazz || clazz.prototype instanceof target)
 		return true;
 
