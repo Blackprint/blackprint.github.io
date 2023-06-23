@@ -148,7 +148,8 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 
 		clearTimeout(_customScript);
 		_customScript = setTimeout(async ()=> {
-			await sf.loader.js([now], {ordered: true});
+			sf.loader.js([now]);
+			await sf.loader.task;
 			if(!isInit) SmallNotif.add("Custom script URL was saved");
 			localStorage.bpCustomScript = now;
 		}, 1000);

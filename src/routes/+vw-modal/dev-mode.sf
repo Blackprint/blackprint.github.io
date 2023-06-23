@@ -98,7 +98,7 @@ sf.model('modal-dev-mode', function(My){
 
 		if(window.___browserSync___ === void 0){
 			try{
-				await sf.loader.js([url+'/browser-sync-client.js?v=2']);
+				sf.loader.js([url+'/browser-sync-client.js?v=2']);
 				await sf.loader.task;
 			} catch(e) {
 				SmallNotif.add("Failed to load client", "red");

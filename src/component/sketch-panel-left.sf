@@ -209,6 +209,7 @@ sketch-page > .panels sketch-panel-left {
 			max-height: calc(100% - 22px);
 			max-width: 185px;
 			overflow: auto;
+			font-size: 14px;
 			&.collapsed > .tree-group {
 				display: none;
 			}

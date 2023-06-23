@@ -96,7 +96,7 @@ sf.model('modal-remote-sketch-connect', function(My){
 		let url = My.url;
 
 		if(window.io == null){
-			await sf.loader.js(['https://cdn.socket.io/4.6.1/socket.io.min.js']);
+			sf.loader.js(['https://cdn.socket.io/4.6.1/socket.io.min.js']);
 			await sf.loader.task;
 		}
 

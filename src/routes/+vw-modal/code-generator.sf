@@ -154,14 +154,14 @@ sf.model('code-generator', function(My){
 		}
 	}
 
-	My.refresh = function(){
+	My.refresh = async function(){
 		My.code = '';
 		My.error.splice(0);
 
 		localStorage.codeGeneratorLanguage = My.target;
 
 		try{
-			My.code = Blackprint.Code.generateFrom(CurrentSketch, My.target, 'MyApp');
+			My.code = await Blackprint.Code.generateFrom(CurrentSketch, My.target, 'MyApp');
 			My.refreshCodeResult();
 		} catch(e) {
 			My.error.push({type: 'error', message: e.message});
@@ -183,7 +183,8 @@ sf.model('code-generator', function(My){
 
 	My.minifyCode = async function(){
 		if(!window.Terser){
-			await sf.loader.js(['https://cdn.jsdelivr.net/npm/terser@5.17.3/dist/bundle.min.min.js'], {ordered: true});
+			sf.loader.js(['https://cdn.jsdelivr.net/npm/terser@5.17.3/dist/bundle.min.min.js']);
+			await sf.loader.task;
 		}
 
 		// Keep comment

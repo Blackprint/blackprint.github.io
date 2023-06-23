@@ -61,7 +61,7 @@ sf.model('custom-node-editor', function(My){
 
 	My.init = async function(){
 		if(window.monaco === void 0){
-			await sf.loader.js([
+			sf.loader.js([
 				'https://cdn.jsdelivr.net/npm/@monaco-editor/loader@1.2.0/lib/umd/monaco-loader.min.js',
 				// 'https://cdn.jsdelivr.net/npm/typescript@latest/lib/typescriptServices.min.js'
 			]);
