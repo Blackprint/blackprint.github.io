@@ -47,6 +47,20 @@ sketch-page{
 		margin-left: 200px;
 	}
 
+	.top-left-info {
+		padding: 7px 10px;
+		margin: 10px;
+		color: #ffffff59;
+		font-size: 12px;
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: #00000047;
+		box-shadow: 0 0 5px #000000b5;
+		border-radius: 10px;
+		white-space: pre-line;
+	}
+
 	.mini-blackprint, &.left-menu-hide {
 		sf-m[name="container"]{
 			margin-left: 0;
@@ -123,7 +137,7 @@ sketch-page{
 				if(CurrentSketch?._remote == null){
 					SmallNotif.add("Loading required nodes", 'yellow', 500);
 
-					Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.7/dist/nodes-data.mjs', {
+					Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-data.mjs', {
 						loadBrowserInterface: true
 					});
 				}
@@ -453,7 +467,8 @@ sf.component('sketch-page', function(My){
 		let suggestedNode = simplifyNamespacePath(Blackprint.Sketch.suggestNodeForPort(ev.port));
 
 		// Suggest for object deconstruction node
-		if(ev.port.type instanceof Object){
+		let portType = ev.port.type;
+		if(portType instanceof Object && portType !== Blackprint.Types.Route && portType !== Blackprint.Types.Trigger){
 			let refA = suggestedNode;
 			let refB = Blackprint.nodes;
 
@@ -652,6 +667,21 @@ sf.component('sketch-page', function(My){
 	// Will run when <sketch-page> inserted on DOM
 	My.init = async function(){
 		let sfm = $(My.space.firstElementChild);
+
+		// Show module version
+		if(true){
+			let sketch = $('script[src*="@blackprint/sketch"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+			let engine = $('script[src*="@blackprint/engine"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+			let codegen = $('script[src*="@blackprint/code-generation"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+
+			sketch = $.escapeText(sketch || '-unknown');
+			engine = $.escapeText(engine || '-unknown');
+			codegen = $.escapeText(codegen || '-unknown');
+
+			sfm.prepend(`<div class="top-left-info">Sketch: v${sketch}\nEngine: v${engine}\nCodeGen: v${codegen}</div>`);
+		}
+
+		// Show tiled background
 		if(!sfm.eq(0).hasClass('bg-tile')){
 			sfm.prepend('<div class="bg-tile"></div>');
 		}
