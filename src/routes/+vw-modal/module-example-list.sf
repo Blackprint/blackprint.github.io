@@ -71,7 +71,7 @@ sf-m[name="module-example-list"] {
 
 ## js-global
 var ModuleExampleList = sf.model('module-example-list', function(My){
-	My.list = EditorHeader._moduleExampleList;
+	My.list = window._moduleExampleList ??= [];
 	My.urlInput = '';
 	My.urlValidity = 'valid';
 

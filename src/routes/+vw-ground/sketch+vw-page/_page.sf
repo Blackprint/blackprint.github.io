@@ -110,6 +110,7 @@ sketch-page{
 
 			if(sketch == null || sketch._abandon) return;
 			window.CurrentSketch = sketch;
+			setTimeout(() => EditorHeader.showTabs = true, 100);
 
 			$('body > .background .tile').css('display', 'none');
 
@@ -148,6 +149,7 @@ sketch-page{
 			if(!/^\/sketch\//m.test(targetURL)){
 				$('body > .background .tile').css('display', '');
 				window.CurrentSketch = null;
+				setTimeout(() => EditorHeader.showTabs = false, 1);
 			}
 		}
 	}

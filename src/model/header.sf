@@ -1,10 +1,204 @@
+## html
+<sf-m name="header" class="header {{ showOptions ? 'sketch-mode' : '' }}">
+	<div class="header-left" @click="mainMenu">
+		<img src="/assets/img/icon/blackprint.png">
+		<div>Blackprint</div>
+		<i class="fa fa-caret-down menu-button-hint"></i>
+	</div>
+	<div class="header-center {{ showTabs ? 'hide':'' }}">
+		<div>A node to node general purpose visual programming</div>
+	</div>
+	<div class="header-project-tabs {{ !showTabs ? 'hide':'' }}">
+		<sf-template path="BPEditor/model/project-list.sf"></sf-template>
+	</div>
+	<div class="header-menu">
+		<div class="item-list">
+			<div class="item" @click="openDocumentation" title="Guide or Documentation"><i class='fa fa-journal-whills'></i></div>
+			<div class="item" @click="Modal.goto('/module-example-list')" title="Module examples">
+				<i class='fa fa-map-signs'></i>
+				<div class="module-counter">{{ _moduleExampleList.length }}</div>
+			</div>
+			<div class="item" @click="Modal.goto('/module-url')" title="Loaded module">
+				<i class='fa fa-boxes'></i>
+				<div class="module-counter">{{ _loadedModuleURL.length }}</div>
+			</div>
+			<div class="item" @click="cloneContainer" title="Open in new window"><i class='fa fa-window-restore'></i></div>
+			<div class="item {{ disableVFXActive ? 'active' : '' }}" @click="disableVFX" title="Improve performance by disable VFX"><i class="fas fa-rocket"></i></div>
+			<div class="item {{ visualizeActive ? 'active' : '' }}" @click="visualizeFlow" title="Visualize data flow"><i class="fas fa-bezier-curve"></i></div>
+		</div>
+		<div class="header-zoom">
+			<div style="display: {{ info.scale === 100 ? 'none' : 'block' }}">
+				<i class="fas fa-search"></i> {{ info.scale | 0 }}%
+			</div>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+body > .header {
+	&> .hide {
+		display: none;
+	}
+	.header-project-tabs{
+		align-self: baseline;
+	}
+
+	z-index: 1;
+	backdrop-filter: blur(1px);
+	position: relative;
+	background: #00000085;
+	align-items: center;
+	border-bottom: 1px solid black;
+	display: flex;
+	box-shadow: 0 0 8px 0 black;
+
+	.header-left {
+		border-right: 2px solid;
+		font-size: 24px;
+		padding: 0 15px 0 18px;
+		text-align: center;
+		display: table;
+		img{
+			height: 50px;
+			filter: drop-shadow(0 0 2px white);
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 8px;
+		}
+		div{
+			vertical-align: middle;
+			display: inline-block;
+		}
+
+		.menu-button-hint{
+			display: none;
+			position: absolute;
+			bottom: -3px;
+			left: 100px;
+		}
+
+		&:hover{
+			.menu-button-hint, div{
+				color: #bdbdbd;
+			}
+		}
+	}
+
+	.header-center {
+		font-size: 18px;
+		text-align: center;
+		padding: 10px;
+		height: 24px;
+	}
+
+	&.sketch-mode{
+		.header-left{
+			cursor: pointer;
+			i.menu-button-hint{
+				display: block;
+			}
+		}
+		.header-menu{
+			display: inherit;
+		}
+	}
+
+	.header-menu{
+		display: none;
+		.item-list{
+			display: flex;
+			position: absolute;
+			right: 0px;
+			top: 12px;
+			font-size: 22px;
+			.item{
+				padding: 0 10px;
+				cursor: pointer;
+				position: relative;
+
+				&.active{
+					color: white;
+				}
+
+				.module-counter {
+					position: absolute;
+					bottom: 0;
+					right: 0;
+					font-size: 10px;
+					color: black;
+					background: #ffffffde;
+					box-shadow: 0 0 6px white;
+					border-radius: 100%;
+					padding: 2px 3px 2px 4px;
+					text-align: center;
+					font-weight: bold;
+					height: 12px;
+					min-width: 10px;
+				}
+			}
+		}
+		.header-zoom{
+			position: absolute;
+			right: 10px;
+			color: white;
+			opacity: 0.8;
+			top: 50px;
+			font-size: 22px;
+		}
+	}
+
+	.header-center{
+		.item-list{
+			display: flex;
+			position: absolute;
+			top: 12px;
+			font-size: 22px;
+			.item{
+				padding: 0 10px;
+				cursor: pointer;
+
+				&.active{
+					color: white;
+				}
+			}
+		}
+	}
+
+	@media(max-width: 900px){
+		.header-center div {
+			display: none;
+		}
+
+		sf-m[name="modal"]{
+			overflow: scroll;
+		}
+	}
+
+	.large-header{
+		vw-ground{
+			height: calc(100vh - 86px);
+		}
+		.header .header-left div{
+			display: block;
+		}
+	}
+}
+
+.header-left-menu{
+	.dropdown-menu li{
+		min-width: 170px;
+	}
+}
+
+## js-global
 // https://www.npmjs.com/package/scarletsframe#initializedefine-model
 var EditorHeader = sf.model('header', function(My, include){
 	My.message = "Hello";
 	My.showOptions = false;
+	My.showTabs = false;
 	My.info = {scale:100};
 	My._loadedModuleURL = Blackprint._modulesURL;
-	My._moduleExampleList = []; // will be referenced by: /src/routes/+vw-modal/module-example-list.sf
+	My._moduleExampleList = window._moduleExampleList ??= []; // will be referenced by: /src/routes/+vw-modal/module-example-list.sf
 
 	My.init = function(){
 		sf.URI.parse(); // Trigger to reparse current URL
