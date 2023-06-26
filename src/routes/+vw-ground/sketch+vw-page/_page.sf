@@ -105,7 +105,7 @@ sketch-page{
 ={
 	on:{
 		async coming(data){ // data === views.data
-			console.log("Sketch page data:", data);
+			// console.log("Sketch page data:", data);
 			let sketch = data.bpInstance ?? SketchList[data.page - 1];
 
 			if(sketch == null || sketch._abandon) return;
@@ -145,7 +145,9 @@ sketch-page{
 			}
 		},
 		leaving(targetURL){
-			console.log("Leaving from sketch page data:", arguments);
+			// console.log("Leaving from sketch page data:", arguments);
+
+			if(targetURL == null) return;
 			if(!/^\/sketch\//m.test(targetURL)){
 				$('body > .background .tile').css('display', '');
 				window.CurrentSketch = null;

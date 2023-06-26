@@ -249,8 +249,10 @@ let _editorModuleURL = sf.model('module-url', function(My){
 			item._url = item._url.replace(/\?.*?$/m, '')+'?1';
 		else item._url += '?1';
 
-		for (var i = 0; i < SketchList.length; i++)
+		for (var i = 0; i < SketchList.length; i++){
+			if(SketchList[i] == null) continue;
 			SketchList[i]._remote?.syncModuleList();
+		}
 
 		Blackprint.loadModuleFromURL(item._url);
 	}

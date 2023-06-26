@@ -54,8 +54,10 @@ sf.model('example-list', function(My){
 
 	My.open = function(key){
 		let obj = sampleList[key];
-		for (var i = 0; i < SketchList.length; i++)
+		for (var i = 0; i < SketchList.length; i++){
+			if(SketchList[i] == null) continue;
 			SketchList[i].clearNodes();
+		}
 
 		Modal.hide();
 

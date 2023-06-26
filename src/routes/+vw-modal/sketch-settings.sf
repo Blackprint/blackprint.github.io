@@ -88,6 +88,8 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 	My.hideUnusedPort = localStorage.bpHideUnusedPort == 'true' || false;
 	My.on$hideUnusedPort = function(now){
 		for (var i = 0; i < SketchList.length; i++) {
+			if(SketchList[i] == null) continue;
+
 			let container = SketchList[i].scope('container');
 			container.hideUnusedPort = now;
 
@@ -102,6 +104,8 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 	My.showSketchMinimap = localStorage.bpShowSketchMinimap == 'true' || false;
 	My.on$showSketchMinimap = function(now){
 		for (var i = 0; i < SketchList.length; i++) {
+			if(SketchList[i] == null) continue;
+
 			let sketch = SketchList[i];
 			let ref = sketch.page.miniViewer;
 
