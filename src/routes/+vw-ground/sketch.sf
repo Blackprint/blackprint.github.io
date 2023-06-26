@@ -1,5 +1,7 @@
 ## html
 <sf-m name="sketch-pages">
+	<sf-template path="BPEditor/model/project-panel-left.sf"></sf-template>
+
 	<!-- /src/routes/+vw-ground/sketch.sf -->
 	<vw-page></vw-page>
 </sf-m>

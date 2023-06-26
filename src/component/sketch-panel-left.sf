@@ -188,11 +188,11 @@ sketch-page > .panels sketch-panel-left {
 		}
 	}
 	.variable-list, .function-list, .event-list, .node-list {
-		color: white;
+		color: #cbcbcb;
 		position: relative;
 		width: 190px;
 		max-height: -webkit-fill-available;
-		border-top: 1px solid white;
+		border-top: 1px solid #787878a3;
 		padding: 5px 5px;
 		// border-bottom: 1px dashed white;
 		.title, .button{

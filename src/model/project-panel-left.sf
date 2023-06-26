@@ -1,0 +1,67 @@
+## html
+<sf-m name="project-panel-left">
+	<div class="button {{ x.active ? 'active' : '' }}" title="{{ x.tooltip }}" sf-each="x in buttons" @click="change(x)">
+		<div class="highlight"></div>
+		<i class="{{ x.icon }}"></i>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="project-panel-left"] {
+	height: calc(100vh - 50px);
+	width: 50px;
+	position: absolute;
+	z-index: 1;
+	background: #000000bd;
+	outline: 1px solid #464646b8;
+
+	.button {
+		position: relative;
+		font-size: 22px;
+		padding: 10px;
+		text-align: center;
+		cursor: pointer;
+		&:hover {
+			color: white;
+		}
+		&.active {
+			color: white;
+			.highlight {
+				margin-left: -10px;
+				margin-top: -10px;
+				background: #ffffff7d;
+				height: 50px;
+				width: 2px;
+				position: absolute;
+				box-shadow: 0 0 15px 1px white;
+			}
+		}
+	}
+}
+
+body vw-page {
+	width: calc(100vw - 50px);
+	margin-left: 50px;
+}
+
+## js-global
+sf.model("project-panel-left", My => {
+	My.buttons = [
+		{active: true, id: 'sketch', tooltip: "Sketch", icon: 'fa fa-pencil-ruler'},
+		{active: false, id: 'project-files', tooltip: "Project files", icon: 'fa fa-folder'},
+		{active: false, id: 'remote', tooltip: "Remote Instance / Collaboration", icon: 'fa fa-wifi'},
+		// {active: false, id: 'source-control', tooltip: "Source Control", icon: 'fa fa-code-branch'}
+	];
+
+	My.init = function(){}
+	My.change = function(item){
+		return SmallNotif.add("Feature not ready");
+
+		let buttons = My.buttons;
+		for (let i=0; i < buttons.length; i++) {
+			buttons[i].active = false;
+		}
+
+		item.active = true;
+	}
+});
