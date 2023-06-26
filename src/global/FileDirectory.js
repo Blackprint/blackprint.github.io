@@ -30,10 +30,10 @@ class CustomDirectory extends Blackprint.Engine.CustomEvent {
 			await dirHandle.getDirectory(toPath, true);
 		else {
 			let target = await dirHandle.createFile(toPath);
-			await target.writeText(await this.readText());
+			await target.writeData(await this.readBuffer());
 		}
 
-		this.delete();
+		await this.delete();
 	}
 
 	async resolveHandle(path, _handle, _create = false){
@@ -143,24 +143,25 @@ class CustomDirectory extends Blackprint.Engine.CustomEvent {
 		return _data;
 	}
 
-	async readText(path){
-		return await (await this.getFile(path)).readText();
+	async getBlob(path){ return await (await this.getFile(path)).getBlob() }
+	async readText(path){ return await (await this.getBlob(path)).text() }
+	async readBuffer(path){ return await (await this.getBlob(path)).arrayBuffer() }
+	async getStream(path){ return await (await this.getBlob(path)).stream() }
+
+	async writeData(path, text){
+		await (await this.getFile(path)).writeData();
 	}
 
-	async writeText(path, text){
-		await (await this.getFile(path)).writeText();
+	async writeDataAt(path, pos, text){
+		await (await this.getFile(path)).writeDataAt(pos, text);
 	}
 
-	async writeTextAt(path, pos, text){
-		await (await this.getFile(path)).writeTextAt(pos, text);
+	async appendData(path, text){
+		await (await this.getFile(path)).appendData(text);
 	}
 
-	async appendText(path, text){
-		await (await this.getFile(path)).appendText(text);
-	}
-
-	async prependText(path, text){
-		await (await this.getFile(path)).prependText(text);
+	async prependData(path, text){
+		await (await this.getFile(path)).prependData(text);
 	}
 
 	async delete(){
@@ -182,38 +183,35 @@ class CustomFile {
 		this.kind = 'file';
 	}
 
-	async readText(){
-		return await (await this.handle.getFile()).text();
-	}
+	async getBlob(){ return await (await this.handle.getFile()) }
+	async readText(){ return await (await this.getBlob()).text() }
+	async readBuffer(){ return await (await this.getBlob()).arrayBuffer() }
+	async getStream(){ return await (await this.getBlob()).stream() }
 
-	async writeText(text){
+	async writeData(data){
 		let writer = await this.handle.createWritable({keepExistingData: false});
-		await writer.write(text);
+		await writer.write(data);
 		await writer.close();
 	}
 
-	async writeTextAt(pos, text){
+	async writeDataAt(pos, data){
 		let writer = await this.handle.createWritable({keepExistingData: true});
 		await writer.seek(pos);
-		await writer.write(text);
+		await writer.write(data);
 		await writer.close();
 	}
 
-	async appendText(){
+	async appendData(data){
 		let writer = await this.handle.createWritable({keepExistingData: true});
-		await writer.write(text);
+		await writer.write(data);
 		await writer.close();
 	}
 
-	async prependText(){
+	async prependData(data){
 		let writer = await this.handle.createWritable({keepExistingData: true});
 		await writer.seek(0);
-		await writer.write(text);
+		await writer.write(data);
 		await writer.close();
-	}
-
-	async move(){
-		throw "ToDo";
 	}
 
 	async lastModified(){

@@ -5,7 +5,7 @@
 		<div class="button" @click="rescanFiles"><i class="fa fa-sync-alt" title="Rescan files"></i></div>
 
 		<!-- /src/component/tree-list.sf -->
-		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode">
+		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode" @pointerover="hover" @pointerout="unhover">
 			<div class="tree-item collapsed" sf-each="key, val in files"
 				style="display: {{ val.hidden ? 'none' : '' }}">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -242,7 +242,7 @@ sf.model("project-panel-workspace", My => {
 				val = _path.join('/');
 
 				let handle = await EditorWorkingDir.resolveCustomHandle(path);
-				handle.move(val);
+				await handle.move(val);
 
 				await My.rescanFiles();
 			}
