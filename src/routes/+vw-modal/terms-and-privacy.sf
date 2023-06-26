@@ -15,6 +15,7 @@
 		<li>This editor may store information in your browser's storage like IndexedDB or LocalStorage.</li>
 		<li>Environment variables that you input on this editor will be stored on your browser's storage.</li>
 		<li>If you're using remote control or remote module, Socket.io may store cookies.</li>
+		<li>When you're using workspace feature, this editor may have access to your files for the provided directory.</li>
 	</ul>
 	<h3>When you're using external modules or custom script:</h3>
 	<ul>
@@ -31,9 +32,7 @@
 
 	If you think some information was misleading/outdated or need clarification, feel free to contact the maintainer or do pull request.
 
-	This editor is MIT Licensed, you're allowed to copy source code and use it for your commercial project. We're looking forward for your awesome contribution someday 😆
-
-	Last updated: 28 October 2022
+	Last updated: 27 June 2023
 </sf-m>
 
 ## scss-global

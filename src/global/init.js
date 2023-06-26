@@ -46,6 +46,8 @@ $(function(){
 		let width = ev.target.innerWidth;
 
 		for (var i = 0; i < SketchList.length; i++) {
+			if(SketchList[i] == null) continue;
+
 			let container = SketchList[i].scope('container');
 			if(container.origSize.h < height)
 				container.origSize.h = container.size.h = height;
@@ -84,7 +86,32 @@ $(function(){
 	});
 });
 
+window.Events = sf.events;
 $(function(){
 	if(window.SmallNotif == null)
 		alert("This editor doesn't seems supported for your browser, please try using Chromium based browser instead");
+
+	// Register event listener
+	Events.register('DBReady', false);
+	Events.register('EditorWorkingDirReady', false);
+
+	$(document.body)
+		.on("dragover", ev => ev.preventDefault())
+		.on("drop", async function(ev) {
+			ev.preventDefault();
+
+			let handle = await ev.dataTransfer.items[0].getAsFileSystemHandle();
+			if(handle == null) return;
+			if(handle.kind !== "directory"){
+				alert("Working directory must be a directory");
+			}
+			else {
+				if(window.EditorWorkingDir != null)
+					alert("Already have working directory, please refresh browser to use new directory");
+
+				window.EditorWorkingDir = new CustomDirectory(handle);
+				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
+				Events.EditorWorkingDirReady = true;
+			}
+		});
 });

@@ -1,0 +1,310 @@
+## html
+<sf-m name="project-panel-workspace">
+	<div class="files-list">
+		<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Explorer</div>
+		<div class="button" @click="rescanFiles"><i class="fa fa-sync-alt" title="Rescan files"></i></div>
+
+		<!-- /src/component/tree-list.sf -->
+		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode">
+			<div class="tree-item collapsed" sf-each="key, val in files"
+				style="display: {{ val.hidden ? 'none' : '' }}">
+				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
+
+				{{@if val.constructor === Object:
+					return new $TreeList({ parentKey: '', key, val });
+				}}
+			</div>
+		</div>
+	</div>
+</sf-m>
+
+## scss-global
+sf-m[name="project-panel-workspace"] {
+	background: #181818;
+	height: 100%;
+	.files-list {
+		color: #cbcbcb;
+		position: relative;
+		width: 190px;
+		max-height: -webkit-fill-available;
+		// border-top: 1px solid #787878a3;
+		padding: 5px 5px;
+		// border-bottom: 1px dashed white;
+		.title, .button{
+			display: inline-block;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+		& > .title {
+			color: #e7e7e7;
+    		font-weight: bold;
+		}
+		.collapse-btn {
+			font-size: 14px;
+			padding: 2px;
+			width: 12px;
+		}
+		.button{
+			margin-right: 10px;
+			float: right;
+		}
+		.tree-view{
+			position: relative;
+			max-height: calc(100% - 22px);
+			max-width: 185px;
+			overflow: auto;
+			font-size: 14px;
+			&.collapsed > .tree-group {
+				display: none;
+			}
+		}
+		&.collapsed {
+			.tree-view {
+				display: none;
+			}
+		}
+	}
+}
+
+## js-global
+sf.model("project-panel-workspace", My => {
+	My.files = {};
+
+	My.init = function(){
+		Events.when('EditorWorkingDirReady', My.rescanFiles);
+	}
+
+	My.rescanFiles = async function(){
+		let dirs = {
+			[EditorWorkingDir.name]: await EditorWorkingDir.recursiveGetFileHandles()
+		};
+
+		function compare(old, now){
+			for (let key in old) {
+				if(now[key] == null)
+					sf.Obj.delete(old, key);
+			}
+
+			for (let key in now) {
+				if(old[key] == null){
+					sf.Obj.set(old, key, now[key]);
+					reSort(old);
+				}
+				else if(old[key].constructor === Object && now[key].constructor === Object)
+					compare(old[key], now[key]);
+			}
+		}
+
+		compare(My.files, dirs);
+	}
+
+	My.checkDragNode = ev => {
+		let focus = ev.target;
+		if(ev.button === 2){ // If context menu
+			My.fileMenu(ev, focus);
+			return;
+		}
+
+		if(focus.nextElementSibling != null) return;
+		focus = $(focus);
+
+		let section = focus.parent('.tree-view').attr('tree-section');
+		let itemEl = focus[0].parentNode;
+		let key = itemEl.getAttribute('tree-item-key');
+		if(key == null) return;
+
+		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
+		if(parent == null) return;
+
+		let endEvent = 'pointerup';
+		if(ev.pointerType === 'touch')
+			endEvent = 'touchend';
+
+		ToolTip.set("Create node");
+		$(sf.Window).once(endEvent, evUp => {
+			ToolTip.set();
+
+			let targetEl = evUp.target;
+			if(endEvent === 'touchend'){
+				let { clientX, clientY } = evUp.changedTouches[0];
+				evUp.clientX = clientX;
+				evUp.clientY = clientY;
+				targetEl = document.elementFromPoint(clientX, clientY);
+			}
+
+			if(targetEl.closest('sketch-page') == null) return;
+			if(targetEl.closest('sf-m.cables') != null){
+				let parentKey = parent.model.parentKey;
+				let namespace = !!parentKey ? (parentKey + '/' + key) : key;
+
+				$.afterRepaint().then(function(){
+					let offset = targetEl.getBoundingClientRect();
+					let container = sketch.scope('container');
+					let posX = (evUp.clientX - offset.x) / container.scale;
+					let posY = (evUp.clientY - offset.y) / container.scale;
+					let nodeOptions = { x: posX, y: posY };
+
+					if(section === 'environmentVar'){
+						nodeOptions.data = { name: key };
+						DropDown.show([{
+							title: "Get " + key, callback(){
+								sketch.createNode('BP/Env/Get', nodeOptions);
+							}
+						}, {
+							title: "Set " + key, callback(){
+								sketch.createNode('BP/Env/Set', nodeOptions);
+							}
+						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
+					}
+					else console.error("Unhandled side panel section:", section);
+				});
+			};
+		});
+	}
+
+	My.collapseSubPanel = (el, isMain) => {
+		let temp = $(el);
+		let parent = temp.parent();
+		parent.toggleClass("collapsed");
+
+		if(!isMain) return;
+		// My.recalculateMenu();
+
+		let collapseBtn = temp.find('.collapse-btn').removeClass('fa-chevron-down').removeClass('fa-chevron-right');
+
+		if(parent.hasClass('collapsed'))
+			collapseBtn.addClass('fa-chevron-right');
+		else collapseBtn.addClass('fa-chevron-down');
+	}
+
+	function reSort(obj){
+		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b));
+
+		let _list = obj._list;
+		let files = [];
+		for (let i=_list.length-1; i >= 0; i--) {
+			let temp = _list[i];
+			if(obj[temp].constructor === Object) continue;
+
+			files.unshift(temp);
+			_list.splice(i, 1);
+		}
+
+		_list.push(...files);
+		obj.refresh?.();
+	}
+	My.collapseTree = function(el){
+		el = el.nextElementSibling;
+		if(el == null) return;
+
+		let hidden;
+		let parent = $(el.parentNode);
+
+		if(parent.hasClass('tree-view') || parent.hasClass('tree-no-model'))
+			hidden = !parent.hasClass('collapsed');
+		else hidden = el.model.hidden = !el.model.hidden;
+
+		if(hidden)
+			parent.addClass("collapsed");
+		else {
+			if(el.model != null) reSort(el.parentNode.model);
+			parent.removeClass("collapsed");
+		}
+	}
+
+	My.fileMenu = function(ev, el){
+		let $el = $(el);
+		let tree = $el.parents('[tree-item-key]');
+		let path = '';
+
+		for (let i=tree.length-1; i >= 0; i--) {
+			if(path !== '') path += '/';
+			path += $(tree[i]).attr('tree-item-key');
+		}
+
+		let itemEl = el.closest('[tree-item-key]');
+		let itemName = itemEl == null ? '' : $(itemEl).attr('tree-item-key');
+		let model = itemEl.model;
+
+		let menu = [{
+			title: "Rename", async callback(){
+				let val = await Swal.fire({
+					title: "Rename to:",
+					text: itemName,
+					input: "text",
+				});
+
+				val = val.value;
+				if(!val) return;
+
+				let _path = path.split('/');
+				_path.pop(); _path.push(val);
+				val = _path.join('/');
+
+				let handle = await EditorWorkingDir.resolveCustomHandle(path);
+				handle.move(val);
+
+				await My.rescanFiles();
+			}
+		}, {
+			title: "Delete", async callback(){
+				let val = await Swal.fire({
+					title: `Are you sure to delete "${itemName}"?`,
+					showCancelButton: true,
+					showCloseButton: true
+				});
+
+				if(val.isDismissed) return;
+
+				if(model.constructor === Object)
+					(await EditorWorkingDir.getDirectory(path))?.delete();
+				else (await EditorWorkingDir.getFile(path))?.delete();
+
+				await My.rescanFiles();
+			}
+		}];
+
+		if(itemName === '') menu = [];
+
+		if(model.constructor === Object){
+			menu.push(...[{
+				title: "New file", async callback(){
+					let val = await Swal.fire({
+						title: "Create file in:",
+						text: path,
+						input: "text",
+					});
+
+					val = val.value;
+					if(!val) return;
+
+					await EditorWorkingDir.createFile(path+'/'+val);
+					await My.rescanFiles();
+				}
+			}, {
+				title: "New folder", async callback(){
+					let val = await Swal.fire({
+						title: "Create folder in:",
+						text: path,
+						input: "text",
+					});
+
+					val = val.value;
+					if(!val) return;
+
+					await EditorWorkingDir.getDirectory(path+'/'+val, true);
+					await My.rescanFiles();
+				}
+			}]);
+		}
+		else {
+			menu.push(...[{
+				title: "Open in editor", async callback(){
+					// 1
+				}
+			}]);
+		}
+
+		DropDown.show(menu, {x: ev.clientX, y: ev.clientY, event: ev});
+	}
+});
