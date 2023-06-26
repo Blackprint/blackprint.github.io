@@ -1,7 +1,7 @@
 ## html
 <sf-m name="project-list">
 	<div class="list">
-		<div class="{{ x.active && 'active' }}" sf-each="x in list">
+		<div class="item {{ x.active && 'active' }}" sf-each="x in list">
 			<i class="fa fa-sticky-note"></i>
 			<span @click="switchTab(x)">{{ x. title }}</span>
 			<i class="fa fa-times close" @click="close(x)"></i>
@@ -18,7 +18,7 @@ sf-m[name="project-list"] {
 	width: calc(100vw - 500px);
 	max-height: 50px;
 	overflow: auto;
-	.list div {
+	.list .item {
 		position: relative;
 		display: inline-flex;
 		flex: 1 1;
@@ -54,8 +54,11 @@ sf-m[name="project-list"] {
 	}
 
 	.create-tab{
-		margin: 3px 3px 3px 5px;
+		margin: 3px 3px 0px 5px;
 		cursor: pointer;
+		vertical-align: middle;
+		// display: inline-flex;
+		// margin: 1px 3px 0px 5px;
 		&:hover {
 			color: white;
 		}

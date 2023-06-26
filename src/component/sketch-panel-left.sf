@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="variable-list">
-			<div class="title" @click="collapseSubPanel(this, true)">Variables</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Variables</div>
 
 			<div class="tree-view tree-item has-child collapsed">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> Environment ({{ _envVar.length }})</div>
@@ -99,7 +99,7 @@
 			</div>
 		</div>
 		<div class="function-list collapsed">
-			<div class="title" @click="collapseSubPanel(this, true)">Functions ({{ functionCount }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Functions ({{ functionCount }})</div>
 			<div class="button" @click="createFunction" title="Create new empty function node"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -117,7 +117,7 @@
 			</div>
 		</div>
 		<div class="event-list collapsed">
-			<div class="title" @click="collapseSubPanel(this, true)">Events ({{ events.totalEvent }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Events ({{ events.totalEvent }})</div>
 			<div class="button" @click="createEvent" title="Create new empty event node"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -133,7 +133,7 @@
 			</div>
 		</div>
 		<div class="node-list">
-			<div class="title" @click="collapseSubPanel(this, true)">Nodes ({{ nodeCount }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Nodes ({{ nodeCount }})</div>
 			<div class="button" @click="createCustomNode" title="Create new node by using code editor "><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -199,6 +199,15 @@ sketch-page > .panels sketch-panel-left {
 			display: inline-block;
 			cursor: pointer;
 			white-space: nowrap;
+		}
+		& > .title {
+			color: #e7e7e7;
+    		font-weight: bold;
+		}
+		.collapse-btn {
+			font-size: 14px;
+			padding: 2px;
+			width: 12px;
 		}
 		.button{
 			margin-right: 10px;
@@ -431,28 +440,40 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			if(el.model != null) reSort(el.parentNode.model);
 			parent.removeClass("collapsed");
 		}
+
+		My.recalculateMenu();
 	}
 
 	My.collapseSubPanel = (el, isMain) => {
-		$(el).parent().toggleClass("collapsed");
+		let temp = $(el);
+		let parent = temp.parent();
+		parent.toggleClass("collapsed");
 
 		if(!isMain) return;
 		My.recalculateMenu();
+
+		let collapseBtn = temp.find('.collapse-btn').removeClass('fa-chevron-down').removeClass('fa-chevron-right');
+
+		if(parent.hasClass('collapsed'))
+			collapseBtn.addClass('fa-chevron-right');
+		else collapseBtn.addClass('fa-chevron-down');
 	}
 
 	My.recalculateMenu = async function(){
 		let variableMenu = My.$el('.variable-list');
 		let functionMenu = My.$el('.function-list');
+		let eventMenu = My.$el('.event-list');
 		let nodeMenu = My.$el('.node-list');
 
 		if(variableMenu[0] == null) return;
 
 		let menuContainer = variableMenu.parent();
 		let maxContainerHeight = menuContainer[0].offsetHeight;
-		let maxMenuHeight = Math.round(maxContainerHeight/3);
+		let maxMenuHeight = Math.round(maxContainerHeight/4);
 
 		variableMenu.css('max-height', ``);
 		functionMenu.css('max-height', ``);
+		eventMenu.css('max-height', ``);
 		nodeMenu.css('max-height', ``);
 
 		await $.afterRepaint();
@@ -460,22 +481,26 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		// collapsed menu => the height is lower than 40px
 		let variableHeight = variableMenu[0].offsetHeight;
 		let functionHeight = functionMenu[0].offsetHeight;
+		let eventHeight = eventMenu[0].offsetHeight;
 		let nodeHeight = nodeMenu[0].offsetHeight;
 
 		let mH = maxMenuHeight;
 		if(
-			(variableHeight < mH && functionHeight < mH && nodeHeight < mH)
-			|| (variableHeight > mH && functionHeight < mH && nodeHeight < mH)
-			|| (variableHeight < mH && functionHeight > mH && nodeHeight < mH)
-			|| (variableHeight < mH && functionHeight < mH && nodeHeight > mH)
+			(variableHeight < mH && functionHeight < mH && eventHeight < mH && nodeHeight < mH)
+			|| (variableHeight > mH && functionHeight < mH && eventHeight < mH && nodeHeight < mH)
+			|| (variableHeight < mH && functionHeight > mH && eventHeight < mH && nodeHeight < mH)
+			|| (variableHeight < mH && functionHeight < mH && eventHeight > mH && nodeHeight < mH)
+			|| (variableHeight < mH && functionHeight < mH && eventHeight < mH && nodeHeight > mH)
 		){
-			variableMenu.css('max-height', `${maxContainerHeight-nodeHeight-functionHeight-10}px`);
-			functionMenu.css('max-height', `${maxContainerHeight-variableHeight-nodeHeight-10}px`);
-			nodeMenu.css('max-height', `${maxContainerHeight-variableHeight-functionHeight-10}px`);
+			variableMenu.css('max-height', `${maxContainerHeight-nodeHeight-functionHeight-eventHeight-10}px`);
+			functionMenu.css('max-height', `${maxContainerHeight-variableHeight-nodeHeight-eventHeight-10}px`);
+			eventMenu.css('max-height', `${maxContainerHeight-variableHeight-functionHeight-nodeHeight-10}px`);
+			nodeMenu.css('max-height', `${maxContainerHeight-variableHeight-functionHeight-eventHeight-10}px`);
 		}
 		else{
 			variableMenu.css('max-height', `${maxMenuHeight-10}px`);
 			functionMenu.css('max-height', `${maxMenuHeight-10}px`);
+			eventMenu.css('max-height', `${maxMenuHeight-10}px`);
 			nodeMenu.css('max-height', `${maxMenuHeight-10}px`);
 		}
 	}
@@ -628,6 +653,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		else if(scope === Blackprint.VarScope.Shared || scope === Blackprint.VarScope.Private)
 			return funcInstance.createVariable(val, { scope });
 		else throw new Error("Unhandled scope: " + scope);
+
+		My.recalculateMenu();
 	}
 
 	My.createFunction = async ev => {
@@ -642,6 +669,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
 		rootInstance.createFunction(val, {description: "No description"});
+
+		My.recalculateMenu();
 	}
 
 	My.createEvent = async ev => {
@@ -656,6 +685,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
 		rootInstance.events.createEvent(val);
+
+		My.recalculateMenu();
 	}
 
 	My.createCustomNode = ev => {
