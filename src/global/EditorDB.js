@@ -44,6 +44,7 @@ $(() => {
 			$(window).once('click', async () => {
 				await EditorWorkingDir.handle.requestPermission();
 				Events.EditorWorkingDirReady = true;
+				Events.EditorWorkingDirChange();
 			});
 		}
 	

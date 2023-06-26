@@ -94,6 +94,7 @@ $(function(){
 	// Register event listener
 	Events.register('DBReady', false);
 	Events.register('EditorWorkingDirReady', false);
+	Events.register('EditorWorkingDirChange');
 
 	$(document.body)
 		.on("dragover", ev => ev.preventDefault())
@@ -107,11 +108,12 @@ $(function(){
 			}
 			else {
 				if(window.EditorWorkingDir != null)
-					alert("Already have working directory, please refresh browser to use new directory");
+					SmallNotif.add("Workspace directory was changed");
 
 				window.EditorWorkingDir = new CustomDirectory(handle);
 				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
 				Events.EditorWorkingDirReady = true;
+				Events.EditorWorkingDirChange();
 			}
 		});
 });

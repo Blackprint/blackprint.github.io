@@ -71,7 +71,7 @@ sf.model("project-panel-workspace", My => {
 	My.files = {};
 
 	My.init = function(){
-		Events.when('EditorWorkingDirReady', My.rescanFiles);
+		Events.on('EditorWorkingDirChange', My.rescanFiles);
 	}
 
 	My.rescanFiles = async function(){
