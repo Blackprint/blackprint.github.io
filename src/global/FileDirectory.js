@@ -12,10 +12,6 @@ class CustomDirectory extends Blackprint.Engine.CustomEvent {
 		this.handle = handle;
 		this.parentHandle = handle.parentHandle;
 		delete handle.parentHandle;
-
-		// EditorWorkingDir.handle.queryPermission().then(status => {
-		// 	if(status === 'granted') this.emit('ready');
-		// });
 	}
 
 	reconstruct(){
@@ -124,20 +120,22 @@ class CustomDirectory extends Blackprint.Engine.CustomEvent {
 
 	async recursiveReadFiles(path){
 		let data = {};
-		this.recursiveGetFileHandles(path, data, true);
+		this.recursiveGetFileHandles(path, data, null, true);
 		return data;
 	}
 
-	async recursiveGetFileHandles(path, _data={}, readText=false){
+	async recursiveGetFileHandles(path, _data={}, dirs=new WeakMap(), readText=false){
 		let list = await this.ls(path);
-
 		for (let i=0; i < list.length; i++) {
 			let item = list[i];
 			if(item.kind === 'file'){
 				if(readText) _data[item.name] = await item.readText();
 				else _data[item.name] = item;
 			}
-			else _data[item.name] = await item.recursiveGetFileHandles('.', {}, readText);
+			else {
+				_data[item.name] = await item.recursiveGetFileHandles('.', {}, dirs, readText);
+				dirs?.set(_data[item.name], item);
+			}
 		}
 
 		return _data;
@@ -172,6 +170,8 @@ class CustomDirectory extends Blackprint.Engine.CustomEvent {
 		await this.parentHandle.removeEntry(this.name);
 	}
 }
+
+window._CustomDirectory = CustomDirectory;
 
 class CustomFile {
 	constructor(handle, dirHandle){
