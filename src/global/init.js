@@ -95,25 +95,4 @@ $(function(){
 	Events.register('DBReady', false);
 	Events.register('EditorWorkingDirReady', false);
 	Events.register('EditorWorkingDirChange');
-
-	$(document.body)
-		.on("dragover", ev => ev.preventDefault())
-		.on("drop", async function(ev) {
-			ev.preventDefault();
-
-			let handle = await ev.dataTransfer.items[0].getAsFileSystemHandle();
-			if(handle == null) return;
-			if(handle.kind !== "directory"){
-				alert("Working directory must be a directory");
-			}
-			else {
-				if(window.EditorWorkingDir != null)
-					SmallNotif.add("Workspace directory was changed");
-
-				window.EditorWorkingDir = new CustomDirectory(handle);
-				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
-				Events.EditorWorkingDirReady = true;
-				Events.EditorWorkingDirChange();
-			}
-		});
 });

@@ -5,7 +5,7 @@
 		<div class="button" @click="rescanFiles"><i class="fa fa-sync-alt" title="Rescan files"></i></div>
 
 		<!-- /src/component/tree-list.sf -->
-		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode" @pointerover="hover" @pointerout="unhover">
+		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode" @pointerover="fileListHover" @pointerleave="fileListLeave" @contextmenu="event.preventDefault()">
 			<div class="tree-item collapsed" sf-each="key, val in files"
 				style="display: {{ val.hidden ? 'none' : '' }}">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -16,6 +16,7 @@
 			</div>
 		</div>
 	</div>
+	<div class="bottom-info">Drag and drop a folder to here to use it for your workspace</div>
 </sf-m>
 
 ## scss-global
@@ -64,25 +65,52 @@ sf-m[name="project-panel-workspace"] {
 			}
 		}
 	}
+
+	.bottom-info {
+		position: absolute;
+		bottom: 0;
+		text-align: center;
+		font-size: 12px;
+		padding: 5px;
+		color: gray;
+		user-select: none;
+	}
 }
 
 ## js-global
 sf.model("project-panel-workspace", My => {
 	My.files = {};
+	My._utils = {};
+	Object.setPrototypeOf(My._utils, Blackprint.Engine.CustomEvent.prototype);
 
 	My.init = function(){
 		Events.on('EditorWorkingDirChange', My.rescanFiles);
+		My.$el.on("dragover", ev => ev.preventDefault()).on("drop", async function(ev) {
+			ev.preventDefault();
+
+			let handle = await ev.dataTransfer.items[0].getAsFileSystemHandle();
+			if(handle == null) return;
+			if(handle.kind !== "directory") alert("Working directory must be a directory");
+			else {
+				if(window.EditorWorkingDir != null)
+					SmallNotif.add("Workspace directory was changed");
+
+				window.EditorWorkingDir = new _CustomDirectory(handle);
+				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
+				Events.EditorWorkingDirReady = true;
+				Events.EditorWorkingDirChange();
+			}
+		});
 	}
 
 	My.rescanFiles = async function(){
-		let dirs = {
-			[EditorWorkingDir.name]: await EditorWorkingDir.recursiveGetFileHandles()
-		};
+		My.directories ??= new WeakMap();
+		let cwd = await EditorWorkingDir.recursiveGetFileHandles('.', {}, My.directories);
+		let dirs = { [EditorWorkingDir.name]: cwd };
 
-		function compare(old, now){
+		function compare(old, now, path=''){
 			for (let key in old) {
-				if(now[key] == null)
-					sf.Obj.delete(old, key);
+				if(now[key] == null) sf.Obj.delete(old, key);
 			}
 
 			for (let key in now) {
@@ -91,11 +119,23 @@ sf.model("project-panel-workspace", My => {
 					reSort(old);
 				}
 				else if(old[key].constructor === Object && now[key].constructor === Object)
-					compare(old[key], now[key]);
+					compare(old[key], now[key], `${path}/${key}`);
 			}
 		}
 
-		compare(My.files, dirs);
+		compare(My.files, dirs, EditorWorkingDir.name);
+		My._utils.emit('file.change');
+
+		let targetEl = My.$el('[tree-section="files"]');
+		if(targetEl.hasClass('collapsed')) My.collapseSubPanel(targetEl[0], true);
+	}
+
+	My.resolvePath = My._utils.resolvePath = function(path){
+		let temp = Blackprint._utils.getDeepProperty(My.files, path.split('/'));
+		if(temp == null) return null;
+
+		if(temp.constructor === Object) return My.directories.get(temp);
+		return temp;
 	}
 
 	My.checkDragNode = ev => {
@@ -105,23 +145,25 @@ sf.model("project-panel-workspace", My => {
 			return;
 		}
 
-		if(focus.nextElementSibling != null) return;
-		focus = $(focus);
+		let isItem = true;
+		if(focus.nextElementSibling != null) isItem = false;
 
-		let section = focus.parent('.tree-view').attr('tree-section');
-		let itemEl = focus[0].parentNode;
-		let key = itemEl.getAttribute('tree-item-key');
+		focus = $(focus);
+		let section = focus.parent('.tree-view > .tree-item > tree-list > [tree-item-key]').attr('tree-item-key');
+		let itemEl = focus[0].closest('[tree-item-key]');
+		let key = itemEl?.getAttribute('tree-item-key');
 		if(key == null) return;
+
+		// Only handle node creation for assets
+		if(section !== 'assets') return;
 
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
 
-		let endEvent = 'pointerup';
-		if(ev.pointerType === 'touch')
-			endEvent = 'touchend';
+		let endEvent = ev.pointerType === 'touch' ? 'touchend' : 'pointerup';
 
 		ToolTip.set("Create node");
-		$(sf.Window).once(endEvent, evUp => {
+		$(sf.Window).once(endEvent, async evUp => {
 			ToolTip.set();
 
 			let targetEl = evUp.target;
@@ -136,28 +178,30 @@ sf.model("project-panel-workspace", My => {
 			if(targetEl.closest('sf-m.cables') != null){
 				let parentKey = parent.model.parentKey;
 				let namespace = !!parentKey ? (parentKey + '/' + key) : key;
+				await $.afterRepaint();
 
-				$.afterRepaint().then(function(){
-					let offset = targetEl.getBoundingClientRect();
-					let container = sketch.scope('container');
-					let posX = (evUp.clientX - offset.x) / container.scale;
-					let posY = (evUp.clientY - offset.y) / container.scale;
-					let nodeOptions = { x: posX, y: posY };
+				let offset = targetEl.getBoundingClientRect();
+				let container = CurrentSketch.scope('container');
+				let posX = (evUp.clientX - offset.x) / container.scale;
+				let posY = (evUp.clientY - offset.y) / container.scale;
+				let nodeOptions = { x: posX, y: posY };
 
-					if(section === 'environmentVar'){
-						nodeOptions.data = { name: key };
-						DropDown.show([{
-							title: "Get " + key, callback(){
-								sketch.createNode('BP/Env/Get', nodeOptions);
-							}
-						}, {
-							title: "Set " + key, callback(){
-								sketch.createNode('BP/Env/Set', nodeOptions);
-							}
-						}], {x: evUp.clientX, y: evUp.clientY, event: evUp});
-					}
-					else console.error("Unhandled side panel section:", section);
-				});
+				let menu = [];
+				if(section === 'assets'){
+					nodeOptions.data = { path: namespace };
+					menu = [{
+						title: "Get Handle", callback(){
+							CurrentSketch.createNode(
+								isItem
+									? 'BP_Editor/Workspace/Assets/File'
+									: 'BP_Editor/Workspace/Assets/Directory'
+							, nodeOptions);
+						}
+					}];
+				}
+				else return;
+
+				DropDown.show(menu, {x: evUp.clientX, y: evUp.clientY, event: evUp});
 			};
 		});
 	}
@@ -223,7 +267,9 @@ sf.model("project-panel-workspace", My => {
 		}
 
 		let itemEl = el.closest('[tree-item-key]');
-		let itemName = itemEl == null ? '' : $(itemEl).attr('tree-item-key');
+		if(itemEl == null) return;
+
+		let itemName = $(itemEl).attr('tree-item-key');
 		let model = itemEl.model;
 
 		let menu = [{
@@ -307,4 +353,36 @@ sf.model("project-panel-workspace", My => {
 
 		DropDown.show(menu, {x: ev.clientX, y: ev.clientY, event: ev});
 	}
+
+	My.fileListLeave = ev => { if(ev.pressure === 0) ToolTip.set() };
+	My.fileListHover = ev => {
+		if(ev.pressure !== 0) return; // Run on hover only, and no button click
+
+		if(!ev.target.classList.contains('title'))
+			return ToolTip.set(false);
+
+		let itemEl = $(ev.target.parentNode);
+		let parentKey = itemEl[0].parentNode.model?.parentKey;
+		if(parentKey == null) return ToolTip.set("Current working directory for this workspace");
+
+		parentKey += '/'+itemEl.attr('tree-item-key');
+		parentKey = parentKey.split('/').slice(1).join('/');
+
+		if(itemEl.hasClass('has-child')){
+			if(parentKey === 'assets')
+				return ToolTip.set("You can store project resource here and reference it to current Blackprint instance");
+
+			if(parentKey === 'instances')
+				return ToolTip.set("[WIP] Blackprint instances will be saved in this folder");
+
+			if(parentKey === 'local_nodes')
+				return ToolTip.set("[WIP] You can create custom node for Blackprint here, and this editor will automatically load it for you");
+		}
+		else { // file
+			if(parentKey === 'blackprint.json')
+				return ToolTip.set("[WIP] Blackprint workspace's settings");
+		}
+
+		ToolTip.set(false);
+	};
 });

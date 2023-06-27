@@ -50,6 +50,70 @@ class extends Blackprint.Node {
 	}
 });
 
+Blackprint.registerNode('BP_Editor/Workspace/Assets/File',
+class extends Blackprint.Node {
+	static output = { Handle: FileSystemFileHandle };
+	constructor(instance){
+		super(instance);
+
+		let iface = this.setInterface();
+		iface.title = "Workspace File"
+		iface.data = {};
+
+		this.workspace = sf.model("project-panel-workspace")._utils;
+	}
+
+	imported(data){
+		let iface = this.iface;
+		iface.data.path = data.path;
+
+		let name = data.path;
+		iface.description = name.slice(name.indexOf('/assets')).slice(-25);
+
+		this.workspace.on('file.change', this._fileChange = async ev => {
+			this.output.File = this.workspace.resolvePath(data.path)?.handle || null;
+		});
+
+		this._fileChange(data);
+	}
+
+	destroy(){
+		this.workspace.off('file.change', this._fileChange);
+	}
+});
+
+Blackprint.registerNode('BP_Editor/Workspace/Assets/Directory',
+class extends Blackprint.Node {
+	static output = { Handle: FileSystemDirectoryHandle };
+	constructor(instance){
+		super(instance);
+
+		let iface = this.setInterface();
+		iface.title = "Workspace Dir"
+		iface.data = {};
+
+		this.workspace = sf.model("project-panel-workspace")._utils;
+	}
+
+	imported(data){
+		let iface = this.iface;
+		iface.data.path = data.path;
+
+		let name = data.path;
+		iface.description = name.slice(name.indexOf('/assets')).slice(-25);
+
+		this.workspace.on('file.change', this._fileChange = async ev => {
+			this.output.Directory = this.workspace.resolvePath(data.path)?.handle || null;
+		});
+
+		this._fileChange(data);
+	}
+
+	destroy(){
+		this.workspace.off('file.change', this._fileChange);
+	}
+});
+
 setTimeout(() => {
 	Blackprint.nodes.BP_Editor.hidden = true;
 }, 1000);
