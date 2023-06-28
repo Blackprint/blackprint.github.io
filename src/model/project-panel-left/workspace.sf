@@ -140,11 +140,6 @@ sf.model("project-panel-workspace", My => {
 
 	My.checkDragNode = ev => {
 		let focus = ev.target;
-		if(ev.button === 2){ // If context menu
-			My.fileMenu(ev, focus);
-			return;
-		}
-
 		let isItem = true;
 		if(focus.nextElementSibling != null) isItem = false;
 
@@ -152,10 +147,15 @@ sf.model("project-panel-workspace", My => {
 		let section = focus.parent('.tree-view > .tree-item > tree-list > [tree-item-key]').attr('tree-item-key');
 		let itemEl = focus[0].closest('[tree-item-key]');
 		let key = itemEl?.getAttribute('tree-item-key');
-		if(key == null) return;
+
+		if(ev.button === 2){ // If context menu
+			My.fileMenu(ev, focus[0], section);
+			return;
+		}
 
 		// Only handle node creation for assets
 		if(section !== 'assets') return;
+		if(key == null) return;
 
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
@@ -256,7 +256,7 @@ sf.model("project-panel-workspace", My => {
 		}
 	}
 
-	My.fileMenu = function(ev, el){
+	My.fileMenu = function(ev, el, section){
 		let $el = $(el);
 		let tree = $el.parents('[tree-item-key]');
 		let path = '';
@@ -286,6 +286,13 @@ sf.model("project-panel-workspace", My => {
 
 		let menu = [{
 			title: "Rename", async callback(){
+				let _itemName = itemName;
+				if(section === 'instances'){
+					let extIndex = itemName.lastIndexOf('.bpi');
+					if(extIndex === -1) extIndex = itemName.length;
+					itemName = itemName.slice(0, extIndex);
+				}
+				
 				let val = await Swal.fire({
 					title: "Rename to:",
 					text: itemName,
@@ -295,14 +302,20 @@ sf.model("project-panel-workspace", My => {
 				val = val.value;
 				if(!val) return;
 
-				let _path = path.split('/');
-				_path.pop(); _path.push(val);
-				val = _path.join('/');
+				// Also rename the tab if exist
+				if(section === 'instances'){
+					val = val + (val.slice(-4) != '.bpi' ? '.bpi' : '');
 
-				let handle = await EditorWorkingDir.resolveCustomHandle(path);
-				await handle.move(val);
+					let list = sf.model("project-list").list;
+					for (let i=0; i < list.length; i++) {
+						if(list[i].title === _itemName){
+							list[i].title = val;
+							break;
+						}
+					}
+				}
 
-				await My.rescanFiles();
+				My.fileRename(path, val);
 			}
 		}, {
 			title: "Delete", async callback(){
@@ -397,4 +410,18 @@ sf.model("project-panel-workspace", My => {
 
 		ToolTip.set(false);
 	};
+
+	My.fileRename = async function(name, to){
+		if(name.startsWith(EditorWorkingDir.name+'/'))
+			name = name.replace(EditorWorkingDir.name+'/', '');
+
+		let _path = name.split('/');
+		_path.pop(); _path.push(to);
+		to = _path.join('/');
+
+		let handle = await EditorWorkingDir.resolveCustomHandle(name);
+		await handle.move(to);
+
+		await My.rescanFiles();
+	}
 });
