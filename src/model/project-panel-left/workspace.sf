@@ -5,7 +5,7 @@
 		<div class="button" @click="rescanFiles"><i class="fa fa-sync-alt" title="Rescan files"></i></div>
 
 		<!-- /src/component/tree-list.sf -->
-		<div class="tree-view" tree-section="files" @pointerdown="checkDragNode" @pointerover="fileListHover" @pointerleave="fileListLeave" @contextmenu="event.preventDefault()">
+		<div class="tree-view" tree-section="files" @dblclick="openFile" @pointerdown="checkDragNode" @pointerover="fileListHover" @pointerleave="fileListLeave" @contextmenu="event.preventDefault()">
 			<div class="tree-item collapsed" sf-each="key, val in files"
 				style="display: {{ val.hidden ? 'none' : '' }}">
 				<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -138,15 +138,26 @@ sf.model("project-panel-workspace", My => {
 		return temp;
 	}
 
+	My.getElementInfo = function(el){
+		let $el = $(el);
+		let current = $el.parent('.tree-view > .tree-item > tree-list > [tree-item-key]');
+		let section = current.attr('tree-item-key');
+		let itemEl = $(el.closest('[tree-item-key]') ?? []);
+		let key = itemEl.attr('tree-item-key');
+		let parent = $el.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
+		let parentKey = parent.model.parentKey;
+		let path = !!parentKey ? (parentKey + '/' + key) : key;
+
+		return { parent, section, itemEl, key, model: itemEl[0]?.model, path, parentKey };
+	}
+
 	My.checkDragNode = ev => {
 		let focus = ev.target;
 		let isItem = true;
 		if(focus.nextElementSibling != null) isItem = false;
 
+		let { parent, section, itemEl, key, path: namespace } = My.getElementInfo(focus);
 		focus = $(focus);
-		let section = focus.parent('.tree-view > .tree-item > tree-list > [tree-item-key]').attr('tree-item-key');
-		let itemEl = focus[0].closest('[tree-item-key]');
-		let key = itemEl?.getAttribute('tree-item-key');
 
 		if(ev.button === 2){ // If context menu
 			My.fileMenu(ev, focus[0], section);
@@ -156,8 +167,6 @@ sf.model("project-panel-workspace", My => {
 		// Only handle node creation for assets
 		if(section !== 'assets') return;
 		if(key == null) return;
-
-		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
 
 		let endEvent = ev.pointerType === 'touch' ? 'touchend' : 'pointerup';
@@ -176,8 +185,6 @@ sf.model("project-panel-workspace", My => {
 
 			if(targetEl.closest('sketch-page') == null) return;
 			if(targetEl.closest('sf-m.cables') != null){
-				let parentKey = parent.model.parentKey;
-				let namespace = !!parentKey ? (parentKey + '/' + key) : key;
 				await $.afterRepaint();
 
 				let offset = targetEl.getBoundingClientRect();
@@ -368,13 +375,6 @@ sf.model("project-panel-workspace", My => {
 				}
 			}]);
 		}
-		else {
-			menu.push(...[{
-				title: "Open in editor", async callback(){
-					throw "Feature not ready";
-				}
-			}]);
-		}
 
 		DropDown.show(menu, {x: ev.clientX, y: ev.clientY, event: ev});
 	}
@@ -386,8 +386,7 @@ sf.model("project-panel-workspace", My => {
 		if(!ev.target.classList.contains('title'))
 			return ToolTip.set(false);
 
-		let itemEl = $(ev.target.parentNode);
-		let parentKey = itemEl[0].parentNode.model?.parentKey;
+		let { parentKey, itemEl } = My.getElementInfo(ev.target);
 		if(parentKey == null) return ToolTip.set("Current working directory for this workspace");
 
 		parentKey += '/'+itemEl.attr('tree-item-key');
@@ -410,6 +409,32 @@ sf.model("project-panel-workspace", My => {
 
 		ToolTip.set(false);
 	};
+
+	My.openFile = function(ev){
+		let { path, model, section, key } = My.getElementInfo(ev.target);
+		if(model == null || model.constructor === Object) return;
+
+		// Load instance in new tab if not opened, switch tab if already opened
+		if(section === 'instances'){
+			let projectList = sf.model("project-list");
+			let list = projectList.list;
+			for (let i=0; i < list.length; i++) {
+				if(list[i].title === key){
+					projectList.switchTab(list[i]);
+					return;
+				}
+			}
+
+			let tab = projectList.createTab();
+			tab.title = key;
+
+			setTimeout(async () => {
+				let file = await My.resolvePath(path);
+				await tab.sketch.importJSON(await file.readText());
+				tab.isUnsaved = false;
+			}, 200);
+		}
+	}
 
 	My.fileRename = async function(name, to){
 		if(name.startsWith(EditorWorkingDir.name+'/'))
