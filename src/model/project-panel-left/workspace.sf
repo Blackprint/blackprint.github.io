@@ -79,14 +79,22 @@ sf-m[name="project-panel-workspace"] {
 
 ## js-global
 sf.model("project-panel-workspace", My => {
+	My._settings = {};
 	My.files = {};
 	My._utils = {};
 	Object.setPrototypeOf(My._utils, Blackprint.Engine.CustomEvent.prototype);
 
 	My.init = function(){
-		Events.on('EditorWorkingDirChange', My.rescanFiles);
+		Events.on('EditorWorkingDirChange', async ()=>{
+			await My.cleanWorkspace();
+			await My.rescanFiles();
+			My.initAsWorkspace();
+		});
+
 		My.$el.on("dragover", ev => ev.preventDefault()).on("drop", async function(ev) {
 			ev.preventDefault();
+			let cleanWorkspace = await My.cleanWorkspace();
+			if(cleanWorkspace == null) return SmallNotif.add(cleanWorkspace);
 
 			let handle = await ev.dataTransfer.items[0].getAsFileSystemHandle();
 			if(handle == null) return;
@@ -99,8 +107,101 @@ sf.model("project-panel-workspace", My => {
 				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
 				Events.EditorWorkingDirReady = true;
 				Events.EditorWorkingDirChange();
+				My.initAsWorkspace();
 			}
 		});
+	}
+
+	My.cleanWorkspace = async function(){
+		let projectList = sf.model("project-list");
+		let list = projectList.list;
+		for (let i=0; i < list.length; i++) {
+			if(list[i].isUnsaved)
+				return "You must save/close opened tab before changing the workspace";
+		}
+
+		for (let i=list.length-1; i >= 0; i--)
+			projectList.closeTab(list[i], true);
+
+		// Create dummy tab
+		await projectList.createTab();
+	}
+
+	My.initAsWorkspace = async function(){
+		// Check if has workspace settings
+		let file;
+		try{
+			file = await EditorWorkingDir.resolveCustomHandle('bp-workspace.json');
+		} catch(e) {}
+
+		if(file){
+			let val = await Swal.fire({
+				title: "Do you want to load and execute this workspace?",
+				text: "Make sure you have trusted the author of this workspace because this editor will load and run the opened instance for this workspace",
+				showCancelButton: true,
+				showCloseButton: true
+			});
+
+			let projectList = sf.model("project-list");
+			if(!val.isDismissed) {
+				My._settings = JSON.parse(await file.readText());
+				let dummyTab = projectList.list[0];
+
+				let opened = My.getSetting(['opened_instances']) ?? [];
+				for (let i=0; i < opened.length; i++) {
+					let file = await My.resolvePath(EditorWorkingDir.name+`/instances/${opened[i]}`);
+					if(!file) continue;
+
+					let tab = projectList.createTab();
+					tab.title = opened[i];
+
+					await new Promise(resolve => setTimeout(async () => {
+						await tab.sketch.importJSON(await file.readText());
+						tab.isUnsaved = false;
+						resolve();
+					}, 200));
+				}
+
+				if(opened.length !== 0) projectList.closeTab(dummyTab);
+			}
+
+			return;
+		}
+
+		let val = await Swal.fire({
+			title: "Do you want to initialize this folder as your workspace?",
+			showCancelButton: true,
+			showCloseButton: true
+		});
+
+		if(val.isDismissed) return;
+
+		await EditorWorkingDir.getDirectory('/instances', true);
+		await EditorWorkingDir.getDirectory('/assets', true);
+		await EditorWorkingDir.getDirectory('/local_nodes', true);
+		await My.saveWorkspaceData();
+	}
+
+	My.saveWorkspaceData = async function(){
+		let file;
+		try {
+			file = await EditorWorkingDir.resolveCustomHandle('bp-workspace.json');
+		} catch(e) {
+			file = await EditorWorkingDir.createFile('bp-workspace.json');
+		}
+
+		await file.writeData(JSON.stringify(My._settings));
+	}
+
+	My.getSetting = function(name){
+		if(name.constructor === String) name = [name];
+		return Blackprint._utils.getDeepProperty(My._settings, name);
+	}
+
+	My.setSetting = function(name, val){
+		if(name.constructor === String) name = [name];
+		Blackprint._utils.setDeepProperty(My._settings, name, val);
+		My.saveWorkspaceData();
 	}
 
 	My.rescanFiles = async function(){
@@ -126,8 +227,10 @@ sf.model("project-panel-workspace", My => {
 		compare(My.files, dirs, EditorWorkingDir.name);
 		My._utils.emit('file.change');
 
-		let targetEl = My.$el('[tree-section="files"]');
-		if(targetEl.hasClass('collapsed')) My.collapseSubPanel(targetEl[0], true);
+		setTimeout(() => {
+			let targetEl = My.$el('[tree-section="files"] > .collapsed > .title');
+			if(targetEl[0]) My.collapseTree(targetEl[0], true);
+		}, 10);
 	}
 
 	My.resolvePath = My._utils.resolvePath = function(path){
@@ -403,8 +506,8 @@ sf.model("project-panel-workspace", My => {
 				return ToolTip.set("[WIP] You can create custom node for Blackprint here, and this editor will automatically load it for you");
 		}
 		else { // file
-			if(parentKey === 'blackprint.json')
-				return ToolTip.set("[WIP] Blackprint workspace's settings");
+			if(parentKey === 'bp-workspace.json')
+				return ToolTip.set("Blackprint workspace's settings");
 		}
 
 		ToolTip.set(false);
