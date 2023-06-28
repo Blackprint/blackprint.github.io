@@ -80,11 +80,25 @@ sf.model("project-list", My => {
 	My.init = function(){}
 	My.uniqId = 2;
 
+	My.init = function(){
+		views.goto('/sketch/1');
+		setTimeout(() => My.storeCurrentSketchToTab(My.list[0], '1'));
+	}
+
+	My.storeCurrentSketchToTab = function(tab, i){
+		setTimeout(() => {
+			let pageIndex = CurrentSketch.page.$el.parent()[0].routerData.page;
+			if(i !== pageIndex) throw new Error("Failed to save sketch page's reference");
+			tab.sketch = CurrentSketch;
+		}, 50);
+	}
+
 	My.createTab = function(){
 		let i = '' + (My.uniqId++);
 		let tab = {active: false, title: 'Untitled-'+i, id: i, isUnsaved: false};
 		My.list.push(tab);
 		My.switchTab(tab);
+		My.storeCurrentSketchToTab(tab, i);
 	}
 
 	My.switchTab = function(tab){
@@ -97,7 +111,7 @@ sf.model("project-list", My => {
 		views.goto(`/sketch/${tab.id}`);
 	}
 
-	My.saveTab = function(tab){
+	My.saveTab = async function(tab){
 		if(tab == null) return;
 		if(tab === true){ // Save current active tab
 			let list = My.list;
@@ -108,9 +122,18 @@ sf.model("project-list", My => {
 			}
 		}
 
+		if(!tab.title.includes('.bpi')) tab.title += '.bpi';
+
 		let workspacePanel = sf.model("project-panel-workspace");
-		let folder = workspacePanel.resolvePath(EditorWorkingDir.name + '/instances');
-		console.log(folder);
+		let file = await workspacePanel.resolvePath(EditorWorkingDir.name + '/instances/' + tab.title);
+
+		// Create file if not exist
+		if(file == null){
+			file = await EditorWorkingDir.createFile('instances/' + tab.title);
+			await workspacePanel.rescanFiles();
+		}
+
+		await file.writeData(tab.sketch.exportJSON({environment: false}));
 	}
 
 	My.openMenu = function(ev, tab){

@@ -398,7 +398,7 @@ sf.model("project-panel-workspace", My => {
 				return ToolTip.set("You can store project resource here and reference it to current Blackprint instance");
 
 			if(parentKey === 'instances')
-				return ToolTip.set("[WIP] Blackprint instances will be saved in this folder");
+				return ToolTip.set("Blackprint instances will be saved in this folder");
 
 			if(parentKey === 'local_nodes')
 				return ToolTip.set("[WIP] You can create custom node for Blackprint here, and this editor will automatically load it for you");
