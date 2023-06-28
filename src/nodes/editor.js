@@ -71,7 +71,7 @@ class extends Blackprint.Node {
 		iface.description = name.slice(name.indexOf('/assets')).slice(-25);
 
 		this.workspace.on('file.change', this._fileChange = async ev => {
-			this.output.File = this.workspace.resolvePath(data.path)?.handle || null;
+			this.output.Handle = this.workspace.resolvePath(data.path)?.handle || null;
 		});
 
 		this._fileChange(data);
@@ -103,7 +103,7 @@ class extends Blackprint.Node {
 		iface.description = name.slice(name.indexOf('/assets')).slice(-25);
 
 		this.workspace.on('file.change', this._fileChange = async ev => {
-			this.output.Directory = this.workspace.resolvePath(data.path)?.handle || null;
+			this.output.Handle = this.workspace.resolvePath(data.path)?.handle || null;
 		});
 
 		this._fileChange(data);
