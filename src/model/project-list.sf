@@ -1,6 +1,6 @@
 ## html
 <sf-m name="project-list">
-	<div class="list" title="Use Alt + 1/2/3 to switch between tab">
+	<div class="list" title="Use Alt + 1/2/3 to switch between tab, Alt + W to close">
 		<div class="item {{ x.active && 'active' }}" sf-each="x in list" @contextmenu.prevent="openMenu(event, x)">
 			<i class="fa fa-sticky-note"></i>
 			<span @click="switchTab(x)" title="{{ x.tooltip || '' }}">{{ x.title }}</span>
@@ -86,6 +86,23 @@ sf.model("project-list", My => {
 	My.init = function(){
 		views.goto('/sketch/1');
 		setTimeout(() => My.storeCurrentSketchToTab(My.list[0], '1'));
+
+		// Avoid closing page when there are unsaved changes
+		window.addEventListener("beforeunload", ev => {
+			// Check for any unsaved tab
+			let list = My.list;
+			let hasUnsaved = false;
+			for (let i=0; i < list.length; i++) {
+				if(list[i].isUnsaved){
+					hasUnsaved = true;
+					break;
+				}
+			}
+
+			if(!hasUnsaved) return;
+			ev.preventDefault();
+			return (ev.returnValue = "You have unsaved changes, are you sure to close this tab?");
+		}, { capture: true });
 	}
 
 	My.storeCurrentSketchToTab = function(tab, i){
@@ -101,6 +118,12 @@ sf.model("project-list", My => {
 		}, 50);
 	}
 
+	My.getActiveTab = function(){
+		let tabs = My.list;
+		for (let i=0; i < tabs.length; i++)
+			if(tabs[i].active) return tabs[i];
+	}
+
 	My.createTab = function(){
 		let i = '' + (My.uniqId++);
 		let tab = {active: false, title: 'Untitled-'+i, id: i, isUnsaved: false};
@@ -112,9 +135,8 @@ sf.model("project-list", My => {
 
 	My.switchTab = function(tab){
 		let tabs = My.list;
-		for (let i=0; i < tabs.length; i++) {
+		for (let i=0; i < tabs.length; i++)
 			tabs[i].active = false;
-		}
 
 		tab.active = true;
 		views.goto(`/sketch/${tab.id}`);

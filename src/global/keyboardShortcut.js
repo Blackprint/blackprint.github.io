@@ -18,6 +18,8 @@ sf.model('keyboard-shortcut', My => {
 			My.loadInstanceTab(ev);
 		else if(ev.altKey && /^[0-9]$/m.test(ev.key))
 			My.switchInstanceTab(+ev.key);
+		else if(ev.altKey && ev.key === 'w')
+			My.projectList.close(My.projectList.getActiveTab());
 		else return;
 
 		ev.preventDefault();
