@@ -80,7 +80,6 @@ sf-m[name="project-list"] {
 ## js-global
 sf.model("project-list", My => {
 	My.list = [{active: true, title: 'Untitled-1', id: '1', isUnsaved: false}];
-	My.init = function(){}
 	My.uniqId = 2;
 
 	My.init = function(){
@@ -166,6 +165,15 @@ sf.model("project-list", My => {
 
 		await file.writeData(tab.sketch.exportJSON({environment: false}));
 		tab.isUnsaved = false;
+
+		let list = My.list;
+		let _list = [];
+		for (let i=0; i < list.length; i++) {
+			if(list[i].title.endsWith('.bpi')) _list.push(list[i].title);
+		}
+
+		if(_list.length === 0) return;
+		workspacePanel.setSetting('opened_instances', _list);
 	}
 
 	My.openMenu = function(ev, tab){
@@ -207,7 +215,7 @@ sf.model("project-list", My => {
 		}], {x: ev.clientX, y: ev.clientY, event: ev});
 	}
 
-	My.close = function(tab){
+	My.closeTab = function(tab, noSwitchTab=false){
 		let tabs = My.list;
 		let i = tabs.indexOf(tab);
 		if(i === -1) return;
@@ -235,6 +243,7 @@ sf.model("project-list", My => {
 
 		tabs.splice(i, 1);
 
+		if(noSwitchTab) return;
 		if(tabs.length === 0) My.createTab();
 		else My.switchTab(tabs[0]);
 	}
