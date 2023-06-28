@@ -267,7 +267,19 @@ sf.model("project-panel-workspace", My => {
 		}
 
 		let itemEl = el.closest('[tree-item-key]');
-		if(itemEl == null) return;
+		if(itemEl == null) {
+			DropDown.show([{
+				title: "Close this workspace",
+				async callback(){
+					sf.Obj.delete(My.files, window.EditorWorkingDir.name);
+					My.files.refresh();
+
+					window.EditorWorkingDir = null;
+					await EditorDB.setSettings("EditorWorkingDir", null);
+				}
+			}], {x: ev.clientX, y: ev.clientY, event: ev});
+			return;
+		}
 
 		let itemName = $(itemEl).attr('tree-item-key');
 		let model = itemEl.model;
@@ -346,7 +358,7 @@ sf.model("project-panel-workspace", My => {
 		else {
 			menu.push(...[{
 				title: "Open in editor", async callback(){
-					// 1
+					throw "Feature not ready";
 				}
 			}]);
 		}
