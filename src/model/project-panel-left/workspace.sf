@@ -574,7 +574,9 @@ sf.model("project-panel-workspace", My => {
 
 	My.refreshLocalNodes = async function(){
 		// This only available on development mode editor (as this have eval, it can be dangerous)
-		if(!sf.hotReload) return;
+		if(sf.hotReload == null || location.pathname !== '/dev.html')
+			return SmallNotif.add("Refresh local nodes feature only available on development mode editor");
+
 		let localNodes = My.files[EditorWorkingDir.name].local_nodes;
 
 		// Skip if not exist

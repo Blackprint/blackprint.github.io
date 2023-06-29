@@ -137,8 +137,9 @@ sf.model('custom-node-editor', function(My){
 
 	// This only runnable on development mode editor
 	My.run = function(){
+		// Return if not in development mode as eval is dangerous
 		if(sf.hotReload == null || location.pathname !== '/dev.html')
-			return; // Return if not in development mode as eval is dangerous
+			return SmallNotif.add("This feature only available on development mode editor");
 
 		let code = My.editor.getValue();
 		let contextName = code.match(/\bregisterNode\(['"](\w+)\//)?.[1];

@@ -1,5 +1,5 @@
 // This only available on development mode editor (as this have eval, it can be dangerous)
-if(sf.hotReload){
+if(sf.hotReload != null && location.pathname === '/dev.html'){
 	sf.loader.js(['https://cdn.jsdelivr.net/npm/sass.js@0.11.1/dist/sass.sync.js']);
 	sf.parser = {
 		parseTemplate(text){

@@ -442,7 +442,14 @@ var EditorHeader = sf.model('header', function(My, include){
 			title: 'Development Mode',
 			icon: 'fa fa-tools',
 			hide: sf.hotReload !== void 0,
-			callback(){
+			async callback(){
+				let val = await Swal.fire({
+					title: "Development mode editor is intended for developers only, because it has feature that can evaluating code you will need to be more aware with code that you will run or execute. Are you sure to continue?",
+					showCancelButton: true,
+					showCloseButton: true
+				});
+
+				if(val.isDismissed) return;
 				location.pathname = '/dev.html';
 			}
 		}, {
