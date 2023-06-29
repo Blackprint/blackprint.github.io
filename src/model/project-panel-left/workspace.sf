@@ -514,7 +514,7 @@ sf.model("project-panel-workspace", My => {
 				return ToolTip.set("Blackprint instances will be saved in this folder");
 
 			if(parentKey === 'local_nodes')
-				return ToolTip.set("You can create custom node for Blackprint here, and this editor will load it for you on init and rescan (by right click this folder)");
+				return ToolTip.set("You can create custom node for Blackprint here,\nand this editor will load it for you on workspace init and rescan (by right click this folder)");
 		}
 		else { // file
 			if(parentKey === 'bp-workspace.json')

@@ -55,5 +55,4 @@ $(() => {
 		let myStorage = await EditorDB.getSettings('MyStorage');
 		if(myStorage != null) _.merge(MyStorage, myStorage);
 	}
-	
-	});
+});
