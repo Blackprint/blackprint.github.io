@@ -444,7 +444,8 @@ var EditorHeader = sf.model('header', function(My, include){
 			hide: sf.hotReload !== void 0,
 			async callback(){
 				let val = await Swal.fire({
-					title: "Development mode editor is intended for developers only, because it has feature that can evaluating code you will need to be more aware with code that you will run or execute. Are you sure to continue?",
+					title: "Warning",
+					text: "Development mode editor is intended for developers only, because it has feature that can evaluating code you will need to be more aware with code that you will run or execute. Are you sure to continue?",
 					showCancelButton: true,
 					showCloseButton: true
 				});
