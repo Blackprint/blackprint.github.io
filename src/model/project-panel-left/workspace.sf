@@ -144,6 +144,10 @@ sf.model("project-panel-workspace", My => {
 
 			let projectList = sf.model("project-list");
 			if(!val.isDismissed) {
+				// Load local nodes first
+				await My.refreshLocalNodes();
+
+				// Then load the instances
 				My._settings = JSON.parse(await file.readText());
 				let dummyTab = projectList.list[0];
 
@@ -204,27 +208,27 @@ sf.model("project-panel-workspace", My => {
 		My.saveWorkspaceData();
 	}
 
+	function compareDir(old, now, path=''){
+		for (let key in old) {
+			if(now[key] == null) sf.Obj.delete(old, key);
+		}
+
+		for (let key in now) {
+			if(old[key] == null){
+				sf.Obj.set(old, key, now[key]);
+				reSort(old);
+			}
+			else if(old[key].constructor === Object && now[key].constructor === Object)
+				compareDir(old[key], now[key], `${path}/${key}`);
+		}
+	}
+
 	My.rescanFiles = async function(){
 		My.directories ??= new WeakMap();
 		let cwd = await EditorWorkingDir.recursiveGetFileHandles('.', {}, My.directories);
 		let dirs = { [EditorWorkingDir.name]: cwd };
 
-		function compare(old, now, path=''){
-			for (let key in old) {
-				if(now[key] == null) sf.Obj.delete(old, key);
-			}
-
-			for (let key in now) {
-				if(old[key] == null){
-					sf.Obj.set(old, key, now[key]);
-					reSort(old);
-				}
-				else if(old[key].constructor === Object && now[key].constructor === Object)
-					compare(old[key], now[key], `${path}/${key}`);
-			}
-		}
-
-		compare(My.files, dirs, EditorWorkingDir.name);
+		compareDir(My.files, dirs, EditorWorkingDir.name);
 		My._utils.emit('file.change');
 
 		setTimeout(() => {
@@ -332,7 +336,7 @@ sf.model("project-panel-workspace", My => {
 	}
 
 	function reSort(obj){
-		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b));
+		if(obj._list) obj._list.sort(Intl.Collator().compare);
 
 		let _list = obj._list;
 		let files = [];
@@ -479,6 +483,13 @@ sf.model("project-panel-workspace", My => {
 			}]);
 		}
 
+		if(section === 'local_nodes'){
+			menu.unshift({
+				title: "Rescan and reload",
+				callback(){ My.refreshLocalNodes() }
+			});
+		}
+
 		DropDown.show(menu, {x: ev.clientX, y: ev.clientY, event: ev});
 	}
 
@@ -503,7 +514,7 @@ sf.model("project-panel-workspace", My => {
 				return ToolTip.set("Blackprint instances will be saved in this folder");
 
 			if(parentKey === 'local_nodes')
-				return ToolTip.set("[WIP] You can create custom node for Blackprint here, and this editor will automatically load it for you");
+				return ToolTip.set("You can create custom node for Blackprint here, and this editor will load it for you on init and rescan (by right click this folder)");
 		}
 		else { // file
 			if(parentKey === 'bp-workspace.json')
@@ -551,5 +562,77 @@ sf.model("project-panel-workspace", My => {
 		await handle.move(to);
 
 		await My.rescanFiles();
+	}
+
+	// Do not use this for cryptography/encryption
+	async function hashString(str){
+		let temp = '';
+		let arr = new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str)));
+		for (let i=0; i < arr.length; i++) temp += arr.toString(36);
+		return temp;
+	}
+
+	My.refreshLocalNodes = async function(){
+		// This only available on development mode editor (as this have eval, it can be dangerous)
+		if(!sf.hotReload) return;
+		let localNodes = My.files[EditorWorkingDir.name].local_nodes;
+
+		// Skip if not exist
+		if(localNodes == null) return;
+		let notif = SmallNotif.add("Rescanning local nodes...", "yellow", false);
+
+		let cwd = await EditorWorkingDir.recursiveGetFileHandles('local_nodes', {}, My.directories);
+		compareDir(localNodes, cwd, EditorWorkingDir.name + '/local_nodes');
+
+		let count = 0;
+		await isScriptChanged(localNodes, EditorWorkingDir.name);
+		async function isScriptChanged(dir, path){
+			// Prioritize name with underscore first
+			let loadList = [];
+			let prioritizeList = [];
+
+			for (let key in dir) {
+				let target = dir[key];
+
+				if(target.constructor === Object){
+					await isScriptChanged(target, path + '/' + key);
+					continue;
+				}
+
+				// Only load file with .js extension
+				if(!target.name.endsWith('.js') && !target.name.endsWith('.sf')) continue;
+				if(target.name.startsWith('_')) prioritizeList.push(key);
+				else loadList.push(key);
+			}
+
+			loadList.unshift(...prioritizeList);
+			for (let i=0; i < loadList.length; i++) {
+				let target = dir[loadList[i]];
+
+				// is file
+				let content = await target.readText();
+				let hash = await hashString(content);
+
+				// Skip if content was unchanged
+				if(target._hash === hash) continue;
+				target._hash = hash;
+
+				// Parse .sf template file
+				if(target.name.endsWith('.sf')){
+					let temp = sf.parser.parseTemplate(content);
+					sf.parser.load(path + '/' + target.name, temp);
+					continue;
+				}
+
+				// Load node or .js script into the editor
+				try{ eval(content); count++; } catch(e) {
+					notif.change("Failed to load node from local_nodes", "red");
+					throw e;
+				}
+			}
+		}
+
+		notif.change(count + " file was reloaded", "green");
+		await new Promise(resolve => setTimeout(resolve, 200));
 	}
 });
