@@ -317,7 +317,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	function reSort(obj){
-		if(obj._list) obj._list.sort((a, b) => a.localeCompare(b));
+		if(obj._list) obj._list.sort(Intl.Collator().compare);
 		obj.refresh?.();
 	}
 
