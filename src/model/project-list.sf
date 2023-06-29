@@ -4,7 +4,7 @@
 		<div class="item {{ x.active && 'active' }}" sf-each="x in list" @contextmenu.prevent="openMenu(event, x)">
 			<i class="fa fa-sticky-note"></i>
 			<span @click="switchTab(x)" title="{{ x.tooltip || '' }}">{{ x.title }}</span>
-			<i class="fa fa-{{ x.isUnsaved ? 'circle' : 'times close' }}" @click="close(x)"></i>
+			<i class="fa fa-{{ x.isUnsaved ? 'circle' : 'times close' }}" @click="closeTab(x)"></i>
 		</div>
 	</div>
 	<div class="create-tab" @click="createTab"><i class="fa fa-plus"></i></div>
