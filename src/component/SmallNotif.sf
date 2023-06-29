@@ -62,6 +62,20 @@ var SmallNotif = sf.model('small.notif', function(My){
         My.list.splice(My.list.indexOf(item), 1);
       }, delay || (1000 + 100 * message.length));
     }
+    else {
+      item.destroy = function(){
+        let i = My.list.indexOf(item);
+        if(i === -1) return;
+        My.list.splice(i, 1);
+      };
+      item.change = function(message, color, delay){
+        item.message = message;
+        item.color = color;
+        
+        if(delay === false) return;
+        item.timer = setTimeout(item.destroy, delay || (1000 + 100 * item.message.length));
+      }
+    }
 
     return item;
   }
