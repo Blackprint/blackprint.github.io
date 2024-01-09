@@ -175,7 +175,7 @@ sf.component('sketch-panel-right', {template: #this.path}, function(My){
 	}
 
 	My.openPanel = function(){
-		removeBlur();
+		if(!My.opened) removeBlur();
 		My.opened = true;
 	}
 
