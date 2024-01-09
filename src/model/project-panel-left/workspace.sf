@@ -16,6 +16,7 @@
 			</div>
 		</div>
 	</div>
+	<div class="bottom-info info-browser-flag {{ needBrowserFlag ? '' : 'hide' }}">Please enable <b>"File System Access API"</b> flags for your browser chrome://flags</div>
 	<div class="bottom-info">Drag and drop a folder to here to use it for your workspace</div>
 </sf-m>
 
@@ -74,6 +75,14 @@ sf-m[name="project-panel-workspace"] {
 		padding: 5px;
 		color: gray;
 		user-select: none;
+		&.hide{
+			display: none;
+		}
+	}
+
+	.info-browser-flag{
+		bottom: 50px;
+		border-bottom: 1px solid #a5a5a536;
 	}
 }
 
@@ -82,21 +91,23 @@ sf.model("project-panel-workspace", My => {
 	My._settings = {};
 	My.files = {};
 	My._utils = {};
+	My.needBrowserFlag = DataTransferItem.prototype.getAsFileSystemHandle == null;
 	Object.setPrototypeOf(My._utils, Blackprint.Engine.CustomEvent.prototype);
 
 	My.init = function(){
 		Events.on('EditorWorkingDirChange', async ()=>{
 			await My.cleanWorkspace();
 			await My.rescanFiles();
-			My.initAsWorkspace();
+			await My.initAsWorkspace();
 		});
 
 		My.$el.on("dragover", ev => ev.preventDefault()).on("drop", async function(ev) {
 			ev.preventDefault();
-			let cleanWorkspace = await My.cleanWorkspace();
-			if(cleanWorkspace == null) return SmallNotif.add(cleanWorkspace);
 
-			let handle = await ev.dataTransfer.items[0].getAsFileSystemHandle();
+			let item = ev.dataTransfer.items[0];
+			if(item.getAsFileSystemHandle == null) return SmallNotif.add("This browser is not supported", 'red');
+
+			let handle = await item.getAsFileSystemHandle();
 			if(handle == null) return;
 			if(handle.kind !== "directory") alert("Working directory must be a directory");
 			else {
@@ -107,7 +118,6 @@ sf.model("project-panel-workspace", My => {
 				await EditorDB.setSettings("EditorWorkingDir", window.EditorWorkingDir);
 				Events.EditorWorkingDirReady = true;
 				Events.EditorWorkingDirChange();
-				My.initAsWorkspace();
 			}
 		});
 	}
@@ -184,6 +194,7 @@ sf.model("project-panel-workspace", My => {
 		await EditorWorkingDir.getDirectory('/assets', true);
 		await EditorWorkingDir.getDirectory('/local_nodes', true);
 		await My.saveWorkspaceData();
+		await My.rescanFiles();
 	}
 
 	My.saveWorkspaceData = async function(){
@@ -487,6 +498,14 @@ sf.model("project-panel-workspace", My => {
 			menu.unshift({
 				title: "Rescan and reload",
 				callback(){ My.refreshLocalNodes() }
+			}, {
+				title: "New interface template.sf",
+				description: "For browser user interface",
+				callback(){ My.refreshLocalNodes() }
+			}, {
+				title: "New node template.js",
+				description: "For Node.js/Deno engine",
+				callback(){ My.refreshLocalNodes() }
 			});
 		}
 
@@ -508,7 +527,7 @@ sf.model("project-panel-workspace", My => {
 
 		if(itemEl.hasClass('has-child')){
 			if(parentKey === 'assets')
-				return ToolTip.set("You can store project resource here and reference it to current Blackprint instance");
+				return ToolTip.set("You can store project resource here and reference it to current Blackprint instance\nAny drag and dropped file will be placed here");
 
 			if(parentKey === 'instances')
 				return ToolTip.set("Blackprint instances will be saved in this folder");
