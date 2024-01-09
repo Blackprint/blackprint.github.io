@@ -79,12 +79,12 @@ sf-m[name="project-list"] {
 
 ## js-global
 sf.model("project-list", My => {
-	My.list = [{active: true, title: 'Untitled-1', id: '1', isUnsaved: false}];
+	My.list = [{active: true, title: 'Untitled-1', id: '1', isUnsaved: false, currentRoute: '/sketch/1'}];
 	My.uniqId = 2;
 
 	My.init = function(){
 		views.goto('/sketch/1');
-		setTimeout(() => My.storeCurrentSketchToTab(My.list[0], '1'));
+		My.storeCurrentSketchToTab(My.list[0], '1');
 
 		// Avoid closing page when there are unsaved changes
 		window.addEventListener("beforeunload", ev => {
@@ -111,6 +111,9 @@ sf.model("project-list", My => {
 			if(tab.sketch === CurrentSketch) return;
 
 			tab.sketch = CurrentSketch;
+			CurrentSketch.tabInfo = tab;
+			CurrentSketch.emit('editor.tabInfo', tab);
+
 			CurrentSketch.on('cable.connect cable.disconnect node.created node.delete node.move node.id.changed port.default.changed _port.split _port.unsplit _port.resync.allow _port.resync.disallow', tab._needSave = function(){
 				tab.isUnsaved = true;
 			});
@@ -125,7 +128,7 @@ sf.model("project-list", My => {
 
 	My.createTab = function(){
 		let i = '' + (My.uniqId++);
-		let tab = {active: false, title: 'Untitled-'+i, id: i, isUnsaved: false};
+		let tab = {active: false, title: 'Untitled-'+i, id: i, isUnsaved: false, currentRoute: '/sketch/'+i};
 		My.list.push(tab);
 		My.switchTab(tab);
 		My.storeCurrentSketchToTab(tab, i);
@@ -138,7 +141,7 @@ sf.model("project-list", My => {
 			tabs[i].active = false;
 
 		tab.active = true;
-		views.goto(`/sketch/${tab.id}`);
+		views.goto(tab.currentRoute);
 	}
 
 	My.saveTab = async function(tab){

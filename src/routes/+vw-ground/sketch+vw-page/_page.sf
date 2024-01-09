@@ -15,6 +15,8 @@
 		<sketch-panel-right></sketch-panel-right>
 	</div>
 
+	<sf-template path="BPEditor/model/project-navigation-bar.sf"></sf-template>
+
 	<div class="mini-blackprint disable-effect {{ miniViewer.topRightHidden && 'hidden' }}">
 		<!-- Will be replaced with element returned by Blackprint.cloneContainer(true) -->
 		<sf-slot for="miniViewer.topRight"></sf-slot>
@@ -533,9 +535,10 @@ sf.component('sketch-page', function(My){
 	sketch.on('node.function.open', EventSlot, async ev => {
 		let name = ev.iface.namespace.split('/').join('-');
 		name += '-'+ev.iface.uniqId;
+		let tabId = sketch.tabInfo.id;
 
 		let pages = $('vw-page > sf-page-view', views.rootDOM);
-		let routePath = "/sketch/node-"+name;
+		let routePath = `/sketch/${tabId}-node-`+name;
 
 		// Remove old page if the instance was different
 		for (let i=0; i < pages.length; i++) {
@@ -547,6 +550,8 @@ sf.component('sketch-page', function(My){
 		await views.goto(routePath, {
 			bpInstance: ev.iface.bpInstance
 		});
+
+		sketch.tabInfo.currentRoute = routePath;
 	});
 
 	// This may cause one memory leak because this will never being cleared
