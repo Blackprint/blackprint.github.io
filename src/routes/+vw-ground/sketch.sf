@@ -63,6 +63,51 @@ sf.model('sketch-pages', function(My){
 		My._eventOnce = true;
 		let pointerX, pointerY;
 
+		My.skipMenuHandler = false;
+		Blackprint.on('menu.create.node', function({ menu, position, options, event, preventDefault }){
+			if(My.skipMenuHandler) return;
+			preventDefault();
+
+			position.event = event;
+
+			// Check if doing region select when opening this context menu
+			let container = CurrentSketch.scope('container');
+			if(container.select.w > 30 || container.select.h > 30){
+				let { x, y, w, h, ix, iy } = container.select;
+
+				if(ix) x = obj.x - obj.w;
+				if(iy) y = obj.y - obj.h;
+
+				position.title = "Region Select";
+				DropDown.show([{
+					title: "Create group decoration",
+					description: "A region marker where you can move all nodes",
+					callback(){
+						let iface = CurrentSketch.createNode('Decoration/Group/Default', {
+							x, y: y-21, data: {width: w, height: h+21, title: "No title"},
+						});
+
+						iface.refreshContent();
+					},
+				}], position);
+				return;
+			}
+
+			position.hasSearch = true;
+			position.searchObject = Blackprint._docs;
+			position.title = "Create Node";
+
+			sort(menu);
+			function sort(obj){
+				obj.sort((a, b) => a.title.localeCompare(b.title));
+				for (let i=0; i < obj.length; i++) {
+					if(obj.deep != null) sort(obj.deep);
+				}
+			}
+
+			DropDown.show(menu, position);
+		});
+
 		$(window).on('keydown', async (ev) => {
 			let passed = checkIfHasSelection(ev);
 			if(!passed) return;
