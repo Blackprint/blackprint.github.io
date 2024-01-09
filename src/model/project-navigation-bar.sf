@@ -13,10 +13,10 @@ project-navigation-bar {
 	margin-left: 200px;
 
 	.container{
-		background: #000000d1;
+		background: #00000075;
 		border-radius: 15%;
-		box-shadow: 0 0 5px #ffffffbf;
-		padding: 8px 10px;
+		box-shadow: 0 0 5px 2px #000000;
+		padding: 8px 10px 5px 10px;
 		margin-top: -5px;
 		margin-left: 20vw;
 		color: grey;
