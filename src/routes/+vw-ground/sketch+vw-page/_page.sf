@@ -15,7 +15,7 @@
 		<sketch-panel-right></sketch-panel-right>
 	</div>
 
-	<sf-template path="BPEditor/model/project-navigation-bar.sf"></sf-template>
+	<sf-template path="BPEditor/component/project-navigation-bar.sf"></sf-template>
 
 	<div class="mini-blackprint disable-effect {{ miniViewer.topRightHidden && 'hidden' }}">
 		<!-- Will be replaced with element returned by Blackprint.cloneContainer(true) -->

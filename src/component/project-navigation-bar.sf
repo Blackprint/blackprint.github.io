@@ -20,6 +20,7 @@ project-navigation-bar {
 		margin-top: -5px;
 		margin-left: 20vw;
 		color: grey;
+		max-width: 40vw;
 		span{
 			cursor: pointer;
 			&:hover{
