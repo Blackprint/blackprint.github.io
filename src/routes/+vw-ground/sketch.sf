@@ -77,8 +77,8 @@ sf.model('sketch-pages', function(My){
 
 				position.title = "Region Select";
 				DropDown.show([{
-					title: "Create group decoration",
-					description: "A region marker where you can move all nodes",
+					title: "Create a group region",
+					description: "A region marker where you can move all nodes as a group",
 					callback(){
 						let iface = CurrentSketch.createNode('Decoration/Group/Default', {
 							x, y: y-21, data: {width: w, height: h+21, title: "No title"},

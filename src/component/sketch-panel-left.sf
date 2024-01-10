@@ -243,6 +243,11 @@ sketch-page > .panels sketch-panel-left {
 		border-top: none;
 	}
 	.group-list{
+		.title{
+			overflow: hidden;
+			max-width: 100%;
+			text-overflow: ellipsis;
+		}
 		.title.active {
 			color: yellow;
 		}
@@ -442,7 +447,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		});
 
 		My.$el('.group-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
-			ToolTip.set("A region marker in this page\nIt's better to use numbered title\nYou can create a group region by hold\nleft click + move + right click");
+			ToolTip.set("Region markers that can be used to grouping nodes in this page\nIt's recommended to use numbered title\n\nYou can create a region marker by hold\nleft click + move + right click");
 		});
 
 		My.$el('.node-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
@@ -808,5 +813,6 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		if(y < 0) y = 0;
 
 		container.moveContainer({x: -x, y: -y});
+		item.iface.swapZIndex(); // Simulate click to the group node
 	}
 });
