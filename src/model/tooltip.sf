@@ -12,6 +12,11 @@
 		<div class="id" style="display: {{ node.id ? '' : 'none' }}">ID: <span>{{ node.id }}</span></div>
 		<div class="desc">{{ node.desc }}</div>
 	</div>
+	<div class="{{ type === 'general' ? '' : 'hide-this' }} general">
+		<div class="title">{{ general.title }}</div>
+		<div class="desc" style="display: {{ general.desc ? '' : 'none' }}">{{ general.desc }}</div>
+		<div class="comment" style="display: {{ general.comment ? '' : 'none' }}">{{ general.comment }}</div>
+	</div>
 </sf-m>
 
 ## scss-global
@@ -64,6 +69,22 @@ sf-m[name="tooltip"]{
 	.icon{
 		padding-right: 5px;
 	}
+
+	.general {
+		.title {
+			font-size: 16px;
+		}
+
+		.desc {
+			color: gray;
+			white-space: pre-wrap;
+		}
+
+		.comment {
+			color: #63a669;
+			white-space: pre-wrap;
+		}
+	}
 }
 
 ## js-global
@@ -76,6 +97,7 @@ var ToolTip = sf.model('tooltip', function(My){
 	My.desc = '';
 	My.port = {type:'', desc:'', color:''};
 	My.node = {path:'', desc:''};
+	My.general = {title:'', desc:'', comment:''};
 
 	My._listener = function(ev){
 		My.x = ev.clientX;
@@ -106,6 +128,11 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.node.path = data.namespace;
 			My.node.desc = data.docs?.description || '';
 			My.node.id = data.id;
+		}
+		else if(type === 'general'){
+			My.general.title = data.title;
+			My.general.desc = data.desc || '';
+			My.general.comment = data.comment || '';
 		}
 		else if(type === 'port'){
 			let typeName = data.type.name || '';
