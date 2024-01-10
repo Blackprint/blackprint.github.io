@@ -132,12 +132,22 @@
 				</div>
 			</div>
 		</div>
+		<div class="group-list">
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Groups ({{ groupList.length }})</div>
+
+			<!-- This list doesn't have namespace, so we don't use TreeList component here -->
+			<div class="tree-view" tree-section="groups" @pointerleave="groupListLeave()">
+				<div class="tree-item" sf-each="val in groupList">
+					<div class="title {{ val.active && 'active' }}" @click="groupListSelect(val)" @pointerover="groupListHover(val)"><i class="fa tree-icon"></i> {{ val.title }}</div>
+				</div>
+			</div>
+		</div>
 		<div class="node-list">
 			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Nodes ({{ nodeCount }})</div>
 			<div class="button" @click="createCustomNode" title="Create new node by using code editor "><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
-			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode" @pointerover="nodeListHover"  @pointerleave="nodeListLeave">
+			<div class="tree-view" tree-section="nodes" @pointerdown="checkDragNode" @pointerover="nodeListHover" @pointerleave="nodeListLeave">
 				<div class="tree-item collapsed" sf-each="key, val in nodes"
 					style="display: {{ val.hidden ? 'none' : '' }}">
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
@@ -187,7 +197,7 @@ sketch-page > .panels sketch-panel-left {
 			}
 		}
 	}
-	.variable-list, .function-list, .event-list, .node-list {
+	.variable-list, .function-list, .event-list, .group-list, .node-list {
 		color: #cbcbcb;
 		position: relative;
 		width: 190px;
@@ -232,6 +242,11 @@ sketch-page > .panels sketch-panel-left {
 	.variable-list {
 		border-top: none;
 	}
+	.group-list{
+		.title.active {
+			color: yellow;
+		}
+	}
 	.opener{
 		cursor: pointer;
 		height: 100%;
@@ -239,11 +254,11 @@ sketch-page > .panels sketch-panel-left {
 		align-items: center;
 		padding: 10px 0 10px 10px;
 		position: absolute;
-		right: 0;
+		right: -10px;
 		i {
 			color: #ffffff70;
 			position: absolute;
-			right: 0;
+			right: 10px;
 			font-size: 12px;
 			display: block;
 		}
@@ -291,6 +306,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.functionCount = 0;
 	My.eventCount = 0;
 	My.nodeCount = 0;
+	My.groupList = [];
 
 	function deepCount(obj, isNodes){
 		let len = 0;
@@ -321,6 +337,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		obj.refresh?.();
 	}
 
+	let waitReSortGroups;
+	function reSortGroups(){
+		clearTimeout(waitReSortGroups);
+		waitReSortGroups = setTimeout(()=>{
+			let comparer = Intl.Collator().compare;
+			My.groupList.sort((A, B) => comparer(A.title, B.title));
+			My.groupList.refresh();
+		}, 1000);
+	}
+
 	let pendingRefreshModule;
 	const refreshNodesCounter = () => {
 		clearTimeout(pendingRefreshModule);
@@ -349,6 +375,42 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	sketch.on('json.imported', refreshVarsCounter);
 	sketch.on('variable.new function.new', refreshVarsCounter);
 
+	My.groupListElObserver ??= new IntersectionObserver((entries, observer)=> {
+		entries.forEach((entry) => {
+			let model = entry.target.model;
+			let list = My.groupList;
+			for (let i=0; i < list.length; i++) {
+				let temp = list[i];
+				if(temp.iface === model){
+					temp.active = entry.intersectionRatio !== 0;
+					break
+				}
+			}
+		});
+	}, {
+		root: null,
+		rootMargin: "0px",
+		threshold: [0, 0.05, 1],
+	});
+
+	sketch.on('node.created', ({ iface }) => {
+		if(iface.namespace === 'Decoration/Group/Default' && My.groupList.findIndex(v=> v.iface === iface) === -1) {
+			let obj = { iface, title: iface.data.title, active: false };
+			My.groupList.push(obj);
+			sf.watch(iface.data, 'title', ()=> {
+				obj.title = iface.data.title;
+				reSortGroups();
+			});
+
+			reSortGroups();
+			My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
+		}
+	});
+	sketch.on('node.removed', ({ iface }) => {
+		let i = My.groupList.findIndex(v=> v.iface === iface);
+		if(i !== -1) My.groupList.splice(i, 1);
+	});
+
 	if(My.isFunctionSketch)
 		funcNodeInstance.on('variable.new', refreshVarsCounter);
 
@@ -364,6 +426,34 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		sketchPage.panels.left = My;
 		My.recalculateMenu();
 		refreshNodesCounter();
+
+		let clearTooltip = ()=> ToolTip.set();
+
+		My.$el('.variable-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
+			ToolTip.set("Can be used for storing output port's value or\naccess stored data into an input port");
+		});
+
+		My.$el('.function-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
+			ToolTip.set("Can be used for creating custom function node or\ngrouping many nodes as a single node");
+		});
+
+		My.$el('.event-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
+			ToolTip.set("Can be used as event emitter that can be accessed\ninside any function or root instance");
+		});
+
+		My.$el('.group-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
+			ToolTip.set("A region marker in this page\nIt's better to use numbered title\nYou can create a group region by hold\nleft click + move + right click");
+		});
+
+		My.$el('.node-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
+			ToolTip.set("Nodes that registered to Blackprint\nYou can create your own node or import it from external sources");
+		});
+
+		// Get Groups list
+		setTimeout(() => {
+			My.groupList = sketch.getNodes('Decoration/Group/Default').map(node => node.iface);
+			reSortGroups();
+		}, 1000);
 	}
 
 	let recheckPreviewSize;
@@ -691,5 +781,32 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 	My.createCustomNode = ev => {
 		Modal.goto('/custom-node-editor');
+	}
+
+	My.groupListLeave = () => {
+		ToolTip.set();
+		My.groupList.forEach(v=> v.iface.$el.children('.node').removeClass('highlighted'));
+	}
+	My.groupListHover = ({ iface }) => {
+		My.groupListLeave();
+		ToolTip.set({
+			title: iface.data.title,
+			desc: iface.data.textContent,
+			comment: iface.comment,
+		}, null, 'general');
+
+		iface.$el.children('.node').addClass('highlighted');
+	}
+	My.groupListSelect = item => {
+		let container = sketch.scope('container');
+		let { x, y } = item.iface;
+
+		x -= 40;
+		y -= 40;
+
+		if(x < 0) x = 0;
+		if(y < 0) y = 0;
+
+		container.moveContainer({x: -x, y: -y});
 	}
 });
