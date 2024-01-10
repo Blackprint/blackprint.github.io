@@ -42,8 +42,7 @@ sf.model('sketch-pages', function(My){
 	function checkIfHasSelection(ev, skipSelectionCheck){
 		// Skip textbox/input element
 		let tagName = ev.target.tagName;
-		if(tagName === 'INPUT' || tagName === 'TEXTAREA')
-			return;
+		if(tagName === 'INPUT' || tagName === 'TEXTAREA') return;
 
 		let sketch = window.CurrentSketch;
 		if(sketch == null) return;
@@ -51,10 +50,8 @@ sf.model('sketch-pages', function(My){
 		let container = sketch.scope('container');
 
 		// Skip if no selected nodes/cables
-		if(!skipSelectionCheck && container.nodeScope.selected.length === 0
-		&& container.cableScope.selected.length === 0){
+		if(!skipSelectionCheck && container.nodeScope.selected.length === 0 && container.cableScope.selected.length === 0)
 			return;
-		}
 
 		return {sketch, container};
 	}
@@ -88,6 +85,7 @@ sf.model('sketch-pages', function(My){
 						});
 
 						iface.refreshContent();
+						iface.swapZIndex(); // simulate click
 					},
 				}], position);
 				return;

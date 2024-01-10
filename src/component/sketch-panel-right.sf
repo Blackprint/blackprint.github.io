@@ -73,11 +73,11 @@ sketch-page > .panels sketch-panel-right {
 		align-items: center;
 		padding: 10px 10px 10px 0;
 		position: absolute;
-		left: 0;
+		left: -10px;
 		i {
 			color: #ffffff70;
 			position: absolute;
-			left: 0;
+			left: 10px;
 			font-size: 12px;
 			display: block;
 		}
