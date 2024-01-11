@@ -90,7 +90,7 @@ sf.component('project-navigation-bar', My => {
 		if(target.previousElementSibling == null){
 			let path = My.mainInstance.page.space.closest('vw-page > sf-page-view').routePath;
 			views.goto(path);
-			mainInstance.tabInfo.currentRoute = path;
+			My.mainInstance.tabInfo.currentRoute = path;
 			return;
 		}
 

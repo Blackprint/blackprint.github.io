@@ -99,7 +99,7 @@
 			</div>
 		</div>
 		<div class="function-list collapsed">
-			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Functions ({{ functionCount }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-right collapse-btn"></i> Functions ({{ functionCount }})</div>
 			<div class="button" @click="createFunction" title="Create new empty function node"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -117,7 +117,7 @@
 			</div>
 		</div>
 		<div class="event-list collapsed">
-			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Events ({{ events.totalEvent }})</div>
+			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-right collapse-btn"></i> Events ({{ events.totalEvent }})</div>
 			<div class="button" @click="createEvent" title="Create new empty event node"><i class="fa fa-plus-square"></i></div>
 
 			<!-- /src/component/tree-list.sf -->
@@ -408,7 +408,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			});
 
 			reSortGroups();
-			My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
+			$.afterRepaint().then(() => {
+				My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
+			}, 100);
 		}
 	});
 	sketch.on('node.removed', ({ iface }) => {
@@ -453,12 +455,6 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		My.$el('.node-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
 			ToolTip.set("Nodes that registered to Blackprint\nYou can create your own node or import it from external sources");
 		});
-
-		// Get Groups list
-		setTimeout(() => {
-			My.groupList = sketch.getNodes('Decoration/Group/Default').map(node => node.iface);
-			reSortGroups();
-		}, 1000);
 	}
 
 	let recheckPreviewSize;
