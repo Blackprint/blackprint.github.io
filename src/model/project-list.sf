@@ -175,6 +175,8 @@ sf.model("project-list", My => {
 			if(list[i].title.endsWith('.bpi')) _list.push(list[i].title);
 		}
 
+		SmallNotif.add("Instance file saved to workspace", 'green');
+
 		if(_list.length === 0) return;
 		workspacePanel.setSetting('opened_instances', _list);
 	}
