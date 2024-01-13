@@ -8,6 +8,7 @@ var views = (new sf.Views('vw-ground', 'page')) // page = http://url.com/#page/.
 	if(current.startsWith('/sketch/') && target.startsWith('/sketch/')){
 		if(views.lastSibling) $(views.lastSibling).addClass('disable-anim');
 		if(views.showedSibling) $(views.showedSibling).removeClass('disable-anim');
+		else $(views.currentDOM).removeClass('disable-anim');
 		return;
 	}
 

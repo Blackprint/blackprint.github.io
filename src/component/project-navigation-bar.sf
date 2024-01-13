@@ -59,7 +59,7 @@ sf.component('project-navigation-bar', My => {
 	My.init = function(){
 		// As we're a child component and we want to access parent data
 		// We need to wait until parent component has been initialized after this component
-		setTimeout(() => {
+		$.afterRepaint().then(() => {
 			let sketch = $('sf-space[blackprint] > sf-m[name="container"]', My.$el[0].closest('sketch-page'))[0].model.$space.sketch;
 			let mainInstance = My.mainInstance = sketch._mainInstance ?? sketch;
 
@@ -74,7 +74,7 @@ sf.component('project-navigation-bar', My => {
 			if(funcMain != null) My.functionName = funcMain.title.split('/').join(' / ');
 
 			if(My.functionName === '') My.$el('.function-name').remove();
-		}, 50);
+		});
 	}
 
 	My.hoverNav = function(ev){

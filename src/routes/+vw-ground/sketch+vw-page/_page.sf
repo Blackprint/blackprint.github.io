@@ -211,7 +211,7 @@ sf.component('sketch-page', function(My){
 		let pageEl = $(sketch.scope.domList[0].closest('sketch-page').parentNode);
 
 		if(pageEl.hasClass('page-current')){
-			views.goto('/sketch/1');
+			// views.goto('/sketch/1');
 			setTimeout(() => pageEl.remove(), 700);
 		}
 		else pageEl.remove();
