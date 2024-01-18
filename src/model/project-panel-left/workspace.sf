@@ -96,7 +96,6 @@ sf.model("project-panel-workspace", My => {
 
 	My.init = function(){
 		Events.on('EditorWorkingDirChange', async ()=>{
-			await My.cleanWorkspace();
 			await My.rescanFiles();
 			await My.initAsWorkspace();
 		});
@@ -154,6 +153,8 @@ sf.model("project-panel-workspace", My => {
 
 			let projectList = sf.model("project-list");
 			if(!val.isDismissed) {
+				await My.cleanWorkspace();
+
 				// Load local nodes first
 				await My.refreshLocalNodes();
 
