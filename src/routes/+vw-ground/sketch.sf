@@ -56,160 +56,339 @@ sf.model('sketch-pages', function(My){
 		return {sketch, container};
 	}
 
+	function exportAndReduceNodePositions(){
+		let data = JSON.parse(CurrentSketch.exportJSON({
+			selectedOnly: true,
+			environment: false,
+			exportFunctions: false,
+			exportVariables: false,
+		}));
+
+		// Find lowest position value
+		let instance = data.instance;
+		let x = Infinity, y = Infinity;
+		for(let key in instance){
+			let val = instance[key];
+			for(let i=0; i < val.length; i++){
+				let node = val[i];
+				if(node.x < x) x = node.x;
+				if(node.y < y) y = node.y;
+			}
+		}
+
+		if(x === Infinity) x = 0;
+		if(y === Infinity) y = 0;
+
+		// Reduce nodes positions
+		for(let key in instance){
+			let val = instance[key];
+			for(let i=0; i < val.length; i++){
+				let node = val[i];
+				node.x -= x;
+				node.y -= y;
+			}
+		}
+
+		return data;
+	}
+
+	let pointerX, pointerY;
+	My._onMenuCreateNode = function({ menu, position, options, event, preventDefault }){
+		if(My.skipMenuHandler) return;
+		preventDefault();
+
+		position.event = event;
+
+		// Check if doing region select when opening this context menu
+		let container = CurrentSketch.scope('container');
+		if(container.select.w > 30 || container.select.h > 30){
+			let { x, y, w, h, ix, iy } = container.select;
+
+			if(ix) x = obj.x - obj.w;
+			if(iy) y = obj.y - obj.h;
+
+			position.title = "Region Select";
+			DropDown.show([{
+				title: "Create a group region",
+				description: "A region marker where you can move all nodes as a group",
+				callback(){
+					let iface = CurrentSketch.createNode('Decoration/Group/Default', {
+						x, y: y-21, data: {width: w, height: h+21, title: "No title"},
+					});
+
+					iface.refreshContent();
+					iface.swapZIndex(); // simulate click
+				},
+			}, {
+				title: "Create a function node",
+				description: "Move the selected region content as a function node",
+				async callback(){
+					if(container.nodeScope.selected.length === 0)
+						return SmallNotif.add("Nodes need to be selected before using this feature", 'red');
+
+					let val = await Swal.fire({
+						title: "Function Name:",
+						inputPlaceholder: "MyApp/Custom/Function",
+						input: "text",
+					});
+
+					val = val.value;
+					if(!val) return;
+
+					// Reorder index based on x and y position
+					let selectedNodes = CurrentSketch.scope('nodes').selected;
+					selectedNodes = selectedNodes.sort((a, b) => a.y - b.y || a.x - b.x); // Compare y position first
+
+					// Find cables that connected to unselected nodes, and find middle position
+					let sx = Infinity, sy = Infinity, mx = 0, my = 0; // Start x/y, Max x/y
+					let unselectedNodeCables = {};
+					for (let i=0; i < selectedNodes.length; i++) {
+						let iface = selectedNodes[i];
+						let { input, output } = iface;
+
+						if(sx > iface.x) sx = iface.x;
+						if(sy > iface.y) sy = iface.y;
+						if(mx < iface.x) mx = iface.x;
+						if(my < iface.y) my = iface.y;
+
+						for (let key in input) {
+							let cables = input[key].cables;
+							for (let a=0; a < cables.length; a++) {
+								let cable = cables[a];
+								let targetIface = cable.output.iface;
+								if(!selectedNodes.includes(targetIface)){
+									unselectedNodeCables[i] ??= [];
+									unselectedNodeCables[i].push({
+										type: 'input',
+										name: key,
+										i,
+										targetIndex: targetIface.i,
+										connectedPort: cable.output,
+									});
+								}
+							}
+						}
+						for (let key in output) {
+							let cables = output[key].cables;
+							for (let a=0; a < cables.length; a++) {
+								let cable = cables[a];
+								let targetIface = cable.input.iface;
+								if(!selectedNodes.includes(targetIface)){
+									unselectedNodeCables[i] ??= [];
+									unselectedNodeCables[i].push({
+										type: 'output',
+										name: key,
+										i,
+										targetIndex: targetIface.i,
+										connectedPort: cable.input,
+									});
+								}
+							}
+						}
+					}
+
+					let instanceCopy = {}; // We need to reset the load order because we add 2 nodes
+					let inputNode = instanceCopy["BP/Fn/Input"] = [{i: 0, x: 100, y: 100, z: 0, output: {}}];
+					let outputNode = instanceCopy["BP/Fn/Output"] = [{i: 1, x: 700, y: 100, z: 1}];
+					inputNode = inputNode[0];
+					outputNode = outputNode[0];
+
+					let usedInputName = {}; // {name: [targetIndex]}
+					let usedOutputName = {}; // {name: [targetIndex]}
+
+					function findUsedIndex(data, targetIndex){
+						let used;
+						if(data.type === 'input') used = usedInputName[data.name] ??= [];
+						else if(data.type === 'output') used = usedOutputName[data.name] ??= [];
+						else throw new Error("Port source is not recognized");
+
+						let usedHasIndex = used.indexOf(targetIndex);
+						if(usedHasIndex === -1){
+							used.push(targetIndex);
+							return used.length - 1;
+						}
+
+						return usedHasIndex;
+					}
+
+					let json = exportAndReduceNodePositions();
+					let instance = json.instance;
+					for (let key in instance) {
+						let ifaces = instance[key];
+						for (let i=0; i < ifaces.length; i++) {
+							let iface = ifaces[i];
+							iface.x += 300;
+							iface.y += 100;
+							iface.i += 2;
+							iface.z += 2;
+
+							let unconnectedCables = unselectedNodeCables[i];
+							if(unconnectedCables != null){
+								for (let a=0; a < unconnectedCables.length; a++) {
+									let temp = unconnectedCables[a];
+									if(temp.type === 'input'){
+										let usedAt = findUsedIndex(temp, iface.i);
+										let output = inputNode.output;
+										let newName = temp.name+(usedAt !== 0 ? usedAt : '');
+										let ref = output[newName] ??= [];
+										ref.push({
+											i: iface.i,
+											name: temp.name
+										});
+										temp.newName = newName;
+									}
+									if(temp.type === 'output'){
+										let usedAt = findUsedIndex(temp, i);
+										let output = iface.output ??= {};
+										let ref = output[temp.name] ??= [];
+										let newName = temp.name+(usedAt !== 0 ? usedAt : '');
+										if(ref.length === 0){
+											ref.push({
+												i: outputNode.i,
+												name: newName
+											});
+										}
+										temp.newName = newName;
+									}
+								}
+							}
+						}
+
+						instanceCopy[key] = ifaces;
+					}
+
+					instance = json.instance = instanceCopy;
+					CurrentSketch.createFunction(val, {structure: json, description: "No description"});
+					let funcIface = CurrentSketch.createNode('BPI/F/'+val, {
+						x: sx + (mx - sx)/3,
+						y: sy + (my - sy)/3,
+					});
+
+					funcIface.once('ready', ()=> {
+						// Delete old selected nodes that already being copied to function node
+						for (let i=0; i < selectedNodes.length; i++)
+							CurrentSketch.deleteNode(selectedNodes[i]);
+
+						funcIface.x -= funcIface.w / 2;
+						funcIface.y -= funcIface.h;
+
+						// Swap cable connection from old nodes into our function node
+						for (let key in unselectedNodeCables) {
+							let list = unselectedNodeCables[key];
+							for (let i=0; i < list.length; i++) {
+								let data = list[i];
+								if(data.type === 'input')
+									data.connectedPort.connectPort(funcIface.input[data.newName]);
+								else if(data.type === 'output')
+									data.connectedPort.connectPort(funcIface.output[data.newName]);
+								else throw new Error("Unrecognized port source");
+							}
+						}
+					});
+				},
+			}], position);
+			return;
+		}
+
+		position.hasSearch = true;
+		position.searchObject = Blackprint._docs;
+		position.title = "Create Node";
+
+		sort(menu);
+		function sort(obj){
+			obj.sort((a, b) => a.title.localeCompare(b.title));
+			for (let i=0; i < obj.length; i++) {
+				if(obj.deep != null) sort(obj.deep);
+			}
+		}
+
+		DropDown.show(menu, position);
+	}
+
+	My._onWindow_keydown = async (ev) => {
+		let passed = checkIfHasSelection(ev);
+		if(!passed) return;
+		let {sketch, container} = passed;
+
+		// Currently we only support copy/paste/delete for nodes
+		if(container.nodeScope.selected.length === 0 && container.cableScope.selected.length === 0) return;
+
+		if(ev.key === 'Delete'){
+			let selected = container.nodeScope.selected;
+			for(let i=0; i < selected.length; i++)
+				sketch.deleteNode(selected[i]);
+
+			selected.splice(0);
+
+			selected = container.cableScope.selected;
+			for(let i=0; i < selected.length; i++)
+				selected[i].disconnect();
+
+			selected.splice(0);
+		}
+	}
+
+	My._onWindow_pointermove = function(ev){
+		pointerX = ev.clientX;
+		pointerY = ev.clientY;
+	}
+
+	My._onWindow_copy = function(ev){
+		let passed = checkIfHasSelection(ev);
+		if(!passed) return;
+		let {sketch, container} = passed;
+		
+		// Currently we only support copy/paste/delete for nodes
+		if(container.nodeScope.selected.length === 0) return;
+
+		ev.clipboardData.setData('text/plain', JSON.stringify(exportAndReduceNodePositions()));
+		ev.preventDefault();
+	}
+
+	My._onWindow_paste = async function(ev){
+		let passed = checkIfHasSelection(ev, true);
+		if(!passed) return;
+		let {sketch, container} = passed;
+
+		let data = ev.clipboardData.getData('text/plain');
+		data = JSON.parse(data);
+
+		let {x, y} = container.pos; // Negative value
+		let {x: oX, y: oY} = container.offset; // Negative value
+		let scale = container.scale; // Negative value
+
+		// Reposition the nodes near the pointer or current container
+		let instance = data.instance;
+		for(let key in instance){
+			let val = instance[key];
+			for(let i=0; i < val.length; i++){
+				let node = val[i];
+				node.x += (-x - oX + pointerX) / scale;
+				node.y += (-y - oY + pointerY) / scale;
+			}
+		}
+
+		let lastIndex = container.nodeScope.list.length;
+		await sketch.importJSON(data, {appendMode: true});
+
+		let { cableScope, nodeScope } = container;
+		cableScope.selected.forEach(v => v.selected = false);
+		cableScope.selected.splice(0);
+
+		nodeScope.selected.forEach(v => v._nodeSelected = false);
+		nodeScope.selected.splice(0);
+		nodeScope.selected.push(...nodeScope.list.slice(lastIndex));
+		nodeScope.selected.forEach(v => v._nodeSelected = true);
+	}
+
 	if(My._eventOnce == null){
 		My._eventOnce = true;
-		let pointerX, pointerY;
-
 		My.skipMenuHandler = false;
-		Blackprint.on('menu.create.node', function({ menu, position, options, event, preventDefault }){
-			if(My.skipMenuHandler) return;
-			preventDefault();
+		Blackprint.on('menu.create.node', data => My._onMenuCreateNode(data));
 
-			position.event = event;
-
-			// Check if doing region select when opening this context menu
-			let container = CurrentSketch.scope('container');
-			if(container.select.w > 30 || container.select.h > 30){
-				let { x, y, w, h, ix, iy } = container.select;
-
-				if(ix) x = obj.x - obj.w;
-				if(iy) y = obj.y - obj.h;
-
-				position.title = "Region Select";
-				DropDown.show([{
-					title: "Create a group region",
-					description: "A region marker where you can move all nodes as a group",
-					callback(){
-						let iface = CurrentSketch.createNode('Decoration/Group/Default', {
-							x, y: y-21, data: {width: w, height: h+21, title: "No title"},
-						});
-
-						iface.refreshContent();
-						iface.swapZIndex(); // simulate click
-					},
-				}], position);
-				return;
-			}
-
-			position.hasSearch = true;
-			position.searchObject = Blackprint._docs;
-			position.title = "Create Node";
-
-			sort(menu);
-			function sort(obj){
-				obj.sort((a, b) => a.title.localeCompare(b.title));
-				for (let i=0; i < obj.length; i++) {
-					if(obj.deep != null) sort(obj.deep);
-				}
-			}
-
-			DropDown.show(menu, position);
-		});
-
-		$(window).on('keydown', async (ev) => {
-			let passed = checkIfHasSelection(ev);
-			if(!passed) return;
-			let {sketch, container} = passed;
-
-			// Currently we only support copy/paste/delete for nodes
-			if(container.nodeScope.selected.length === 0 && container.cableScope.selected.length === 0) return;
-
-			if(ev.key === 'Delete'){
-				let selected = container.nodeScope.selected;
-				for(let i=0; i < selected.length; i++)
-					sketch.deleteNode(selected[i]);
-
-				selected.splice(0);
-
-				selected = container.cableScope.selected;
-				for(let i=0; i < selected.length; i++)
-					selected[i].disconnect();
-
-				selected.splice(0);
-			}
-		})
-		.on('pointermove', function(ev){
-			pointerX = ev.clientX;
-			pointerY = ev.clientY;
-		})
-		.on('copy', function(ev){
-			let passed = checkIfHasSelection(ev);
-			if(!passed) return;
-			let {sketch, container} = passed;
-			
-			// Currently we only support copy/paste/delete for nodes
-			if(container.nodeScope.selected.length === 0) return;
-
-			let data = sketch.exportJSON({
-				selectedOnly: true,
-				environment: false,
-				exportFunctions: false,
-				exportVariables: false,
-			});
-			data = JSON.parse(data);
-
-			// Find lowest position value
-			let instance = data.instance;
-			let x = Infinity, y = Infinity;
-			for(let key in instance){
-				let val = instance[key];
-				for(let i=0; i < val.length; i++){
-					let node = val[i];
-					if(node.x < x) x = node.x;
-					if(node.y < y) y = node.y;
-				}
-			}
-
-			if(x === Infinity) x = 0;
-			if(y === Infinity) y = 0;
-
-			// Reduce nodes positions
-			for(let key in instance){
-				let val = instance[key];
-				for(let i=0; i < val.length; i++){
-					let node = val[i];
-					node.x -= x;
-					node.y -= y;
-				}
-			}
-
-			ev.clipboardData.setData('text/plain', JSON.stringify(data));
-			ev.preventDefault();
-		})
-		.on('paste', async function(ev){
-			let passed = checkIfHasSelection(ev, true);
-			if(!passed) return;
-			let {sketch, container} = passed;
-
-			let data = ev.clipboardData.getData('text/plain');
-			data = JSON.parse(data);
-
-			let {x, y} = container.pos; // Negative value
-			let {x: oX, y: oY} = container.offset; // Negative value
-			let scale = container.scale; // Negative value
-
-			// Reposition the nodes near the pointer or current container
-			let instance = data.instance;
-			for(let key in instance){
-				let val = instance[key];
-				for(let i=0; i < val.length; i++){
-					let node = val[i];
-					node.x += (-x - oX + pointerX) / scale;
-					node.y += (-y - oY + pointerY) / scale;
-				}
-			}
-
-			let lastIndex = container.nodeScope.list.length;
-			await sketch.importJSON(data, {appendMode: true});
-
-			let { cableScope, nodeScope } = container;
-			cableScope.selected.forEach(v => v.selected = false);
-			cableScope.selected.splice(0);
-
-			nodeScope.selected.forEach(v => v._nodeSelected = false);
-			nodeScope.selected.splice(0);
-			nodeScope.selected.push(...nodeScope.list.slice(lastIndex));
-			nodeScope.selected.forEach(v => v._nodeSelected = true);
-		});
+		$(window).on('keydown', ev => My._onWindow_keydown(ev))
+		.on('pointermove', ev => My._onWindow_pointermove(ev))
+		.on('copy', ev => My._onWindow_copy(ev))
+		.on('paste', ev => My._onWindow_paste(ev))
 	}
 });
