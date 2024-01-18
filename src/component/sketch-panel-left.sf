@@ -424,6 +424,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	});
 
 	sketch.on('node.created', ({ iface }) => {
+		if(iface.node.instance !== sketch) return;
 		if(iface.namespace === 'Decoration/Group/Default' && My.groupList.findIndex(v=> v.iface === iface) === -1) {
 			let obj = { iface, title: iface.data.title, active: false };
 			My.groupList.push(obj);
