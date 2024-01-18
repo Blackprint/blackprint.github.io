@@ -362,15 +362,19 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		obj.refresh?.();
 	}
 
-	let waitReSortGroups;
+	let waitReSortGroups, waitReSortGroups_Rec;
 	function reSortGroups(){
 		clearTimeout(waitReSortGroups);
+		clearTimeout(waitReSortGroups_Rec);
 		waitReSortGroups = setTimeout(()=>{
 			let comparer = Intl.Collator().compare;
 			My.groupList.sort((A, B) => comparer(A.title, B.title));
 			My.groupList.refresh();
-			My.recalculateMenu();
 		}, 1000);
+
+		waitReSortGroups_Rec = setTimeout(()=>{
+			My.recalculateMenu();
+		}, 50);
 	}
 
 	let pendingRefreshModule;
