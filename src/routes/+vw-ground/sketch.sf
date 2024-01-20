@@ -92,6 +92,26 @@ sf.model('sketch-pages', function(My){
 		return data;
 	}
 
+	function reorderMenu(list, prioritizeKey=[]){
+		let priority = [];
+		let kv = {};
+		for (let i=list.length-1; i >= 0; i--) {
+			let temp = list[i];
+			if(prioritizeKey.includes(temp.title)){
+				kv[temp.title] = temp;
+				list.splice(i, 1);
+			}
+		}
+		for (let i=0; i < prioritizeKey.length; i++) {
+			let exist = kv[prioritizeKey[i]];
+			if(exist == null) continue;
+			priority.push(exist);
+			delete kv[prioritizeKey[i]];
+		}
+
+		list.unshift(...priority);
+	}
+
 	let pointerX, pointerY;
 	My._onMenuCreateNode = function({ menu, position, options, event, preventDefault }){
 		if(My.skipMenuHandler) return;
@@ -302,6 +322,99 @@ sf.model('sketch-pages', function(My){
 			}
 		}
 
+		if(My._cableDropMenu != null){
+			let cable = My._cableDropMenu;
+			position.title = "Suggested Node";
+			let ownerContext = cable.owner.iface.namespace.split('/').slice(0, 2);
+			reorderMenu(menu, [
+				ownerContext[0],
+				'Data',
+				'Input',
+			]);
+
+			let sketch = CurrentSketch;
+			function createNode(namespace, data){
+				let offset = event.target.getBoundingClientRect();
+				let iface = sketch.createNode(namespace, {
+					x: event.clientX - offset.x,
+					y: event.clientY - offset.y,
+					data,
+				});
+
+				options.onCreated?.(iface);
+			}
+
+			let Variables = [];
+			if(cable.source === 'output'){
+				async function promoteToVar(scope){
+					let ref = await My.panels.left.createVariable(null, scope);
+					let offset = event.target.getBoundingClientRect();
+					let iface = sketch.createNode('BP/Var/Set', {
+						x: event.clientX - offset.x,
+						y: event.clientY - offset.y,
+						data: { name: ref.id, scope }
+					});
+					iface.useType(cable.owner);
+					iface.input.Val.connectCable(cable);
+				}
+
+				Variables.push({
+					title: "New Public",
+					icon: 'fa fa-plus-square',
+					callback(){promoteToVar(Blackprint.VarScope.Public)}
+				});
+
+				// is inside function?
+				if(sketch._funcMain){
+					Variables.push({
+						title: "New Private",
+						icon: 'fa fa-plus-square',
+						callback(){promoteToVar(Blackprint.VarScope.Private)}
+					}, {
+						title: "New Shared",
+						icon: 'fa fa-plus-square',
+						callback(){promoteToVar(Blackprint.VarScope.Shared)}
+					});
+				}
+
+				if(cable.owner.type === String || cable.owner.type.any){
+					if(Blackprint.Environment._list.length !== 0){
+						Variables.unshift({
+							title: "Environment",
+							deep: Blackprint.Environment._list.map(v => ({
+								title: v.key,
+								callback(){createNode('BP/Env/Set', {name: v.key})}
+							}))
+						});
+					}
+				}
+			}
+			else if(cable.source === 'input'){
+				if(cable.owner.type === String || cable.owner.type.any){
+					if(Blackprint.Environment._list.length !== 0){
+						Variables.unshift({
+							title: "Environment",
+							deep: Blackprint.Environment._list.map(v => ({
+								title: v.key,
+								callback(){createNode('BP/Env/Get', {name: v.key})}
+							}))
+						});
+					}
+				}
+			}
+
+			let port = cable.owner;
+			let funcList = Blackprint.Sketch.suggestNode(port.source === 'input' ? 'output' : 'input', port.type, sketch.functions);
+
+			funcList = Object.keys(funcList).map(v => ({
+				title: v,
+				callback(){createNode(`BPI/F/${v}`)}
+			}));
+
+			if(Variables.length !== 0) menu.push({title: "Variables", deep: Variables});
+			if(funcList.length !== 0) menu.push({title: "Functions", deep: funcList});
+		}
+
 		DropDown.show(menu, position);
 	}
 
@@ -383,6 +496,7 @@ sf.model('sketch-pages', function(My){
 
 	if(My._eventOnce == null){
 		My._eventOnce = true;
+		My._cableDropMenu = null;
 		My.skipMenuHandler = false;
 		Blackprint.on('menu.create.node', data => My._onMenuCreateNode(data));
 
