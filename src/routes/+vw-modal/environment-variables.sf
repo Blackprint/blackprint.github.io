@@ -168,9 +168,13 @@ sf.model('environment-variables', function(My){
 					Blackprint.Environment.delete(key);
 			}
 
-			localStorage.bpEnvData = JSON.stringify(Blackprint.Environment.map);
-			SmallNotif.add("Environment data was saved", 'green');
+			My.saveToLocalStorage();
 		}, 1000);
+	}
+
+	My.saveToLocalStorage = function(){
+		localStorage.bpEnvData = JSON.stringify(Blackprint.Environment.map);
+		SmallNotif.add("Environment data was saved", 'green');
 	}
 
 	My.validateKey = function(value){
