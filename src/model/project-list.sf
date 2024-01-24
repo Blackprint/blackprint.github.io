@@ -114,7 +114,7 @@ sf.model("project-list", My => {
 			CurrentSketch.tabInfo = tab;
 			CurrentSketch.emit('editor.tabInfo', tab);
 
-			CurrentSketch.on('cable.connect cable.disconnect node.created node.delete node.move node.id.changed port.default.changed _port.split _port.unsplit _port.resync.allow _port.resync.disallow', tab._needSave = function(){
+			CurrentSketch.on('cable.connect cable.disconnect node.created node.delete node.move node.id.changed port.default.changed _port.split _port.unsplit _port.resync.allow _port.resync.disallow variable.renamed', tab._needSave = function(){
 				tab.isUnsaved = true;
 			});
 		}, 50);
