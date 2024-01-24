@@ -155,6 +155,7 @@ drop-down.dropdown-menu drop-down{
 }
 
 drop-down{
+	user-select: none;
 	&> .first {
 		display: block;
 		padding: 5px 10px;
