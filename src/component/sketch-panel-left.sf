@@ -1,5 +1,5 @@
 ## html
-<sketch-panel-left class="panel {{ opened ? 'opened' : ''}}">
+<sketch-panel-left class="panel {{ opened ? 'opened' : ''}}" @contextmenu="event.preventDefault()">
 	<div class="content">
 		<div class="preview" style="height: {{ scaledPreviewHeight }}px">
 			<div class="zoom" style="transform: scale({{ previewScale }})">
@@ -138,7 +138,7 @@
 			<div class="title" @click="collapseSubPanel(this, true)"><i class="fa fa-chevron-down collapse-btn"></i> Groups ({{ groupList.length }})</div>
 
 			<!-- This list doesn't have namespace, so we don't use TreeList component here -->
-			<div class="tree-view tree-view-scroll" tree-section="groups" @pointerleave="groupListLeave()">
+			<div class="tree-view tree-view-scroll" tree-section="groups" @pointerleave="groupListLeave()" @pointerdown="checkDragNode">
 				<div class="tree-item" sf-each="val in groupList">
 					<div class="title {{ val.active && 'active' }}" @click="groupListSelect(val)" @pointerover="groupListHover(val)"><i class="fa tree-icon"></i> {{ val.title }}</div>
 				</div>
@@ -643,10 +643,104 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let section = focus.parent('.tree-view').attr('tree-section');
 		let itemEl = focus[0].parentNode;
 		let key = itemEl.getAttribute('tree-item-key');
-		if(key == null) return;
+		if(key == null && section !== 'groups') return;
 
 		let parent = focus.parent(".tree-item.has-child > tree-list, .tree-view > .tree-item")[0];
 		if(parent == null) return;
+
+		if(ev.button === 2){
+			$(window).once('contextmenu', ev2 => {
+				if(ev.target !== ev2.target) return;
+				ev2.preventDefault();
+
+				let model = itemEl.model;
+				if(section === 'nodes') return; // Do nothing for now
+				if(model == null) return;
+
+				let menu = [{
+					title: "Rename",
+					async callback(){
+						async function dialog(title, placeholder, oldVal){
+							let val = await Swal.fire({
+								title, inputPlaceholder: placeholder, inputValue: oldVal, input: "text",
+							});
+
+							return val.value;
+						}
+
+						if(section === 'environmentVar'){
+							let val = await dialog("Rename Environment Variable:", "MyApp_Custom_Variable", model.key);
+							if(!val) return;
+
+							let modalObj = sf.model('environment-variables');
+							modalObj.renameEnv(model, {value: val});
+							modalObj.saveToLocalStorage();
+						}
+						if(section === 'variables'){
+							let val = await dialog("Rename Variable Namespace:", "MyApp/Custom/Variable", model.id);
+							if(!val) return;
+
+							CurrentSketch.renameVariable(model.id, val, Blackprint.VarScope.Public);
+						}
+						if(section === 'sharedVariables'){
+							let val = await dialog("Rename Shared Variable Name:", "MyApp_Custom_Variable", model.id);
+							if(!val) return;
+
+							let instance = CurrentSketch._funcMain.node._funcInstance;
+							instance.renameVariable(model.id, val, Blackprint.VarScope.Shared);
+						}
+						if(section === 'privateVars'){
+							let val = await dialog("Rename Private Variable Name:", "MyApp_Custom_Variable", model.id);
+							if(!val) return;
+
+							let instance = CurrentSketch._funcMain.node._funcInstance;
+							instance.renameVariable(model.id, val, Blackprint.VarScope.Private);
+						}
+						if(section === 'functions'){
+							let val = await dialog("Rename Function Namespace:", "MyApp/Custom/Function", model.id);
+							if(!val) return;
+
+							CurrentSketch.renameFunction(model.id, val);
+						}
+						if(section === 'functionInputs'){
+							let val = await dialog("Rename Input Port Name:", "MyInputPortName", model.name);
+							if(!val) return;
+
+							CurrentSketch._funcMain.renamePort('input', model.name, val);
+						}
+						if(section === 'functionOutputs'){
+							let val = await dialog("Rename Output Port Name:", "MyOutputPortName", model.name);
+							if(!val) return;
+
+							CurrentSketch._funcMain.renamePort('output', model.name, val);
+						}
+						if(section === 'events'){
+							let val = await dialog("Rename Event Name:", "MyApp/Event/Name", model.namespace);
+							if(!val) return;
+
+							CurrentSketch.events.renameEvent(model.namespace, val);
+						}
+						if(section === 'groups'){
+							let val = await dialog("Rename Group Name:", "No title", model.iface.data.title);
+							if(!val) return;
+
+							model.iface.data.title = val;
+						}
+					}
+				}, {
+					title: "Delete",
+					description: "Hold shift for instant delete",
+					callback(){
+
+					}
+				}];
+
+				DropDown.show(menu, ev);
+			});
+			return;
+		}
+
+		if(section === 'groups') return;
 
 		let endEvent = 'pointerup';
 		if(ev.pointerType === 'touch')
