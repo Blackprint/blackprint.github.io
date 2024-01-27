@@ -926,6 +926,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		if(x < 0) x = 0;
 		if(y < 0) y = 0;
 
+		x = container.scale * x;
+		y = container.scale * y;
+
 		container.moveContainer({x: -x, y: -y});
 		item.iface.swapZIndex(); // Simulate click to the group node
 	}
