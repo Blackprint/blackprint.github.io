@@ -204,6 +204,7 @@ var DropDown = sf.model('dropdown', function(My){
 	My.searchActive = false;
 	My.pendingDeepOpen = false;
 	My.pendingDeepOpen_ = 0;
+	My.lastClickEvent = null;
 
 	My.icon = {
 		more: 'fa fa-chevron-right'
@@ -254,6 +255,7 @@ var DropDown = sf.model('dropdown', function(My){
 
 			function onClick(ev){
 				let item = ev.target.model;
+				DropDown.lastClickEvent = ev;
 				item.callback.apply(item.context, item.args);
 
 				My.$el('drop-down > ul').off('click', onClick);
@@ -528,6 +530,7 @@ sf.component('drop-down', {template: #this.path}, function(My, include, $item){
 					if(opt.unhover !== void 0)
 						opt.unhover.apply(opt.context, opt.args);
 
+					DropDown.lastClickEvent = ev;
 					opt.callback.apply(opt.context, opt.args);
 					My.root.hide();
 				});
