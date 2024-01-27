@@ -688,51 +688,51 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 							modalObj.renameEnv(model, {value: val});
 							modalObj.saveToLocalStorage();
 						}
-						if(section === 'variables'){
+						else if(section === 'variables'){
 							let val = await dialog("Rename Variable Namespace:", "MyApp/Custom/Variable", model.id);
 							if(!val) return;
 
-							CurrentSketch.renameVariable(model.id, val, Blackprint.VarScope.Public);
+							sketch.renameVariable(model.id, val, Blackprint.VarScope.Public);
 						}
-						if(section === 'sharedVariables'){
+						else if(section === 'sharedVariables'){
 							let val = await dialog("Rename Shared Variable Name:", "MyApp_Custom_Variable", model.id);
 							if(!val) return;
 
-							let instance = CurrentSketch._funcMain.node._funcInstance;
+							let instance = funcNodeInstance;
 							instance.renameVariable(model.id, val, Blackprint.VarScope.Shared);
 						}
-						if(section === 'privateVars'){
+						else if(section === 'privateVars'){
 							let val = await dialog("Rename Private Variable Name:", "MyApp_Custom_Variable", model.id);
 							if(!val) return;
 
-							let instance = CurrentSketch._funcMain.node._funcInstance;
+							let instance = funcNodeInstance;
 							instance.renameVariable(model.id, val, Blackprint.VarScope.Private);
 						}
-						if(section === 'functions'){
+						else if(section === 'functions'){
 							let val = await dialog("Rename Function Namespace:", "MyApp/Custom/Function", model.id);
 							if(!val) return;
 
-							CurrentSketch.renameFunction(model.id, val);
+							sketch.renameFunction(model.id, val);
 						}
-						if(section === 'functionInputs'){
+						else if(section === 'functionInputs'){
 							let val = await dialog("Rename Input Port Name:", "MyInputPortName", model.name);
 							if(!val) return;
 
-							CurrentSketch._funcMain.renamePort('input', model.name, val);
+							sketch._funcMain.renamePort('input', model.name, val);
 						}
-						if(section === 'functionOutputs'){
+						else if(section === 'functionOutputs'){
 							let val = await dialog("Rename Output Port Name:", "MyOutputPortName", model.name);
 							if(!val) return;
 
-							CurrentSketch._funcMain.renamePort('output', model.name, val);
+							sketch._funcMain.renamePort('output', model.name, val);
 						}
-						if(section === 'events'){
+						else if(section === 'events'){
 							let val = await dialog("Rename Event Name:", "MyApp/Event/Name", model.namespace);
 							if(!val) return;
 
-							CurrentSketch.events.renameEvent(model.namespace, val);
+							sketch.events.renameEvent(model.namespace, val);
 						}
-						if(section === 'groups'){
+						else if(section === 'groups'){
 							let val = await dialog("Rename Group Name:", "No title", model.iface.data.title);
 							if(!val) return;
 
@@ -742,8 +742,27 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 				}, {
 					title: "Delete",
 					description: "Hold shift for instant delete",
-					callback(){
+					async callback(){
+						if(!DropDown.lastClickEvent.shiftKey){
+							let result = await Swal.fire({
+								title: 'Are you sure want to delete this?',
+								showCancelButton: true,
+								confirmButtonText: 'Yes',
+							});
+							if(!result.isConfirmed) return;
+						}
 
+						if(section === 'environmentVar') Blackprint.Environment.delete(model.key);
+						else if(section === 'variables') sketch.deleteVariable(model.id, Blackprint.VarScope.Public);
+						else if(section === 'sharedVariables')
+							funcNodeInstance.deleteVariable(model.id, Blackprint.VarScope.Shared);
+						else if(section === 'privateVars')
+							funcNodeInstance.deleteVariable(model.id, Blackprint.VarScope.Private);
+						else if(section === 'functions') sketch.deleteFunction(model.id);
+						else if(section === 'functionInputs') funcNodeInstance.deletePort('input', model.name);
+						else if(section === 'functionOutputs') funcNodeInstance.deletePort('output', model.name);
+						else if(section === 'events') sketch.events.deleteEvent(model.namespace);
+						else if(section === 'groups') sketch.deleteNode(model.iface);
 					}
 				}];
 
