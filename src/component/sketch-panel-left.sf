@@ -378,16 +378,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	}
 
 	let pendingRefreshModule;
-	const refreshNodesCounter = () => {
+	My.refreshNodesCounter = () => {
 		clearTimeout(pendingRefreshModule);
 
 		pendingRefreshModule = setTimeout(async () => {
 			await My.recalculateMenu();
 			My.nodeCount = deepCount(Blackprint.availableNode, true);
-		}, 500);
+		}, 250);
 	}
 	let pendingRefreshVars;
-	const refreshVarsCounter = () => {
+	My.refreshVarsCounter = () => {
 		clearTimeout(pendingRefreshVars);
 
 		pendingRefreshVars = setTimeout(() => {
@@ -399,11 +399,8 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 				My.functionSharedVariableLength = deepCount(My.funcSharedVariable);
 				My.functionVariableLength = deepCount(My.funcVariable);
 			}
-		}, 500);
+		}, 250);
 	}
-
-	sketch.on('json.imported', refreshVarsCounter);
-	sketch.on('variable.new function.new', refreshVarsCounter);
 
 	My.groupListElObserver ??= new IntersectionObserver((entries, observer)=> {
 		entries.forEach((entry) => {
@@ -423,7 +420,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		threshold: [0, 0.05, 1],
 	});
 
-	sketch.on('node.created', ({ iface }) => {
+	My._onNodeCreated = ({ iface }) => {
 		if(iface.node.instance !== sketch) return;
 		if(iface.namespace === 'Decoration/Group/Default' && My.groupList.findIndex(v=> v.iface === iface) === -1) {
 			let obj = { iface, title: iface.data.title, active: false };
@@ -435,30 +432,23 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 			reSortGroups();
 			$.afterRepaint().then(() => {
-				My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
-			}, 100);
+				setTimeout(() => {
+					My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
+				}, 100);
+			});
 		}
-	});
-	sketch.on('node.removed', ({ iface }) => {
+	};
+
+	My._onNodeDeleted = ({ iface }) => {
 		let i = My.groupList.findIndex(v=> v.iface === iface);
 		if(i !== -1) My.groupList.splice(i, 1);
-	});
-
-	if(My.isFunctionSketch)
-		funcNodeInstance.on('variable.new', refreshVarsCounter);
-
-	Blackprint.on('module.added', refreshNodesCounter); // ToDo: use dot to separate event scope
-	Blackprint.on('module.delete', refreshNodesCounter);
-	Blackprint.on('module.update', refreshNodesCounter);
-	Blackprint.on('bp_editorNodeAvailability', refreshNodesCounter);
-	$(refreshNodesCounter); // Run when all script/page is loaded
-	$(refreshVarsCounter); // Run when all script/page is loaded
+	};
 
 	My.init = function(){
 		let sketchPage = My.$el.parent('sketch-page')[0].model;
 		sketchPage.panels.left = My;
 		My.recalculateMenu();
-		refreshNodesCounter();
+		My.refreshNodesCounter();
 
 		let clearTooltip = ()=> ToolTip.set();
 
@@ -481,6 +471,28 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		My.$el('.node-list > .title').on('pointerleave', clearTooltip).on('pointerover', ()=> {
 			ToolTip.set("Nodes that registered to Blackprint\nYou can create your own node or import it from external sources");
 		});
+
+		sketch.on('node.created', data => My._onNodeCreated(data));
+		sketch.on('node.deleted', data => My._onNodeDeleted(data));
+
+		if(My.isFunctionSketch)
+			funcNodeInstance.rootInstance.on('variable.new variable.deleted', ev => My.refreshVarsCounter(ev));
+
+		Blackprint.on('module.added', ev => My.refreshNodesCounter(ev)); // ToDo: use dot to separate event scope
+		Blackprint.on('module.delete', ev => My.refreshNodesCounter(ev));
+		Blackprint.on('module.update', ev => My.refreshNodesCounter(ev));
+		Blackprint.on('bp_editorNodeAvailability', ev => My.refreshNodesCounter(ev));
+		$(My.refreshNodesCounter); // Run when all script/page is loaded
+		$(My.refreshVarsCounter); // Run when all script/page is loaded
+
+		sketch.on('json.imported', ev => My.refreshVarsCounter(ev));
+		sketch.on('variable.new variable.deleted function.new function.deleted', ev => My.refreshVarsCounter(ev));
+
+		let ifaceList = sketch.ifaceList;
+		for (let i=0; i < ifaceList.length; i++) {
+			let iface = ifaceList[i];
+			if(iface.namespace === 'Decoration/Group/Default') My._onNodeCreated({ iface });	
+		}
 	}
 
 	let recheckPreviewSize;
@@ -529,7 +541,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		removeBlur();
 		My.$el.parent('sketch-page').removeClass('left-menu-hide');
 		My.opened = true;
-		CurrentSketch.recalculatePosition();
+		sketch.recalculatePosition();
 	}
 
 	My.closePanel = function(ev){
@@ -537,7 +549,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		ev.stopPropagation();
 		My.$el.parent('sketch-page').addClass('left-menu-hide');
 		My.opened = false;
-		CurrentSketch.recalculatePosition();
+		sketch.recalculatePosition();
 	}
 
 	My.collapseTree = function(el){
