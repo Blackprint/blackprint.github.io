@@ -721,7 +721,7 @@ sf.component('sketch-page', function(My){
 	My.clearNodes = ()=> sketch.clearNodes();
 
 	My.cloneContainer = function(){
-		let title = sketch._funcMain != null ? `"${sketch._funcMain.title}" Function` : `Main`;
+		let title = sketch.parentInterface != null ? `"${sketch.parentInterface.title}" Function` : `Main`;
 
 		// Clone into new window
 		new sf.Window({

@@ -309,7 +309,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.previewScale = 1;
 	My.scaledPreviewHeight = 1;
 
-	let funcNodeInstance = sketch._funcMain?.node._funcInstance;
+	let funcNodeInstance = sketch.parentInterface?.node.bpFunction;
 	if(funcNodeInstance != null)
 		My.variables = funcNodeInstance.rootInstance.variables;
 	else My.variables = sketch.variables;
@@ -318,9 +318,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My.events = sketch.events || ({totalEvent: 0, treeList: {}});
 	My.nodes = Blackprint.nodes;
 
-	My.isFunctionSketch = sketch._funcMain != null;
-	My.funcInput = sketch._funcMain?.input._portList ?? [];
-	My.funcOutput = sketch._funcMain?.output._portList ?? [];
+	My.isFunctionSketch = sketch.parentInterface != null;
+	My.funcInput = sketch.parentInterface?.input._portList ?? [];
+	My.funcOutput = sketch.parentInterface?.output._portList ?? [];
 	My.funcSharedVariable = funcNodeInstance?.variables ?? {}; // shared function variables
 	My.funcVariable = sketch.variables ?? {}; // private function variables
 
@@ -718,13 +718,13 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 							let val = await dialog("Rename Input Port Name:", "MyInputPortName", model.name);
 							if(!val) return;
 
-							sketch._funcMain.renamePort('input', model.name, val);
+							sketch.parentInterface.renamePort('input', model.name, val);
 						}
 						else if(section === 'functionOutputs'){
 							let val = await dialog("Rename Output Port Name:", "MyOutputPortName", model.name);
 							if(!val) return;
 
-							sketch._funcMain.renamePort('output', model.name, val);
+							sketch.parentInterface.renamePort('output', model.name, val);
 						}
 						else if(section === 'events'){
 							let val = await dialog("Rename Event Name:", "MyApp/Event/Name", model.namespace);
@@ -873,7 +873,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		val = val.value;
 		if(!val) return;
 
-		let funcInstance = sketch._funcMain?.node._funcInstance;
+		let funcInstance = sketch.parentInterface?.node.bpFunction;
 		let rootInstance = funcInstance?.rootInstance ?? sketch;
 
 		if(scope === Blackprint.VarScope.Public)
@@ -895,7 +895,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		val = val.value;
 		if(!val) return;
 
-		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
+		let rootInstance = sketch.parentInterface?.node.bpFunction.rootInstance ?? sketch;
 		rootInstance.createFunction(val, {description: "No description"});
 
 		My.recalculateMenu();
@@ -911,7 +911,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		val = val.value;
 		if(!val) return;
 
-		let rootInstance = sketch._funcMain?.node._funcInstance.rootInstance ?? sketch;
+		let rootInstance = sketch.parentInterface?.node.bpFunction.rootInstance ?? sketch;
 		rootInstance.events.createEvent(val);
 
 		My.recalculateMenu();

@@ -365,7 +365,7 @@ sf.model('sketch-pages', function(My){
 				});
 
 				// is inside function?
-				if(sketch._funcMain){
+				if(sketch.parentInterface){
 					Variables.push({
 						title: "New Private",
 						icon: 'fa fa-plus-square',

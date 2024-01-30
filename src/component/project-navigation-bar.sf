@@ -70,7 +70,7 @@ sf.component('project-navigation-bar', My => {
 			}
 			else My.instanceName = mainInstance.tabInfo.title;
 
-			let funcMain = sketch._funcMain;
+			let funcMain = sketch.parentInterface;
 			if(funcMain != null) My.functionName = funcMain.title.split('/').join(' / ');
 
 			if(My.functionName === '') My.$el('.function-name').remove();
