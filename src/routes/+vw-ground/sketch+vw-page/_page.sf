@@ -529,6 +529,12 @@ sf.component('sketch-page', function(My){
 				showPortValue(cables[i].output.iface.node);
 			}
 		}
+
+		if(cable == null && cables == null) { // Idle
+			bottomPanel.noteTitle = `Running...`;
+			bottomPanel.note = ``;
+			bottomPanel.stepModeIsRequesting = false;
+		}
 	});
 
 	function showPortValue(node){

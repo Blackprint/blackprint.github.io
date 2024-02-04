@@ -7,10 +7,10 @@
 		<div class="buttons">
 			<div @click="executionPauseSwitch" class="button {{
 				execOrder.pause && execOrder.length === 0 && !execOrder._hasStepPending ? 'inactive' : ''
-			}}"><i class="fa fa-{{ execOrder.pause ? 'play' : 'pause' }}"></i> {{
-				execOrder.pause ? 'Next' : 'Pause'
+			}}"><i class="fa fa-{{ r_execOrder.pause ? 'play' : 'pause' }}"></i> {{
+				r_execOrder.pause ? 'Next' : 'Pause'
 			}}</div>
-			<div class="button {{ execOrder.stepMode ? 'active' : '' }}" @click="executionStepMode">
+			<div class="button {{ r_execOrder.stepMode ? 'active' : '' }}" @click="executionStepMode">
 				<i class="fa fa-shoe-prints"></i> Step Mode
 			</div>
 			<div class="button" @click="sketchRefresh"><i class="fa fa-sitemap"></i> Refresh</div>
@@ -143,6 +143,7 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 	My.sketchPage = null;
 	My.instance = null;
 	My.execOrder = null;
+	My.r_execOrder = {pause: false, stepMode: false}; // Remote engine + Editor's engine status
 	My.noteTitle = '';
 	My.note = '';
 	My.stepModeIsRequesting = '';
@@ -156,6 +157,68 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 		My.sketchPage.panels.bottom = My;
 		My.instance = My.sketchPage.sketch;
 		My.execOrder = My.instance.executionOrder;
+
+		sf.watch(My.execOrder, 'pause', (old, now)=> {
+			if(My.instance._remote) return; My.r_execOrder.pause = now;
+		});
+		sf.watch(My.execOrder, 'stepMode', (old, now)=> {
+			if(My.instance._remote) return; My.r_execOrder.stepMode = now;
+		});
+
+		sf.watch(My.instance, '_remote', hasRemote);
+		if(My.instance._remote) hasRemote();
+		function hasRemote(){
+			My.hasRemote = true;
+			let remote = My.instance._remote;
+			let ifaceList = My.instance.ifaceList;
+
+			function findCable(info){
+				if(info == null) return null;
+
+				let iface = ifaceList[info.out.i];
+				let output = iface.output;
+
+				let cables = output[info.out.name].cables;
+				let cable = null;
+				for (let i=0; i < cables.length; i++) {
+					let ref = cables[i];
+					if(ref.output.iface.i === info.out.i && ref.input?.iface.i === info.in?.i){
+						cable = ref;
+						break;
+					}
+				}
+
+				return cable;
+			}
+
+			remote.on('stepmode.enabled', data => {
+				My.r_execOrder.stepMode = data.flag;
+				if(data.flag) My.opened = true;
+			});
+			remote.on('stepmode.paused', data => {
+				My.r_execOrder.pause = data.pause;
+				if(data.pause) My.opened = true;
+				else {
+					My.instance._emit('execution.paused', {
+						afterNode: null,
+						beforeNode: null,
+						cable: null,
+						cables: null,
+						triggerSource: 0,
+					});
+				}
+			});
+			remote.on('stepmode.status', data => {
+				My.r_execOrder.pause = true;
+				My.instance._emit('execution.paused', {
+					afterNode: data.afterNode != null ? ifaceList[data.afterNode].node : null,
+					beforeNode: data.beforeNode != null ? ifaceList[data.beforeNode].node : null,
+					cable: findCable(data.cable),
+					cables: data.cables?.map(findCable),
+					triggerSource: data.triggerSource,
+				});
+			});
+		}
 	}
 
 	function removeBlur(){
@@ -175,19 +238,31 @@ sf.component('sketch-panel-bottom', {template: #this.path}, function(My){
 			My.sketchPage.$el('editor-display-port-value').remove();
 		}
 
-		if(executionOrder.pause){
-			My.noteTitle = My.note = '';
-			executionOrder.pause = false;
-			executionOrder.next(true);
+		if(My.hasRemote){
+			if(My.r_execOrder.pause) My.instance._remote.pauseExecution(false);
+			else My.instance._remote.pauseExecution(true);
 		}
-		else executionOrder.pause = true;
+		else{
+			if(executionOrder.pause){
+				My.noteTitle = My.note = '';
+				executionOrder.pause = false;
+				executionOrder.next(true);
+			}
+			else executionOrder.pause = true;
+		}
 	}
 
 	My.executionStepMode = function(){
 		let executionOrder = My.instance.executionOrder;
 		executionOrder.stepMode = !executionOrder.stepMode;
 
-		if(executionOrder.stepMode) executionOrder.pause = true;
+		if(My.hasRemote){
+			if(My.r_execOrder.stepMode) My.instance._remote.enableStepMode(false);
+			else My.instance._remote.enableStepMode(true);
+		}
+		else{
+			if(executionOrder.stepMode) executionOrder.pause = true;
+		}
 	}
 
 	My.sketchRefresh = function(){
