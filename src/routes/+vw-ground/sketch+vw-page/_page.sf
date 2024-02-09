@@ -435,7 +435,9 @@ sf.component('sketch-page', function(My){
 	sketch.on('node.function.open', EventSlot, async ev => {
 		let name = ev.iface.namespace.split('/').join('-');
 		name += '-'+ev.iface.uniqId;
-		let tabId = sketch.tabInfo.id;
+
+		let tabInfo = sketch.tabInfo ?? sketch.rootInstance.tabInfo;
+		let tabId = tabInfo.id;
 
 		let pages = $('vw-page > sf-page-view', views.rootDOM);
 		let routePath = `/sketch/${tabId}-node-`+name;
@@ -451,7 +453,7 @@ sf.component('sketch-page', function(My){
 			bpInstance: ev.iface.bpInstance
 		});
 
-		sketch.tabInfo.currentRoute = routePath;
+		tabInfo.currentRoute = routePath;
 	});
 
 	// This may cause one memory leak because this will never being cleared
