@@ -539,6 +539,13 @@ sf.component('sketch-page', function(My){
 		}
 	});
 
+	sketch.on('execution.terminated', EventSlot, ({ reason, iface }) => {
+		SmallNotif.add(reason, 'red');
+		let bottomPanel = My.panels.bottom;
+		bottomPanel.opened = true;
+		bottomPanel.noteTitle = "Execution stopped";
+	});
+
 	function showPortValue(node){
 		let { input, output } = node.iface;
 		for(let key in input){

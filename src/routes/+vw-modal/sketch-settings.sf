@@ -25,6 +25,10 @@
 			<div class="title">Show sketch minimap</div>
 			<input type="checkbox" sf-bind="showSketchMinimap">
 		</div>
+		<div class="item">
+			<div class="title">Single node execution loop limit</div>
+			<input type="number" sf-bind="singleNodeExecutionLoopLimit">
+		</div>
 	</div>
 </sf-m>
 
@@ -159,4 +163,11 @@ var SketchSettings = sf.model('sketch-settings', function(My){
 		}, 1000);
 	}
 	if(My.customScript) My.on$customScript(My.customScript, true);
+
+	Blackprint.settings('singleNodeExecutionLoopLimit', +(localStorage.singleNodeExecutionLoopLimit ??= 10_000));
+	My.singleNodeExecutionLoopLimit = Blackprint.settings.singleNodeExecutionLoopLimit;
+	My.on$singleNodeExecutionLoopLimit = function(now){
+		Blackprint.settings.singleNodeExecutionLoopLimit = +now;
+		localStorage.singleNodeExecutionLoopLimit = +now;
+	};
 });
