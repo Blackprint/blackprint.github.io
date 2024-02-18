@@ -206,7 +206,7 @@ var EditorHeader = sf.model('header', function(My, include){
 
 	My.mainMenu = function(ev){
 		if(My.showOptions === false) return;
-		let sketch = window.CurrentSketch;
+		let sketch = (CurrentSketch.rootInstance || CurrentSketch);
 		let sketchSocket = sf.model('modal-remote-sketch-connect').socket;
 		let engineSocket = sf.model('modal-remote-engine-connect').socket;
 

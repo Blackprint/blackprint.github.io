@@ -106,9 +106,10 @@ sf.model('remote-sync', function(My){
 		socket.emit('puppetnode.ask');
 
 		socket.once('puppetnode.answer', async (data) => {
-			let temp = CurrentSketch.exportJSON({environment: false});
-			CurrentSketch.clearNodes();
-			await CurrentSketch.importJSON(temp);
+			let rootInstance = (tab.sketch.rootInstance || tab.sketch);
+			let temp = rootInstance.exportJSON({environment: false});
+			rootInstance.clearNodes();
+			await rootInstance.importJSON(temp);
 		});
 	};
 

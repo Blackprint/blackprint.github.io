@@ -166,6 +166,7 @@ sf.model("project-list", My => {
 			await workspacePanel.rescanFiles();
 		}
 
+		let rootInstance = (tab.sketch.rootInstance || tab.sketch);
 		await file.writeData(tab.sketch.exportJSON({environment: false}));
 		tab.isUnsaved = false;
 

@@ -57,7 +57,8 @@ sf.model('sketch-pages', function(My){
 	}
 
 	function exportAndReduceNodePositions(){
-		let data = JSON.parse(CurrentSketch.exportJSON({
+		let rootInstance = (CurrentSketch.rootInstance || CurrentSketch);
+		let data = JSON.parse(rootInstance.exportJSON({
 			selectedOnly: true,
 			environment: false,
 			exportFunctions: false,
