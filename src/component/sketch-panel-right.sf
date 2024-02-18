@@ -34,6 +34,7 @@ body sketch-page > .panels sketch-panel-right {
 
 sketch-page > .panels.has-minimap sketch-panel-right {
 	height: calc(100% - 200px);
+	overflow: auto;
 }
 
 sketch-page > .panels sketch-panel-right {
