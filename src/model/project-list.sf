@@ -83,8 +83,10 @@ sf.model("project-list", My => {
 	My.uniqId = 2;
 
 	My.init = function(){
-		views.goto('/sketch/1');
-		My.storeCurrentSketchToTab(My.list[0], '1');
+		if(views.currentPath.startsWith('/sketch/')) {
+			views.goto('/sketch/1');
+			My.storeCurrentSketchToTab(My.list[0], '1');
+		}
 
 		// Avoid closing page when there are unsaved changes
 		window.addEventListener("beforeunload", ev => {
