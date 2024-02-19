@@ -592,17 +592,36 @@ sf.component('sketch-page', function(My){
 	My.init = async function(){
 		let sfm = $(My.space.firstElementChild);
 
+		// Rescan if the tab info was missing
+		if(sketch.tabInfo == null) {
+			let projectList = sf.model("project-list");
+			let tabs = projectList.list;
+			setTimeout(() => {
+				for (let i=0; i < tabs.length; i++) {
+					let tab = tabs[i];
+					let currentRoute = '/sketch/' + views.data.page;
+					if(tab.currentRoute === currentRoute){
+						projectList.storeCurrentSketchToTab(tab, views.data.page);
+						break;
+					}
+				}
+			}, 1);
+		}
+
 		// Show module version
 		if(true){
 			let sketch = $('script[src*="@blackprint/sketch"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
 			let engine = $('script[src*="@blackprint/engine"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+			let remote_ = $('script[src*="@blackprint/remote-control"]');
+			let remote = remote_.attr('src').match("(?<=@)([0-9\.]+)")?.[0];
 			let codegen = $('script[src*="@blackprint/code-generation"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
 
-			sketch = $.escapeText(sketch || '-unknown');
-			engine = $.escapeText(engine || '-unknown');
-			codegen = $.escapeText(codegen || '-unknown');
+			sketch = 'Sketch: v' + $.escapeText(sketch || '-unknown');
+			engine = '\nEngine: v' + $.escapeText(engine || '-unknown');
+			if(remote_ != null) remote = '\nRemote: v' + $.escapeText(remote || '-unknown');
+			codegen = '\nCodeGen: v' + $.escapeText(codegen || '-unknown');
 
-			sfm.prepend(`<div class="top-left-info">Sketch: v${sketch}\nEngine: v${engine}\nCodeGen: v${codegen}</div>`);
+			sfm.prepend(`<div class="top-left-info">${sketch}${engine}${remote}${codegen}</div>`);
 		}
 
 		// Show tiled background
