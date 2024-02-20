@@ -140,7 +140,13 @@ sketch-page{
 				if(CurrentSketch?._remote == null){
 					SmallNotif.add("Loading required nodes", 'yellow', 500);
 
-					Blackprint.loadModuleFromURL('https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-data.mjs', {
+					Blackprint.loadModuleFromURL([
+						'https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-console.mjs?1',
+						'https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-data.mjs?1',
+						'https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-decoration.mjs?1',
+						'https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-flowcontrol.mjs?1',
+						'https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-input.mjs?1',
+					], {
 						loadBrowserInterface: true
 					});
 				}
@@ -618,7 +624,7 @@ sf.component('sketch-page', function(My){
 
 			sketch = 'Sketch: v' + $.escapeText(sketch || '-unknown');
 			engine = '\nEngine: v' + $.escapeText(engine || '-unknown');
-			if(remote_ != null) remote = '\nRemote: v' + $.escapeText(remote || '-unknown');
+			if(remote_.length !== 0) remote = '\nRemote: v' + $.escapeText(remote || '-unknown');
 			codegen = '\nCodeGen: v' + $.escapeText(codegen || '-unknown');
 
 			sfm.prepend(`<div class="top-left-info">${sketch}${engine}${remote}${codegen}</div>`);
