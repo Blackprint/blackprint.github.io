@@ -8,7 +8,7 @@ In the browser you can easily import the from CDN, and you will have `Blackprint
 
 ```html
 <!-- Put this in <head> -->
-<script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.7" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.9" crossorigin="anonymous"></script>
 
 <!-- [Optional] Load required modules -->
 <!-- If you didn't do this, Blackprint Engine may load from module list that specified on the exported JSON -->
@@ -58,7 +58,7 @@ In this example we will name the file as `init.mjs`
 
 ```js
 // Initialize the engine first
-import Blackprint from 'https://cdn.skypack.dev/@blackprint/engine@0.7';
+import Blackprint from 'https://cdn.skypack.dev/@blackprint/engine@0.9';
 ```
 
 #### Run your application

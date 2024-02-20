@@ -618,13 +618,14 @@ sf.component('sketch-page', function(My){
 		if(true){
 			let sketch = $('script[src*="@blackprint/sketch"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
 			let engine = $('script[src*="@blackprint/engine"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
-			let remote_ = $('script[src*="@blackprint/remote-control"]');
-			let remote = remote_.attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+			let remote = $('script[src*="@blackprint/remote-control"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
 			let codegen = $('script[src*="@blackprint/code-generation"]').attr('src').match("(?<=@)([0-9\.]+)")?.[0];
+
+			if(location.pathname.startsWith('/dev.html')) remote ??= 0; // We have remote module imported on dev mode
 
 			sketch = 'Sketch: v' + $.escapeText(sketch || '-unknown');
 			engine = '\nEngine: v' + $.escapeText(engine || '-unknown');
-			if(remote_.length !== 0) remote = '\nRemote: v' + $.escapeText(remote || '-unknown');
+			remote = remote != null ? '\nRemote: v' + $.escapeText(remote || '-unknown') : '';
 			codegen = '\nCodeGen: v' + $.escapeText(codegen || '-unknown');
 
 			sfm.prepend(`<div class="top-left-info">${sketch}${engine}${remote}${codegen}</div>`);

@@ -6,9 +6,8 @@ Code generation can be used to convert your Blackprint instance into native code
 ## How to use
 Code generation module is separated from the sketch or engine module. To use it you must import the codegen module first.
 
-> The `codegen` module will be migrated to `@blackprint/engine` in version `0.8.14`.
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.8.13/dist/codegen.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@blackprint/code-generation@0.1.1/dist/codegen.min.js" crossorigin="anonymous"></script>
 ```
 
 ### Register code
