@@ -1,6 +1,7 @@
 ## Hello 👋
 Welcome to Blackprint Editor!<br>
-This documentation still being improved 😺
+This documentation still being improved 😺<br>
+Currently this documentation is written for JavaScript
 
 ---
 
@@ -18,7 +19,7 @@ This documentation still being improved 😺
 |3. Sketch|Single container of nodes/diagrams and the cables|
 |4. Editor|A collection of tools that can help you for using Blackprint|
 
-Each of the component have different functionality, so if you want to create an issue please make sure to fill it on the correct repository. Currently this documentation is written for JavaScript implementation.
+Each of the component have different functionality, so if you want to create an issue please make sure to fill it on the correct repository.
 
 ---
 

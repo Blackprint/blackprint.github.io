@@ -9,7 +9,7 @@ Blackprint is designed to be modular and it has relation like below:
 > In the browser environment, **Sketch Interface** script will not get loaded if you didn't load/import `@blackprint/sketch`
 
 ## Register Node
-This registration is **necessary**.<br>
+This registration is _**required**_.<br>
 Every node is registered in a namespace and every namespace need to be capitalized. Don't use symbol for the namespace except `.`, `_`, `/`. In some programming language, the dot `.` symbol will be converted into underscore `_`.
 
 ```js

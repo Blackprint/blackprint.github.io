@@ -169,13 +169,37 @@ instance.clearNodes();
 ```
 
 ## Add event listener to the instance
-These event can also be registered for **Sketch Instance**.
+These event can also be used for **Sketch Instance**.
 
 |Event Name|Event Object|Description|
 |---|---|---|
-|`node.id.changed`|`{ iface: Interface, from: String, to: String }`|Node ID was added/changed/removed|
+|`node.id.changed`|`{ iface: Interface, old: String, now: String }`|Node ID was added/changed/removed|
 |`cable.disconnect`|`{ port: Port, target?: Port, cable: Cable }`|A cable was disconnected or deleted|
 |`cable.connect`|`{ port: Port, target: Port, cable: Cable }`|A cable was connected between two port|
+|`json.imported`|`{ appendMode: Boolean, nodes: Array, raw: String }`|JSON was imported into the instance|
+|`cable.created`|`{ port: Port, cable: Cable }`|A cable was created|
+|`cable.deleted`|`{ cable: Cable }`|A cable was deleted|
+|`node.delete`|`{ iface: Interface }`|A node is being deleted|
+|`node.deleted`|`{ iface: Interface }`|A node was deleted|
+|`node.created`|`{ iface: Interface }`|A node was created|
+|`error`|`{ type: String, data: Object }`|An error happened on the instance|
+|`event.field.created`|`{ name: String, namespace: String }`|New event data field was created|
+|`event.field.renamed`|`{ old: String, now: String, namespace: String }`|An event data field was renamed|
+|`event.field.deleted`|`{ name: String, namespace: String }`|An event data field was deleted|
+|`variable.new`|<x-code2>{<x-t>scope: VarScope,</x-t><x-t>id: String,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|New variable was created|
+|`variable.renamed`|<x-code2>{<x-t>old: String, now: String,</x-t><x-t>scope: VarScope,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|A variable was renamed|
+|`variable.deleted`|<x-code2>{<x-t>id: String,</x-t><x-t>scope: VarScope,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|A variable was deleted|
+|`function.new`|`{ reference: BPFunction }`|A function template was created|
+|`function.renamed`|`{ old: String, now: String, reference: BPFunction }`|A function template was renamed|
+|`function.deleted`|`{ reference: BPFunction, id: String }`|A function template was deleted|
+|`event.new`|`{ reference: InstanceEvent }`|An event namespace was created|
+|`event.renamed`|`{ old: String, now: String, reference: InstanceEvent }`|An event namespace was renamed|
+|`event.deleted`|`{ reference: InstanceEvent }`|An event namespace was deleted|
+|`execution.paused`|<x-code2>{<x-t>afterNode?: Node<NodeStaticProps>,</x-t><x-t>beforeNode?: Node<NodeStaticProps>,</x-t><x-t>cable?: Cable,</x-t><x-t>cables?: Cable[],</x-t><x-t>triggerSource: Number,</x-t>}</x-code2>|The instance have been paused|
+|`execution.terminated`|`{ reason: String, iface: Interface }`|The instance data flow got terminated|
+|`function.port.renamed`|<x-code2>{<x-t>which: PortWhich,</x-t><x-t>old: String,</x-t><x-t>now: String,</x-t><x-t>reference: BPFunction,</x-t>}</x-code2>|A function node's port get renamed|
+|`function.port.deleted`|<x-code2>{<x-t>which: PortWhich,</x-t><x-t>name: String,</x-t><x-t>reference: BPFunction,</x-t>}</x-code2>|A function node's port get deleted|
+|`execution.terminated`|`{ reason: String, iface: Interface }`|The instance data flow got terminated|
 
 Below is an example on how to register event on the instance:
 ```js

@@ -25,17 +25,17 @@ You need to put this in the `<head>` tag.
 
 If you want to import Blackprint Sketch for unit testing in Node.js, you also need to set the Blackprint to use `windowless` mode. I also recommend for using Jest.
 ```js
+/**
+ * @jest-environment jsdom
+ */
 window.ResizeObserver = class{}; // Polyfill with empty class
-window.sf = require("scarletsframe/dist/scarletsframe.min.js");
 
-// Disable sf.loader for browser
+// This will automatically load ScarletsFrame + Engine + Sketch
+require("@blackprint/sketch");
+
+// Disable loader for browser, as we're testing with Node.js
 sf.loader.turnedOff = true;
 sf.loader.task = false;
-
-// Load Blackprint Engine before the Sketch
-require("@blackprint/engine");
-require("@blackprint/sketch/dist/blackprint.min.js");
-require("@blackprint/sketch/dist/blackprint.sf.js");
 
 // Let Blackprint know we're running in windowless environment
 Blackprint.settings('windowless', true);
@@ -122,7 +122,7 @@ var iface = sketch.createNode('Math/Multiply', {x:20, y:20});
 ```
 
 ## Get created node and cable list
-**Blackprint Sketch** does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly with `.push, .splice, .pop` or other array manipulation function.
+**Blackprint Sketch** does expose model and components through sketch.scope('modelName'). Below is reactive list, so if you remove or modify the array it will also modify the sketch container. It's **not recommended** to modify the list directly with `.push, .splice, .pop` or other array manipulation function. You shoudn't reference to the node by index too when using this list, as the index may got changed.
 ```js
 var ifaceList = sketch.scope('nodes').list; // as Array<Interface>
 var cableList = sketch.scope('cables').list; // as Array<Cable>
@@ -186,19 +186,13 @@ You can also register an event that exist on Engine class for your Sketch instan
 |Event Name|Event Object|Description|
 |---|---|---|
 |`container.selection`|`{ cables: Array, nodes: Array }`|User is selecting some nodes and cables|
-|`json.imported`|`{ appendMode: Boolean, nodes: Array, raw: String }`|JSON was imported into the instance|
 |`error`|`{ type: String, data: Object }`|An error happened on the instance|
 |`port.default.changed`|`{ port: Port }`|Default port value was changed|
 |`cable.create.branch`|`{ event: Event, cable: Cable }`|A cable was splitted and a cable branch was created|
-|`cable.created`|`{ port: Port, cable: Cable }`|A cable was created|
 |`cable.dropped`|`{ port: Port, cable: Cable, event: Event }`|A cable that was created by user interaction was dropped by user|
 |`cable.drag`|`{ cable: Cable }`|A cable is being dragged by user|
-|`cable.deleted`|`{ cable: Cable }`|A cable was deleted|
 |`node.move`|`{ iface: Interface, event: Event }`|A node is moved by user interaction|
 |`node.resize`|`{ items: Array }`|Some nodes get resized|
-|`node.delete`|`{ iface: Interface }`|A node is being deleted|
-|`node.deleted`|`{ iface: Interface }`|A node was deleted|
-|`node.created`|`{ iface: Interface }`|A node was created|
 |`node.click`|`{ iface: Interface, event: Event }`|User clicked the node header|
 |`node.hover`|`{ iface: Interface, event: Event }`|User is hovering/focus the node header|
 |`node.unhover`|`{ iface: Interface, event: Event }`|User is leaving focus the node header|

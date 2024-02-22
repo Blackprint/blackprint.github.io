@@ -35,7 +35,7 @@ class extends Blackprint.Node {
 4. Data cycle
 	- `update()`: called when current node receiving an data on input port
 	- `request()`: called when other node is requesting data from current node's output port
-	- `syncIn()`: called when the synchronizing with `node.syncOut()`
+	- `syncIn()`: called when the synchronizing with `node.syncOut()` for remote engine
 5. `destroy()`: called on node deletion from instance
 
 > Example code for every section below is a simplified version of implementation, you also need to add `constructor` function like example above for registering node. They are also optional, you can skip them if you don't need it.

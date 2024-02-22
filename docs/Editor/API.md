@@ -17,6 +17,8 @@ BPEditor.Dialog({
 });
 ```
 
+If you want to try the code above, you can open your browser's devtools and enter it into the console. You will see an "error dialog" on this editor as `BPEditor` is exposed globally. If you're using TypeScript, you can also use `window.BPEditor` to fix the typecheck.
+
 ## Polyfill
 If you're implementing your own editor from Blackprint Sketch, you will need to copy and paste code below to `<head></head>` before loading any nodes modules. You can also customize it if needed.
 
