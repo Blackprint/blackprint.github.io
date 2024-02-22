@@ -11,6 +11,7 @@
 project-navigation-bar {
 	position: absolute;
 	margin-left: 200px;
+	pointer-events: none;
 
 	.container{
 		background: #00000075;
@@ -31,8 +32,10 @@ project-navigation-bar {
 		span:last-child {
 			color: white;
 			cursor: default;
-			i { color: grey; }
     		text-shadow: unset;
+			pointer-events: all;
+
+			i { color: grey; }
 		}
 		.hide{
 			display: none;
