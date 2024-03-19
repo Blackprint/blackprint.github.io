@@ -7,7 +7,7 @@
 			<i class="fa fa-{{ x.isUnsaved ? 'circle' : 'times close' }}" @click="closeTab(x)"></i>
 		</div>
 	</div>
-	<div class="create-tab" @click="createTab"><i class="fa fa-plus"></i></div>
+	<div class="create-tab" @click="createTab" title="Create new instance, public variable/event/function will not be shared on the new instance"><i class="fa fa-plus"></i></div>
 </sf-m>
 
 ## scss-global
