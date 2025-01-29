@@ -11,7 +11,7 @@ This tree list accept: {
 	<div class="tree-item" sf-each="key, val in deep" tree-item-key="{{ key.replace(/\W/g, '_') }}">
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if val.branch != null:
-			return new $TreeList2({parentKey: parentKey, key, val: val.branch});
+			return new $TreeList2({parentKey: parentKey, key, val: val.branch, onToggle: onToggle});
 		}}
 	</div>
 </tree-list2>
@@ -30,6 +30,7 @@ sf.component('tree-list2', {template: #this.path}, function(My, include, $item={
 
 	My.deep = $item.val ?? {};
 	My.hidden = false;
+	My.onToggle = $item.onToggle ?? function(){};
 
 	My.init = function(){
 		My.$el.parent().addClass("has-child").addClass("collapsed");
@@ -46,5 +47,7 @@ sf.component('tree-list2', {template: #this.path}, function(My, include, $item={
 		if(hidden)
 			$(el.parentNode).addClass("collapsed");
 		else $(el.parentNode).removeClass("collapsed");
+		
+		My.onToggle(hidden);
 	}
 });

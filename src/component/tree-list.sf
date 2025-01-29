@@ -10,7 +10,7 @@ This tree list accept: {
 		<div class="title" @click="collapse(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 		{{@if hasChild(val):
 			return new $TreeList({
-				parentKey: parentKey, key, val, hasChild: hasChild,
+				parentKey: parentKey, key, val, hasChild: hasChild, onToggle: onToggle
 			});
 		}}
 	</div>
@@ -50,6 +50,7 @@ sf.component('tree-list', {template: #this.path}, function(My, include, $item={}
 	My.deep = $item.val ?? {};
 	My.hidden = true;
 	My.hasChild = $item.hasChild ?? (obj => obj.constructor === Object);
+	My.onToggle = $item.onToggle ?? function(){};
 
 	My.init = function(){
 		My.$el.parent().addClass("has-child").addClass("collapsed");
@@ -64,5 +65,7 @@ sf.component('tree-list', {template: #this.path}, function(My, include, $item={}
 		if(hidden)
 			$(el.parentNode).addClass("collapsed");
 		else $(el.parentNode).removeClass("collapsed");
+
+		My.onToggle(hidden);
 	}
 });

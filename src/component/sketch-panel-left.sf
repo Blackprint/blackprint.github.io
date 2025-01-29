@@ -32,7 +32,7 @@
 							<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 							{{@if val.constructor === Object:
-								return new $TreeList({ parentKey: '', key, val });
+								return new $TreeList({ parentKey: '', key, val, onToggle(){ recalculateMenu() } });
 							}}
 						</div>
 					</div>
@@ -73,6 +73,7 @@
 											parentKey: '',
 											key,
 											val,
+											onToggle(){ recalculateMenu() }
 										});
 									}}
 								</div>
@@ -91,6 +92,7 @@
 											parentKey: '',
 											key,
 											val,
+											onToggle(){ recalculateMenu() }
 										});
 									}}
 								</div>
@@ -112,7 +114,7 @@
 
 					{{@if val.constructor === Object:
 						return new $TreeList({
-							parentKey: '', key, val
+							parentKey: '', key, val, onToggle(){ recalculateMenu() }
 						});
 					}}
 				</div>
@@ -129,7 +131,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						return new $TreeList({ parentKey: '', key, val });
+						return new $TreeList({ parentKey: '', key, val, onToggle(){ recalculateMenu() } });
 					}}
 				</div>
 			</div>
@@ -155,7 +157,7 @@
 					<div class="title" @click="collapseTree(this)"><i class="fa tree-icon"></i> {{ key }}</div>
 
 					{{@if val.constructor === Object:
-						return new $TreeList({ parentKey: '', key, val });
+						return new $TreeList({ parentKey: '', key, val, onToggle(){ recalculateMenu() } });
 					}}
 				</div>
 			</div>
@@ -208,6 +210,7 @@ sketch-page > .panels sketch-panel-left {
 		border-top: 1px solid #787878a3;
 		padding: 5px 5px;
 		min-height: 22px;
+		height: fit-content;
 		// border-bottom: 1px dashed white;
 		.title, .button{
 			display: inline-block;
@@ -248,7 +251,7 @@ sketch-page > .panels sketch-panel-left {
 		}
 	}
 	.tree-view-scroll{
-		overflow: hidden scroll;
+		overflow: hidden auto;
 		height: calc(100% - 22px); // reduce by '.title' element size
 		position: relative;
 	}
@@ -588,7 +591,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		else collapseBtn.addClass('fa-chevron-down');
 	}
 
-	My.recalculateMenu = async function(isTryAgain){
+	My.recalculateMenu = async function(){
 		let variableMenu = My.$el('.variable-list');
 		let functionMenu = My.$el('.function-list');
 		let eventMenu = My.$el('.event-list');
@@ -618,16 +621,6 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 		// Restore scroll position for each menu after size reset
 		$menus.forEach((v, i) => v.find('.tree-view-scroll')[0].scrollTop = scrolls[i]);
-
-		// Retest height, if incorrect, lets try again once
-		if(!isTryAgain) setTimeout(() => {
-			let totalHeight = 0;
-			$menus.forEach(v => {
-				totalHeight += v[0].offsetHeight;
-			});
-
-			if(totalHeight < (maxContainerHeight - 50)) My.recalculateMenu(true);
-		}, 1000);
 	}
 
 	My.nodeListLeave = ev => {
