@@ -588,7 +588,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		else collapseBtn.addClass('fa-chevron-down');
 	}
 
-	My.recalculateMenu = async function(){
+	My.recalculateMenu = async function(isTryAgain){
 		let variableMenu = My.$el('.variable-list');
 		let functionMenu = My.$el('.function-list');
 		let eventMenu = My.$el('.event-list');
@@ -618,6 +618,16 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 
 		// Restore scroll position for each menu after size reset
 		$menus.forEach((v, i) => v.find('.tree-view-scroll')[0].scrollTop = scrolls[i]);
+
+		// Retest height, if incorrect, lets try again once
+		if(!isTryAgain) setTimeout(() => {
+			let totalHeight = 0;
+			$menus.forEach(v => {
+				totalHeight += v[0].offsetHeight;
+			});
+
+			if(totalHeight < (maxContainerHeight - 50)) My.recalculateMenu(true);
+		}, 1000);
 	}
 
 	My.nodeListLeave = ev => {
