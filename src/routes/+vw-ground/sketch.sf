@@ -125,8 +125,8 @@ sf.model('sketch-pages', function(My){
 		if(container.select.w > 30 || container.select.h > 30){
 			let { x, y, w, h, ix, iy } = container.select;
 
-			if(ix) x = obj.x - obj.w;
-			if(iy) y = obj.y - obj.h;
+			if(ix) x = x - w;
+			if(iy) y = y - h;
 
 			position.title = "Region Select";
 			DropDown.show([{
