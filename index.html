@@ -65,6 +65,8 @@
 	<script type="text/javascript">
 		// Register sf.$ to global
 		$ = sf.$;
+		window.FileSystemFileHandle ??= class {};
+		window.FileSystemDirectoryHandle ??= class {};
 
 		// Load modules
 		;(async function(){
