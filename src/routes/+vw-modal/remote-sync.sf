@@ -2,13 +2,13 @@
 <sf-m name="remote-sync">
 	<div class="description">Sync this Editor with Remote Blackprint</div>
 	<div class="list">
-		<div class="item" @click="puppetNodeList()" title="Use this if the remote module doesn't have nodes for Browser, or if you don't want to execute external module into this editor">
+		<!--div class="item" @click="puppetNodeList()" title="Use this if the remote module doesn't have nodes for Browser, or if you don't want to execute external module into this editor">
 			<div class="icon"><i class="fa fa-sync-alt"></i></div>
 			<div class="content">
 				<div class="title">Puppet Node List</div>
 				<div class="description">Replace this editor's node list with remote puppet node</div>
 			</div>
-		</div>
+		</div-->
 		<div class="item" @click="sendModuleList()" title="Use this if the remote is also using JavaScript, and the modules have support for target environment">
 			<div class="icon"><i class="fa fa-upload"></i></div>
 			<div class="content">
@@ -102,10 +102,12 @@ sf.model('remote-sync', function(My){
 	}
 
 	My.puppetNodeList = function(){
+		// ToDo: below was removed, but it is still here for reference
 		let socket = getHandler().socket;
-		socket.emit('puppetnode.ask');
 
+		socket.emit('puppetnode.ask');
 		socket.once('puppetnode.answer', async (data) => {
+			let tab = sf.model("project-list").getActiveTab();
 			let rootInstance = (tab.sketch.rootInstance || tab.sketch);
 			let temp = rootInstance.exportJSON({environment: false});
 			rootInstance.clearNodes();
@@ -118,7 +120,7 @@ sf.model('remote-sync', function(My){
 	};
 
 	My.receiveInstance = function(){
-		getHandler().client.importRemoteJSON();
+		getHandler().client.requestRemoteJSON();
 	};
 
 	My.sendInstance = function(){

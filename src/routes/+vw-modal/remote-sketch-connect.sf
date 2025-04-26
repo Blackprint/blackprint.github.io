@@ -151,11 +151,6 @@ sf.model('modal-remote-sketch-connect', function(My){
 			}
 		});
 
-		socket.on('puppetnode.answer', (data)=> {
-			Blackprint.PuppetNode.setRegisteredNodes(data);
-			Blackprint.emit('bp_editorNodeAvailability');
-		});
-
 		if(Modal.showed && Modal.views.currentPath === '/remote-sketch-connect')
 			Modal.hide();
 	}

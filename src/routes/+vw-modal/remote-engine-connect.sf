@@ -118,16 +118,11 @@ sf.model('modal-remote-engine-connect', function(My){
 			if((Date.now() - time) < 10e3) // younger than 10 sec
 				client.sendSketchToRemote();
 			else {
-				client.importRemoteJSON();
+				client.requestRemoteJSON();
 				client.once('empty.json.import', function(){
 					client.sendSketchToRemote();
 				});
 			}
-		});
-
-		socket.on('puppetnode.answer', (data)=> {
-			Blackprint.PuppetNode.setRegisteredNodes(data);
-			Blackprint.emit('bp_editorNodeAvailability');
 		});
 
 		client.on('disabled', ()=> SmallNotif.add("Remote sync was disabled", 'red'));
