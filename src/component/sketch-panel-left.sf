@@ -843,9 +843,9 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 						nodeOptions.data = { name: key };
 						sketch.createNode('BP/FnVar/Input', nodeOptions);
 					}
-					else if(section === 'functionOutputs'){
-						nodeOptions.data = { name: key };
-						sketch.createNode('BP/FnVar/Output', nodeOptions);
+					else if(section === 'functionOutputs'){1
+						nodeOptions.data = {};
+						sketch.createNode('BP/Fn/Output', nodeOptions);
 					}
 					else if(section === 'events'){
 						nodeOptions.data = { namespace: namespace };

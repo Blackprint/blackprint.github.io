@@ -460,6 +460,7 @@ sf.component('sketch-page', function(My){
 		});
 
 		tabInfo.currentRoute = routePath;
+		ev.iface.bpInstance.recalculatePosition();
 	});
 
 	// This may cause one memory leak because this will never being cleared
