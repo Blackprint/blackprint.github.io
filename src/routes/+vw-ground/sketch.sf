@@ -56,9 +56,8 @@ sf.model('sketch-pages', function(My){
 		return {sketch, container};
 	}
 
-	function exportAndReduceNodePositions(){
-		let rootInstance = (CurrentSketch.rootInstance || CurrentSketch);
-		let data = JSON.parse(rootInstance.exportJSON({
+	function exportAndReduceNodePositions(sketchInstance){
+		let data = JSON.parse(sketchInstance.exportJSON({
 			selectedOnly: true,
 			environment: false,
 			exportFunctions: false,
@@ -232,7 +231,7 @@ sf.model('sketch-pages', function(My){
 						return usedHasIndex;
 					}
 
-					let json = exportAndReduceNodePositions();
+					let json = exportAndReduceNodePositions(CurrentSketch.rootInstance || CurrentSketch);
 					let instance = json.instance;
 					for (let key in instance) {
 						let ifaces = instance[key];
@@ -455,7 +454,7 @@ sf.model('sketch-pages', function(My){
 		// Currently we only support copy/paste/delete for nodes
 		if(container.nodeScope.selected.length === 0) return;
 
-		ev.clipboardData.setData('text/plain', JSON.stringify(exportAndReduceNodePositions()));
+		ev.clipboardData.setData('text/plain', JSON.stringify(exportAndReduceNodePositions(CurrentSketch)));
 		ev.preventDefault();
 	}
 
