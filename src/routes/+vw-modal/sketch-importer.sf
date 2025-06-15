@@ -2,7 +2,7 @@
 <sf-m name="sketch-importer">
 	<div class="description" title="To avoid any risks if you have stored sensitive data on this editor, make sure you have verify the author of the nodes and the JSON to be imported.">Please verify the author before importing</div>
 	<div class="info-modules">
-		<div class="title">These modules will be imported:</div>
+		<div class="title">These modules will be imported: <span @click="removeModuleList" class="remove-module"><i class="fa fa-trash"></i></span></div>
 		<ul class="list">
 			<li class="item" sf-each="x in modules">
 				{{ x }}
@@ -68,6 +68,12 @@ sf-m[name="sketch-importer"] {
 		margin: 5px 2px;
 		.title{
 			color: gray;
+		}
+	}
+	.remove-module{
+		cursor: pointer;
+		&:hover{
+			color: white;
 		}
 	}
 	.info-clear{
@@ -146,6 +152,11 @@ var SketchImporter = sf.model('sketch-importer', function(My){
 			My.nodes.push({name: key, count: instance[key].length});
 
 		My.checkSavedData();
+	}
+
+	My.removeModuleList = function(){
+		My.modules = [];
+		My.pendingLoad.moduleJS = [];
 	}
 
 	My.importNow = function(){
