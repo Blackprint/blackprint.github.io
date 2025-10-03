@@ -11,6 +11,10 @@
 		<div class="path">Path: <span>{{ node.path }}</span></div>
 		<div class="id" style="display: {{ node.id ? '' : 'none' }}">ID: <span>{{ node.id }}</span></div>
 		<div class="desc">{{ node.desc }}</div>
+		<div class="preview">
+			<video :src="{{ node.hasVideo }}" style="display: {{ node.hasVideo ? '' : 'none' }}"></video>
+			<img :src="{{ node.hasPicture }}" style="display: {{ node.hasPicture ? '' : 'none' }}"></video>
+		</div>
 	</div>
 	<div class="{{ type === 'general' ? '' : 'hide-this' }} general">
 		<div class="title">{{ general.title }}</div>
@@ -96,8 +100,15 @@ var ToolTip = sf.model('tooltip', function(My){
 	My.type = 'basic';
 	My.desc = '';
 	My.port = {type:'', desc:'', color:''};
-	My.node = {path:'', desc:''};
+	My.node = {path:'', desc:'', hasVideo:'', hasPicture:''};
 	My.general = {title:'', desc:'', comment:''};
+
+	My.nodeVideoEl = null;
+	My.nodePictureEl = null;
+	My.init = function(){
+		My.nodeVideoEl = My.$el('.node .preview video');
+		My.nodePictureEl = My.$el('.node .preview img');
+	}
 
 	My._listener = function(ev){
 		My.x = ev.clientX;
@@ -120,6 +131,13 @@ var ToolTip = sf.model('tooltip', function(My){
 		}
 
 		My.type = type;
+		
+		let videoEl = My.nodeVideoEl[0];
+		videoEl.loop = false;
+		videoEl.pause();
+
+		My.node.hasVideo = '';
+		My.node.hasPicture = '';
 
 		if(!data) return;
 
@@ -128,6 +146,14 @@ var ToolTip = sf.model('tooltip', function(My){
 			My.node.path = data.namespace;
 			My.node.desc = data.docs?.description || '';
 			My.node.id = data.id;
+			My.node.hasVideo = data.docs?.tags?.video_url || '';
+			My.node.hasPicture = data.docs?.tags?.picture_url || '';
+
+			if(My.node.hasVideo){
+				let videoEl = My.nodeVideoEl[0];
+				videoEl.loop = true;
+				videoEl.play();
+			}
 		}
 		else if(type === 'general'){
 			My.general.title = data.title;

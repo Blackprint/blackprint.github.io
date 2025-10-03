@@ -10,8 +10,7 @@
 ## scss-global
 project-navigation-bar {
 	position: absolute;
-	margin-left: 200px;
-	pointer-events: none;
+	justify-self: anchor-center;
 
 	.container{
 		background: #00000075;
@@ -19,7 +18,6 @@ project-navigation-bar {
 		box-shadow: 0 0 5px 2px #000000;
 		padding: 8px 10px 5px 10px;
 		margin-top: -5px;
-		margin-left: 20vw;
 		color: grey;
 		max-width: 40vw;
 		span{

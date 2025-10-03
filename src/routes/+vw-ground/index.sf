@@ -40,6 +40,10 @@
 				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/python/python-plain.svg" style="max-width: 45px;margin-bottom: 2px;">
 				<div class="name">Python</div>
 			</a>
+			<a class="item" href="https://github.com/Blackprint/engine-lua" target="_blank">
+				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/lua/lua-plain.svg">
+				<div class="name">Luau</div>
+			</a>
 			<!--a class="item" href="https://github.com/Blackprint/engine-csharp" target="_blank">
 				<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@2.14.0/icons/csharp/csharp-plain.svg">
 				<div class="name">C#</div>

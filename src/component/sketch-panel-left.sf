@@ -436,6 +436,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 			reSortGroups();
 			$.afterRepaint().then(() => {
 				setTimeout(() => {
+					if(iface.$el == null) return;
 					My.groupListElObserver.observe(iface.$el.eq(0).children('.node')[0]);
 				}, 100);
 			});

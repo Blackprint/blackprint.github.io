@@ -450,7 +450,7 @@ sf.model('sketch-pages', function(My){
 		let passed = checkIfHasSelection(ev);
 		if(!passed) return;
 		let {sketch, container} = passed;
-		
+
 		// Currently we only support copy/paste/delete for nodes
 		if(container.nodeScope.selected.length === 0) return;
 
@@ -463,8 +463,15 @@ sf.model('sketch-pages', function(My){
 		if(!passed) return;
 		let {sketch, container} = passed;
 
-		let data = ev.clipboardData.getData('text/plain');
-		data = JSON.parse(data);
+		let data = ev.clipboardData.getData('text/plain').trim();
+
+		try {
+			data = JSON.parse(data);
+		} catch(e){
+			return; // not valid JSON
+		}
+
+		if(data.instance == null) return; // Not Blackprint Instance
 
 		let {x, y} = container.pos; // Negative value
 		let {x: oX, y: oY} = container.offset; // Negative value
