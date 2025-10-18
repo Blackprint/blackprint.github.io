@@ -37,7 +37,7 @@ $(function(){
 			sf.model('header').disableVFX();
 		}
 
-		if(views.data.page != null && /\/sketch\/[^0-9]/.test(views.currentPath))
+		if(views.data.page != null && /\/sketch\/[0-9]/.test(views.currentPath))
 			views.goto("/sketch/1");
 	}, 100);
 

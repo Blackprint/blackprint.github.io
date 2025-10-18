@@ -17,8 +17,8 @@ var BlackprintEventFallback = {
 		SmallNotif.add(`The cable type is not suitable (${target.type.name} != ${port.type.name})`, 'red');
 	},
 	'cable.virtual_type_mismatch'({ port, target }){
-		let A = port.virtualType.map(v => v.name).join("|");
-		let B = target.virtualType.map(v => v.name).join("|");
+		let A = port.virtualType?.map(v => v.name).join("|") ?? port.type.name;
+		let B = target.virtualType?.map(v => v.name).join("|") ?? target.type.name;
 		SmallNotif.add(`No virtual type that matched each other (${A} != ${B})`, 'yellow');
 	},
 	'cable.duplicate_removed'({ cable, port }){

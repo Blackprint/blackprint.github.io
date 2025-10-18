@@ -131,7 +131,7 @@ var ToolTip = sf.model('tooltip', function(My){
 		}
 
 		My.type = type;
-		
+
 		let videoEl = My.nodeVideoEl[0];
 		videoEl.loop = false;
 		videoEl.pause();
@@ -197,7 +197,7 @@ var ToolTip = sf.model('tooltip', function(My){
 
 			My.port.type = typeName;
 			My.port.feature = feature;
-			
+
 			let desc = data.docs?.description || '';
 			My.port.desc = desc.replace(/@menu\b.*?$/s, '').trim();
 

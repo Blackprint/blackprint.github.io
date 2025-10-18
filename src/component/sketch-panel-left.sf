@@ -426,7 +426,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 	My._onNodeCreated = ({ iface }) => {
 		if(iface.node.instance !== sketch) return;
 		if(iface.namespace === 'Decoration/Group/Default' && My.groupList.findIndex(v=> v.iface === iface) === -1) {
-			let obj = { iface, title: iface.data.title, active: false };
+			let obj = { iface, title: iface.data?.title, active: false };
 			My.groupList.push(obj);
 			sf.watch(iface.data, 'title', ()=> {
 				obj.title = iface.data.title;
@@ -495,7 +495,7 @@ sf.component('sketch-panel-left', {template: #this.path}, function(My){
 		let ifaceList = sketch.ifaceList;
 		for (let i=0; i < ifaceList.length; i++) {
 			let iface = ifaceList[i];
-			if(iface.namespace === 'Decoration/Group/Default') My._onNodeCreated({ iface });	
+			if(iface.namespace === 'Decoration/Group/Default') My._onNodeCreated({ iface });
 		}
 	}
 
