@@ -188,7 +188,7 @@ These event can also be used for **Sketch Instance**.
 |`event.field.deleted`|`{ name: String, namespace: String }`|An event data field was deleted|
 |`variable.new`|<x-code2>{<x-t>scope: VarScope,</x-t><x-t>id: String,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|New variable was created|
 |`variable.renamed`|<x-code2>{<x-t>old: String, now: String,</x-t><x-t>scope: VarScope,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|A variable was renamed|
-|`variable.deleted`|<x-code2>{<x-t>id: String,</x-t><x-t>scope: VarScope,</x-t><x-t>reference?: BPVariable,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|A variable was deleted|
+|`variable.deleted`|<x-code2>{<x-t>id: String,</x-t><x-t>scope: VarScope,</x-t><x-t>bpFunction?: BPFunction,</x-t>}</x-code2>|A variable was deleted|
 |`function.new`|`{ reference: BPFunction }`|A function template was created|
 |`function.renamed`|`{ old: String, now: String, reference: BPFunction }`|A function template was renamed|
 |`function.deleted`|`{ reference: BPFunction, id: String }`|A function template was deleted|
