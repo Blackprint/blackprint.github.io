@@ -1,0 +1,136 @@
+<!-- For testing/creating new nodes interface separately -->
+<!DOCTYPE html><html><head>
+	<title>Test</title>
+	<script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.28.5/dist/scarletsframe.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+	<script src="/dist/engine.min.js?1590401976888"></script>
+	<script type="text/javascript">
+		$ = sf.dom;
+	</script>
+	<script type="text/javascript" src='https://cdn.jsdelivr.net/npm/sfmediastream@latest'></script>
+
+	<link href="/dist/blackprint.min.css?1590384721993">
+	<script src="/dist/blackprint.html.js?1590383005665"></script>
+	<script src="/dist/blackprint.min.js?1590401847902"></script>
+</head><body style="background-color:#232323">
+
+
+<!-- Component that will be handled on script -->
+<comp-test>
+	{{henlo}}
+</comp-test>
+  <audio src="http://localhost/kizuna-ai/perfecthuh.m4a?1" controls crossorigin></audio>
+  <canvas id="canvas"></canvas>
+
+<!-- Declare your script here -->
+<script type="text/javascript">
+
+sf.component('comp-test', function(self){
+	self.henlo = 'henlo';
+});
+
+</script>
+
+
+<script type="text/javascript">
+var audioCtx = ScarletsMedia.audioContext;
+
+var el = document.querySelector('audio');
+var source = audioCtx.createMediaElementSource(el);
+
+const dpr = window.devicePixelRatio || 1;
+var WIDTH = canvas.width = canvas.offsetWidth =
+    1024 * dpr;
+var HEIGHT = canvas.height = canvas.offsetHeight =
+    200 * dpr;
+
+var options = {audio:{channelCount:1, echoCancellation:false}};
+navigator.mediaDevices.getUserMedia(options).then(function(mediaStream){
+  var mic = audioCtx.createMediaStreamSource(mediaStream);
+  mic.connect(pitchShift.input);
+});
+
+const ctx = canvas.getContext("2d");
+ctx.scale(dpr, dpr);
+// ctx.translate(0, HEIGHT);
+
+ctx.lineWidth = 1;
+
+function drawLineSegment(x, y, flip){
+  ctx.beginPath();
+  if(flip){
+    ctx.moveTo(x+2, HEIGHT);
+    ctx.lineTo(x+2, HEIGHT-y);
+  }
+  else{
+    ctx.moveTo(x+2, 0);
+    ctx.lineTo(x+2, y);
+  }
+  ctx.stroke();
+};
+
+el.playbackRate = 0.07;
+document.addEventListener('click', function(){
+  el.currentTime = 0.602616;
+  // el.play();
+});
+
+var analyser = audioCtx.createAnalyser();
+var analyser2 = audioCtx.createAnalyser();
+analyser2.minDecibels = analyser.minDecibels = -90;
+analyser2.maxDecibels = analyser.maxDecibels = -0;
+
+source.connect(analyser);
+source.connect(audioCtx.destination);
+
+var pitchShift = ScarletsMediaEffect.pitchShift();
+// pitchShift.shift(3);
+
+//source.connect(pitchShift.input);
+pitchShift.output.connect(audioCtx.destination);
+pitchShift.output.connect(analyser2);
+
+analyser.fftSize = analyser2.fftSize = 2048;
+var bufferLength = analyser.frequencyBinCount;
+var dataArray = new Uint8Array(bufferLength);
+var dataArray2 = new Uint8Array(bufferLength);
+
+el.onplay = function(){
+  //requestAnimationFrame(draw);
+}
+
+requestAnimationFrame(draw);
+function draw() {
+  if(!el.paused)
+   	 analyser.getByteFrequencyData(dataArray);
+
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+  // Pure (Blue)
+  ctx.strokeStyle = "#0000ffa6";
+  for(var i = 0; i < bufferLength; i++) {
+    var v = dataArray[i] / 128.0;
+    var y = v * HEIGHT/2;
+    drawLineSegment(i, y);
+  }
+
+  analyser2.getByteFrequencyData(dataArray2);
+
+  // Modified (Red)
+  ctx.strokeStyle = "#ff0b0ba6";
+  for(var i = 0; i < bufferLength; i++) {
+    var v = dataArray2[i] / 128.0;
+    var y = v * HEIGHT/2;
+    drawLineSegment(i, y, true);
+  }
+
+  requestAnimationFrame(draw);
+}
+</script>
+
+
+<!-- Component that will be handled on script -->
+<style type="text/scss">
+
+</style>
+</body></html>
