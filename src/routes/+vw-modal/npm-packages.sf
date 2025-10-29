@@ -118,6 +118,15 @@ sf.model('npm-packages', function(My){
 	My.search = '';
 	My.loading = false;
 
+	let blacklist = [
+		'blackprint',
+		'@blackprint/engine',
+		'@blackprint/sketch',
+		'@blackprint/code-generation',
+		'@blackprint/remote-control',
+		'@blackprint/cli-tools',
+	];
+
 	My.init = function(){
 		My.refreshList();
 	}
@@ -131,12 +140,26 @@ sf.model('npm-packages', function(My){
 		let list = (await $.getJSON(_query)).objects;
 		My.loading = false;
 
+		// Filter out unrelated modules
+		for (let i=list.length-1; i >= 0; i--) {
+			let item = list[i].package;
+
+			if(blacklist.includes(item.name)) {
+				list.splice(i, 1); // delete
+				continue;
+			}
+			if(/blackprint/.test(item.name)) continue;
+			if(item.description && /blackprint/.test(item.description)) continue;
+			if(item.keywords?.includes('blackprint')) continue;
+			list.splice(i, 1); // delete
+		}
+
 		// ToDo: check if version was different with current loaded module
 		let temp = Blackprint.modulesURL;
 		for(let key in temp){
 			for (var i = 0; i < list.length; i++) {
 				let item = list[i].package;
-				item.description = item.description.replace(/&#39;/g, "'");
+				item.description = item.description?.replace(/&#39;/g, "'");
 
 				if(key.includes(item.name)){
 					item._active = true;

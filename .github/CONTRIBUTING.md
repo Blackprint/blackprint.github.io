@@ -43,7 +43,7 @@ You may also need to change `<script>` URL on  `/index.html` and `/dev.html` if 
 
 ```xml
 <!-- Comment this -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.3.0"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.10.0"></script> -->
 
 <!-- Uncomment this -->
 <script src="/dist/engine.min.js"></script>

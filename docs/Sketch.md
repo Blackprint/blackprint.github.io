@@ -13,12 +13,12 @@ You need to put this in the `<head>` tag.
 ```html
 <!-- If you're going to use Sketch, the framework must be loaded before the engine -->
 <script src="https://cdn.jsdelivr.net/npm/scarletsframe@0.35" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.9" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@blackprint/engine@0.10" crossorigin="anonymous"></script>
 
 <!-- Load Sketch after the Engine -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.9/dist/blackprint.sf.css">
-<script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.9/dist/blackprint.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.9/dist/blackprint.sf.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.10/dist/blackprint.sf.css">
+<script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.10/dist/blackprint.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@blackprint/sketch@0.10/dist/blackprint.sf.js" crossorigin="anonymous"></script>
 ```
 
 </div><div tab="Unit Test">

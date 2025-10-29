@@ -2,7 +2,7 @@
 <!-- Filling the default page if haven't being routed -->
 <sf-m name="welcome-text" class="welcome-text">
 	<h1>Welcome to Blackprint Editor!</h1>
-	<div class="description">This editor haven't being designed for mobile screen.</div>
+	<div class="description">This editor haven't been designed for mobile screen.</div>
 	<div class="content">
 		<div class="item" @click="toWorkspace">
 			<i class="fas fa-torii-gate"></i> Go to sketch page
@@ -13,6 +13,12 @@
 		<div class="item" onclick="Modal.goto('/documentation')">
 			<i class='fa fa-book-open'></i> <span>Documentation</span>
 		</div>
+	</div>
+
+	<div class="vscode-preview" style="margin-top: 20px;">
+		<a href="https://marketplace.visualstudio.com/items?itemName=Blackprint.blackprint-vscode-extension" class="description" style="color: #a3e372;">
+			You can also grab the VSCode extension here to use Blackprint on your editor
+		</a>
 	</div>
 
 	<div class="available-engine">

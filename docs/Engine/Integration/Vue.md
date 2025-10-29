@@ -18,11 +18,11 @@ Image below is the visualization for the JSON on Blackprint Sketch.
 
 Below is the JavaScript for the example above
 ```js
-// Only allow module from cdn.jsdelivr.net  
+// Only allow module from cdn.jsdelivr.net
 Blackprint.allowModuleOrigin('cdn.jsdelivr.net');
 
 // You can copy paste this to Blackprint Editor
-let json_text = `{"instance":{"Console/Log":[{"i":0,"x":556,"y":109,"z":0,"id":"logger"}],"Input/UI/SliderBox":[{"i":1,"x":86,"y":154,"z":1,"id":"slider1","data":{"0":{"value":2,"min":-100,"max":100,"step":0.1}},"output":{"0":[{"i":2,"name":"A"}]}},{"i":4,"x":86,"y":193,"z":2,"id":"slider2","data":{"0":{"value":2,"min":-100,"max":100,"step":0.1}},"output":{"0":[{"i":2,"name":"B"}]}}],"Example/Math/Multiply":[{"i":2,"x":326,"y":90,"z":3,"id":"multiply","output":{"Result":[{"i":0,"name":"Any"}]}}],"Example/Button/Simple":[{"i":3,"x":49,"y":55,"z":4,"output":{"Clicked":[{"i":2,"name":"Exec"}]}}]},"moduleJS":["https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-console.mjs","https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-input.mjs","https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.8/dist/nodes-example.mjs"]}`;
+let json_text = `{"instance":{"Console/Log":[{"i":0,"x":556,"y":109,"z":0,"id":"logger"}],"Input/UI/SliderBox":[{"i":1,"x":86,"y":154,"z":1,"id":"slider1","data":{"0":{"value":2,"min":-100,"max":100,"step":0.1}},"output":{"0":[{"i":2,"name":"A"}]}},{"i":4,"x":86,"y":193,"z":2,"id":"slider2","data":{"0":{"value":2,"min":-100,"max":100,"step":0.1}},"output":{"0":[{"i":2,"name":"B"}]}}],"Example/Math/Multiply":[{"i":2,"x":326,"y":90,"z":3,"id":"multiply","output":{"Result":[{"i":0,"name":"Any"}]}}],"Example/Button/Simple":[{"i":3,"x":49,"y":55,"z":4,"output":{"Clicked":[{"i":2,"name":"Exec"}]}}]},"moduleJS":["https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.9/dist/nodes-console.mjs","https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.9/dist/nodes-input.mjs","https://cdn.jsdelivr.net/npm/@blackprint/nodes@0.9/dist/nodes-example.mjs"]}`;
 
 // Create new engine instance
 var instance = new Blackprint.Engine();
