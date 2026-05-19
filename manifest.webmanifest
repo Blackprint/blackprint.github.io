@@ -1,0 +1,24 @@
+{
+	"name": "Blackprint Editor",
+	"short_name": "Blackprint",
+	"description": "A general purpose visual programming editor",
+	"icons": [{
+		"src": "assets/img/icon/blackprint-glow.png",
+		"sizes": "150x150",
+		"type": "image/png"
+	}],
+	"categories": ["utility"],
+	"shortcuts": [{
+		"name": "Open Development Mode",
+		"short_name": "Development Mode",
+		"description": "Open Development Mode page",
+		"url": "/dev.html",
+		"icons": [{ "src": "assets/img/icon/blackprint-glow.png", "sizes": "150x150" }]
+	}],
+	"orientation": "landscape",
+	"start_url": "/",
+	"scope": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#000000"
+}
