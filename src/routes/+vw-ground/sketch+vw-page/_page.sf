@@ -25,6 +25,7 @@
 
 ## scss-global
 sketch-page{
+	display: grid;
 	.mini-blackprint{
 		width: 240px;
 		height: 195px;
